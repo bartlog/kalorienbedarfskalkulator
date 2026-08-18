@@ -96,7 +96,7 @@ Guards gegen unplausibles Aufschaukeln:
 - Gleichgerichtete Faktoren derselben Wirkachse werden **nicht multipliziert — nur der stärkste zählt** (bislang inert, da aktuell keine zwei aktiven REE-Faktoren dieselbe Achse teilen — siehe `modifikatoren.js`).
 - **Aktivitätslevel (ganzheitlich, inkl. Sport) und MET-Berechnung sind exklusiv**, nicht additiv (Radio-Button). Kein separater "PAL-Zuschlag" mehr: Ein pauschaler Aufschlag ohne echte Trainingsdaten wäre nicht literaturgestützt, da die klassischen PAL-Werte (FAO/WHO/UNU) bereits als *ganzheitliche* Kategorie inkl. typischem Sportverhalten validiert sind — addiert man einen weiteren Sport-Zuschlag drauf, zählt das Training potenziell doppelt. Wählt der Nutzer die genaue MET-Berechnung, wird das Aktivitätslevel-Feld im UI automatisch auf "Sitzend" fixiert und deaktiviert (`ui.js: anwendenMetUeberschreibung`) — die MET-Berechnung *ersetzt* die Schätzung, statt sie zu ergänzen.
 - Globale Plausibilitätsgrenze: `TEE ∈ [1.0 × REE_basis, 2.5 × REE_basis]`
-- Zielkalorien nie unter `REE_basis` — bei Unterschreitung Warnhinweis statt Zahl.
+- Zielkalorien nie unter `REE_basis` — bei Unterschreitung **Deckelung auf `REE_basis` statt Blockade**, mit Warnhinweis inkl. des ungedeckelten Wunschwerts (`ziel.gewuenschtHaupt`). Konsistent mit demselben Deckelungsmuster bei „Kalorienbedarf für Fettabbau". Zusätzlich unabhängig davon: bei Ziel „Abnehmen" **und** BMI &lt;18,5 eigenständige medizinische Warnung (`ziel.bmiWarnung`), da eine weitere Reduktion dort unabhängig vom Rechenergebnis nicht angebracht ist.
 
 ### 3. Modifikator-Klassifikation (`modifikatoren.js`)
 
@@ -107,7 +107,9 @@ Jeder Eintrag trägt ein Feld `wirkung: 'ree' | 'pal' | 'tee' | 'hinweis'`.
 | Faktor | Wirkung |
 |---|---|
 | Aktivitätslevel (Alltag inkl. gewohntem Training) | `pal` 1,2–1,9, ganzheitliche Selbsteinschätzung |
-| Sport, genau (MET-Berechnung) — **ersetzt** obige Schätzung | `pal` MET × kg × h, umgerechnet in PAL-Äquivalent |
+| Sport, genau (MET-Berechnung) — **ersetzt** obige Schätzung | `pal` MET × kg × h, umgerechnet in PAL-Äquivalent, über mehrere Aktivitäten/Woche summiert |
+
+**MET-Tabelle statt Freitext**: Dropdown mit ca. 34 Aktivitäten aus dem *Compendium of Physical Activities* (Ainsworth et al., 2024 Adult Compendium, pacompendium.com — Standardreferenz der Sportwissenschaft), gruppiert nach Kategorie (Gehen & Wandern, Laufen, Radfahren, Schwimmen, Kraft & Konditionstraining, Yoga, Ballsport), plus „Sonstige" mit manuellem MET-Wert als Fallback. Intensitätsstufen (locker/moderat/intensiv) bilden echte, separat im Compendium geführte Varianten ab statt einer freien, nicht belegten 1–10-Skala. Jede Aktivität bekommt eine eigene Zeile (Aktivität + Stunden/Woche); wählt der Nutzer in der letzten Zeile eine Aktivität, wird automatisch eine neue leere Zeile angehängt (`ui.js: neueMetZeile`). Dropdown-Optionen nutzen eine eindeutige `id` als `<option value>`, **nicht** den MET-Wert selbst — mehrere Aktivitäten teilen sich denselben MET-Wert (z. B. Tischtennis/Volleyball/Radfahren-locker = 4,0), das hätte bei `select.value = ...` beim Wiederherstellen aus dem Speicher die falsche Aktivität ausgewählt. Tabelle zusätzlich im Methodik-Tab einsehbar (`renderMethodik`).
 | Adaptive Thermogenese (Diät-Historie) | `ree` −5 bis −10 % |
 | Schwangerschaft / Stillzeit | `tee` +250 / +500 kcal |
 | Schilddrüsen-Diagnose (ärztlich, optional) | `ree` −10…+30 %, hinter Disclaimer |

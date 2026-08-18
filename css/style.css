@@ -175,6 +175,44 @@ select:disabled {
   border-left: 2px solid var(--color-highlight-bg);
 }
 
+/* ---- MET-Aktivitätsliste (dynamisch) ------------------------------------ */
+
+.met-zeile {
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-start;
+  margin-bottom: 0.6rem;
+}
+
+.met-zeile .met-aktivitaet {
+  flex: 2;
+  min-width: 0;
+}
+
+.met-zeile .met-manuell,
+.met-zeile .met-stunden {
+  flex: 1;
+  min-width: 0;
+}
+
+.met-entfernen {
+  flex: 0 0 auto;
+  width: 2.1rem;
+  height: 2.1rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-card);
+  color: var(--color-muted);
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.met-entfernen:hover {
+  background: var(--color-highlight-bg);
+  color: var(--color-signal);
+}
+
 /* ---- Erweiterte Angaben ------------------------------------------------- */
 
 .advanced {

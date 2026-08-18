@@ -30,5 +30,5 @@ The formula coefficients for Ten-Haaf, Müller, and Lührmann came from the user
 
 ## Conventions
 
-- UI copy is in German; keep new user-facing strings consistent with that (labels, buttons, disclaimer). Never leak internal identifiers (function/variable names) into user-facing copy.
+- UI copy is in German; keep new user-facing strings consistent with that (labels, buttons, disclaimer). Never leak internal identifiers (function/variable names) into user-facing copy. Use **"Grundumsatz"** consistently for REE — not "Ruheumsatz" (same concept, but mixing both terms in the same UI confused a user in testing).
 - No external requests, analytics, or third-party scripts — the "runs entirely local in the browser" constraint is a hard requirement from the project's purpose, not a style preference. The font stack (`Roboto, -apple-system, "Segoe UI", ...`) relies on locally installed fonts only, no web-font loading.

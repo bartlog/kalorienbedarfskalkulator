@@ -3,7 +3,7 @@
 
   const { berechne } = window.KBR.berechnung;
   const { REGISTRY } = window.KBR.formeln;
-  const { HINWEISE } = window.KBR.modifikatoren;
+  const { HINWEISE, MET_AKTIVITAETEN, MET_QUELLE } = window.KBR.modifikatoren;
   const { ffmAusKfa } = window.KBR.formeln;
   const speicher = window.KBR.speicher;
 
@@ -112,6 +112,91 @@
 
   // ---- Statische Listen (Hinweise, Formelquellen) --------------------------
 
+  // ---- MET-Aktivitätsliste (dynamisch, Kategorie B) ------------------------
+
+  function metAktivitaetOptionsHtml() {
+    const kategorien = [...new Set(MET_AKTIVITAETEN.map((a) => a.kategorie))];
+    const optgroups = kategorien
+      .map((kat) => {
+        const options = MET_AKTIVITAETEN.filter((a) => a.kategorie === kat)
+          .map((a) => `<option value="${a.id}">${a.label} (${a.met.toFixed(1).replace(".", ",")} MET)</option>`)
+          .join("");
+        return `<optgroup label="${kat}">${options}</optgroup>`;
+      })
+      .join("");
+    return `<option value="">– Aktivität wählen –</option>${optgroups}<option value="sonstige">Sonstige (MET manuell)</option>`;
+  }
+
+  function neueMetZeile() {
+    const row = document.createElement("div");
+    row.className = "met-zeile";
+    row.innerHTML = `
+      <select class="met-aktivitaet" aria-label="Aktivität">${metAktivitaetOptionsHtml()}</select>
+      <input type="number" class="met-manuell" placeholder="MET-Wert" min="1" max="20" step="0.1" hidden aria-label="MET-Wert manuell">
+      <input type="number" class="met-stunden" placeholder="Std/Woche" min="0.25" max="30" step="0.25" aria-label="Stunden pro Woche">
+      <button type="button" class="met-entfernen" aria-label="Zeile entfernen">×</button>
+    `;
+    const select = row.querySelector(".met-aktivitaet");
+    const manuell = row.querySelector(".met-manuell");
+    select.addEventListener("change", () => {
+      manuell.hidden = select.value !== "sonstige";
+      const liste = el("met-liste");
+      if (row === liste.lastElementChild && select.value !== "") {
+        liste.appendChild(neueMetZeile());
+      }
+    });
+    row.querySelector(".met-entfernen").addEventListener("click", () => {
+      const liste = el("met-liste");
+      row.remove();
+      if (!liste.children.length) {
+        liste.appendChild(neueMetZeile());
+      }
+    });
+    return row;
+  }
+
+  function initMetListe() {
+    el("met-liste").appendChild(neueMetZeile());
+  }
+
+  function leseMetZeilen() {
+    return Array.from(document.querySelectorAll("#met-liste .met-zeile"))
+      .map((row) => {
+        const select = row.querySelector(".met-aktivitaet");
+        const manuell = row.querySelector(".met-manuell");
+        const stunden = row.querySelector(".met-stunden");
+        const aktivitaet = MET_AKTIVITAETEN.find((a) => a.id === select.value);
+        const metWert = select.value === "sonstige" ? Number(manuell.value) : aktivitaet ? aktivitaet.met : NaN;
+        const label = select.value === "sonstige" ? "Sonstige Aktivität" : aktivitaet ? aktivitaet.label : "";
+        return { metWert, stundenProWoche: Number(stunden.value) || 0, label };
+      })
+      .filter((z) => z.metWert > 1 && z.stundenProWoche > 0);
+  }
+
+  function leseMetZeilenRoh() {
+    return Array.from(document.querySelectorAll("#met-liste .met-zeile")).map((row) => ({
+      auswahl: row.querySelector(".met-aktivitaet").value,
+      manuellWert: row.querySelector(".met-manuell").value,
+      stunden: row.querySelector(".met-stunden").value,
+    }));
+  }
+
+  function stelleMetZeilenWieder(zeilenDaten) {
+    const liste = el("met-liste");
+    liste.innerHTML = "";
+    (zeilenDaten || []).forEach((z) => {
+      const row = neueMetZeile();
+      liste.appendChild(row);
+      const select = row.querySelector(".met-aktivitaet");
+      select.value = z.auswahl || "";
+      const manuell = row.querySelector(".met-manuell");
+      manuell.hidden = select.value !== "sonstige";
+      manuell.value = z.manuellWert || "";
+      row.querySelector(".met-stunden").value = z.stunden || "";
+    });
+    liste.appendChild(neueMetZeile());
+  }
+
   function renderHinweisListe() {
     const liste = el("liste-nicht-gerechnet");
     liste.innerHTML = HINWEISE.map((h) => `<li><strong>${h.label}:</strong> ${h.grund}</li>`).join("");
@@ -122,6 +207,17 @@
     container.innerHTML = REGISTRY.map(
       (f) => `<div class="formel-eintrag"><h3>${f.name}</h3><p>${f.quelle}</p></div>`
     ).join("");
+
+    el("methodik-met-quelle").textContent = MET_QUELLE;
+    const kategorien = [...new Set(MET_AKTIVITAETEN.map((a) => a.kategorie))];
+    el("methodik-met").innerHTML = kategorien
+      .map((kat) => {
+        const zeilen = MET_AKTIVITAETEN.filter((a) => a.kategorie === kat)
+          .map((a) => `<li>${a.label}: <strong>${a.met.toFixed(1).replace(".", ",")} MET</strong></li>`)
+          .join("");
+        return `<div class="formel-eintrag"><h3>${kat}</h3><ul class="hinweis-liste">${zeilen}</ul></div>`;
+      })
+      .join("");
   }
 
   // ---- Eingabe aus dem Formular einsammeln ---------------------------------
@@ -148,15 +244,7 @@
     const istSportler = ffmModus !== "keine" && el("istSportler").checked;
 
     const sportModus = document.querySelector('input[name="sportModus"]:checked').value;
-    const sport =
-      sportModus === "met"
-        ? {
-            modus: "met",
-            metWert: Number(el("metWert").value),
-            stundenProEinheit: Number(el("metStunden").value),
-            einheitenProWoche: Number(el("metEinheiten").value),
-          }
-        : { modus: sportModus };
+    const sport = sportModus === "met" ? { modus: "met", aktivitaeten: leseMetZeilen() } : { modus: sportModus };
 
     const schwangerschaftStillzeit = el("schwangerschaftStillzeit").value || null;
     const adaptiveThermogeneseAktiv = el("adaptiveThermogenese").checked;
@@ -199,9 +287,7 @@
         kfaProzent: el("kfaProzent").value,
         istSportler: el("istSportler").checked,
         sportModus,
-        metWert: el("metWert").value,
-        metStunden: el("metStunden").value,
-        metEinheiten: el("metEinheiten").value,
+        metZeilen: leseMetZeilenRoh(),
         schwangerschaftStillzeit,
         adaptiveThermogeneseAktiv,
         schilddruseAktiv: el("schilddruseAktiv").checked,
@@ -240,7 +326,7 @@
   }
 
   function renderErgebnis(r, eingabe) {
-    const axisMaxKcal = Math.max(r.ree.max, r.tee.max, r.ziel.unterReeBasis ? r.ree.max : r.ziel.max, r.fettabbau.max) * 1.1;
+    const axisMaxKcal = Math.max(r.ree.max, r.tee.max, r.ziel.max, r.fettabbau.max) * 1.1;
     const axisMaxProtein = r.proteinAufbau.max * 1.15;
 
     renderSporttageHinweis(eingabe.sport ? eingabe.sport.modus : "keine");
@@ -252,20 +338,27 @@
     renderBar("bar-tee", { min: r.tee.min, max: r.tee.max, haupt: r.tee.haupt, axisMin: 0, axisMax: axisMaxKcal });
 
     el("val-ziel-label").textContent = r.ziel.label;
-    const zielWarnung = el("ziel-warnung");
-    const barZiel = el("bar-ziel");
+    el("val-ziel").textContent = formatKcal(r.ziel.haupt);
+    renderBar("bar-ziel", { min: r.ziel.min, max: r.ziel.max, haupt: r.ziel.haupt, axisMin: 0, axisMax: axisMaxKcal, warn: r.ziel.unterReeBasis || r.ziel.bmiWarnung });
+
+    const zielWarnungTexte = [];
     if (r.ziel.unterReeBasis) {
-      el("val-ziel").textContent = "—";
-      zielWarnung.hidden = false;
-      barZiel.innerHTML = "";
-    } else {
-      el("val-ziel").textContent = formatKcal(r.ziel.haupt);
-      zielWarnung.hidden = true;
-      renderBar("bar-ziel", { min: r.ziel.min, max: r.ziel.max, haupt: r.ziel.haupt, axisMin: 0, axisMax: axisMaxKcal });
+      zielWarnungTexte.push(
+        `Das gewünschte Kaloriendefizit (${formatKcal(r.ziel.gewuenschtHaupt)}) würde den Grundumsatz unterschreiten — aus Sicherheitsgründen wurde das Ziel auf den Grundumsatz angehoben. Ein größeres Defizit wird nicht empfohlen.`
+      );
     }
+    if (r.ziel.bmiWarnung) {
+      zielWarnungTexte.push(
+        "Dein BMI liegt im Untergewichtsbereich — eine weitere Gewichtsreduktion wird hier nicht empfohlen. Bitte sprich vorher mit einer Ärztin/einem Arzt oder einer Ernährungsfachkraft."
+      );
+    }
+    const zielWarnung = el("ziel-warnung");
+    zielWarnung.innerHTML = zielWarnungTexte.map((t) => `<p>${t}</p>`).join("");
+    zielWarnung.hidden = zielWarnungTexte.length === 0;
 
     el("val-fettabbau").textContent = formatKcal(r.fettabbau.haupt);
-    renderBar("bar-fettabbau", { min: r.fettabbau.min, max: r.fettabbau.max, haupt: r.fettabbau.haupt, axisMin: 0, axisMax: axisMaxKcal });
+    renderBar("bar-fettabbau", { min: r.fettabbau.min, max: r.fettabbau.max, haupt: r.fettabbau.haupt, axisMin: 0, axisMax: axisMaxKcal, warn: r.fettabbau.unterReeBasis });
+    el("fettabbau-hinweis").hidden = !r.fettabbau.unterReeBasis;
 
     el("val-protein-erhalt").textContent = `${formatGramm(r.proteinErhalt.min)} – ${formatGramm(r.proteinErhalt.max)}`;
     renderBar("bar-protein-erhalt", {
@@ -346,9 +439,7 @@
     setzeRadioFallsVorhanden("sportModus", sportModus);
     el("feld-met").hidden = sportModus !== "met";
     anwendenMetUeberschreibung(sportModus === "met");
-    el("metWert").value = gespeichert.metWert || "";
-    el("metStunden").value = gespeichert.metStunden || "";
-    el("metEinheiten").value = gespeichert.metEinheiten || "";
+    stelleMetZeilenWieder(gespeichert.metZeilen);
 
     aktualisiereSchwangerschaftSichtbarkeit();
     if (!el("feld-schwangerschaft").hidden) {
@@ -374,6 +465,7 @@
   function init() {
     initTabs();
     initConditionalFields();
+    initMetListe();
     renderHinweisListe();
     renderMethodik();
     fuelleFormularAus(speicher.laden());

@@ -126,11 +126,24 @@
         basisPAL: 1.2, ziel: "lose", sport: { modus: "keine" },
       });
       assert(r.ziel.unterReeBasis === true, "Sehr niedriger TDEE + Abnehmen loest Warnhinweis 'unter REE_basis' aus");
+      assertApprox(r.ziel.haupt, r.ree.basis, 0.01, "Ziel wird bei Unterschreitung auf den Grundumsatz gedeckelt (nicht blockiert)");
+      assert(r.ziel.gewuenschtHaupt < r.ree.basis, "gewuenschtHaupt zeigt weiterhin den ungedeckelten (niedrigeren) Wunschwert für den Hinweistext");
+      assert(r.ziel.bmiWarnung === false, "Normalgewicht (BMI~20) loest keine BMI-Warnung aus");
+    })();
+    (function () {
+      // Untergewicht + Ziel Abnehmen -> eigenständige BMI-Warnung, unabhängig vom Grundumsatz-Clamp
+      const r = berechne({
+        gender: "female", age: 25, heightCm: 170, weightKg: 48,
+        basisPAL: 1.55, ziel: "lose", sport: { modus: "keine" },
+      });
+      assert(r.formel.bmi < 18.5, "Testfall hat tatsächlich Untergewicht (BMI < 18.5)");
+      assert(r.ziel.bmiWarnung === true, "Untergewicht + Ziel Abnehmen loest BMI-Warnung aus");
     })();
     (function () {
       const r = berechne({
         gender: "male", age: 25, heightCm: 190, weightKg: 100,
-        basisPAL: 1.9, ziel: "gain", sport: { modus: "met", metWert: 10, stundenProEinheit: 1.5, einheitenProWoche: 5 },
+        basisPAL: 1.9, ziel: "gain",
+        sport: { modus: "met", aktivitaeten: [{ metWert: 10, stundenProWoche: 7.5, label: "Laufen" }] },
       });
       assert(r.tee.haupt <= r.ree.basis * 2.5 + 0.01, "TEE bleibt innerhalb der globalen Plausibilitätsgrenze (<= 2.5x REE_basis)");
       assert(r.tee.haupt >= r.ree.basis * 1.0 - 0.01, "TEE bleibt innerhalb der globalen Plausibilitätsgrenze (>= 1.0x REE_basis)");
@@ -140,9 +153,25 @@
       // (kein separater "PAL-Zuschlag" mehr -> kein Doppelzählungsrisiko mit dem ganzheitlichen PAL)
       const basis = { gender: "male", age: 30, heightCm: 178, weightKg: 75, basisPAL: 1.375, ziel: "maintain" };
       const rKeine = berechne({ ...basis, sport: { modus: "keine" } });
-      const rMet = berechne({ ...basis, sport: { modus: "met", metWert: 9, stundenProEinheit: 1, einheitenProWoche: 3 } });
+      const rMet = berechne({ ...basis, sport: { modus: "met", aktivitaeten: [{ metWert: 9, stundenProWoche: 3, label: "Laufen" }] } });
       assert(rMet.tee.haupt > rKeine.tee.haupt, "MET-Berechnung erhöht TEE gegenüber 'keine'");
       assert(window.KBR.modifikatoren.sportPalZuschlag === undefined, "sportPalZuschlag wurde entfernt (kein additiver PAL-Zuschlag mehr)");
+
+      // Mehrere Aktivitäten in einer Woche werden korrekt summiert
+      const rZweiAktivitaeten = berechne({
+        ...basis,
+        sport: {
+          modus: "met",
+          aktivitaeten: [
+            { metWert: 9, stundenProWoche: 3, label: "Laufen" },
+            { metWert: 4, stundenProWoche: 2, label: "Tischtennis" },
+          ],
+        },
+      });
+      assert(
+        rZweiAktivitaeten.tee.haupt > rMet.tee.haupt,
+        "Mehrere MET-Aktivitäten summieren sich (zwei Aktivitäten > eine Aktivität)"
+      );
     })();
     (function () {
       const r = berechne({

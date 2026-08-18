@@ -76,9 +76,7 @@ window.KBR.berechnung = (function (auswahl, modifikatoren) {
     let sportZuschlag = null;
     if (eingabe.sport && eingabe.sport.modus === "met") {
       sportZuschlag = modifikatoren.sportMet({
-        metWert: eingabe.sport.metWert,
-        stundenProEinheit: eingabe.sport.stundenProEinheit,
-        einheitenProWoche: eingabe.sport.einheitenProWoche,
+        aktivitaeten: eingabe.sport.aktivitaeten,
         weightKg: eingabe.weightKg,
         reeAdj: reeAdjHaupt,
       });
@@ -95,6 +93,7 @@ window.KBR.berechnung = (function (auswahl, modifikatoren) {
       sportModus: eingabe.sport ? eingabe.sport.modus : "keine",
       sportZuschlagMin: zuschlagMin,
       sportZuschlagMax: zuschlagMax,
+      sportAktivitaeten: eingabe.sport && eingabe.sport.modus === "met" ? eingabe.sport.aktivitaeten : [],
     };
   }
 
@@ -141,8 +140,13 @@ window.KBR.berechnung = (function (auswahl, modifikatoren) {
       const deltaT = eingabe.fieber.temperaturC - 37;
       liste.push(`Fieber (${eingabe.fieber.temperaturC} °C, Δ${deltaT.toFixed(1)} °C über 37 °C): REE +10–13 % pro °C`);
     }
-    if (pal.sportModus === "met") {
-      liste.push(`Sport (MET-Berechnung, ersetzt Aktivitätslevel-Schätzung): PAL-Äquivalent +${pal.sportZuschlagMin.toFixed(2)}`);
+    if (pal.sportModus === "met" && pal.sportAktivitaeten && pal.sportAktivitaeten.length) {
+      const details = pal.sportAktivitaeten
+        .map((a) => `${a.label} (${a.stundenProWoche.toString().replace(".", ",")} h/Woche, ${a.metWert.toString().replace(".", ",")} MET)`)
+        .join(", ");
+      liste.push(
+        `Sport (MET-Berechnung, ersetzt Aktivitätslevel-Schätzung): ${details} — PAL-Äquivalent +${pal.sportZuschlagMin.toFixed(2)}`
+      );
     }
     if (teeAdditiv.schwangerschaft) {
       liste.push(
@@ -194,12 +198,22 @@ window.KBR.berechnung = (function (auswahl, modifikatoren) {
       { min: teeRohHaupt * (1 - FORMEL_UNSICHERHEIT_RELATIV), max: teeRohHaupt * (1 + FORMEL_UNSICHERHEIT_RELATIV) },
     ]);
 
+    // Statt eines Ziels unterhalb des Grundumsatzes komplett zu blockieren:
+    // auf den Grundumsatz kappen (Sicherheitsgrenze) und die Abweichung vom
+    // gewünschten Defizit als Warnhinweis ausgeben — konsistent mit dem
+    // gleichen Deckelungsmuster bei "Kalorienbedarf für Fettabbau" unten.
     const zielFaktor = GOAL_ADJUSTMENT[eingabe.ziel].factor;
-    const zielHaupt = teeHaupt * (1 + zielFaktor);
-    const zielMin = teeMin * (1 + zielFaktor);
-    const zielMax = teeMax * (1 + zielFaktor);
+    const zielGewuenschtHaupt = teeHaupt * (1 + zielFaktor);
+    const zielUnterReeBasis = zielGewuenschtHaupt < ree.reeBasis;
+    const zielHaupt = Math.max(zielGewuenschtHaupt, ree.reeBasis);
+    const zielMin = Math.max(teeMin * (1 + zielFaktor), ree.reeBasis);
+    const zielMax = Math.max(teeMax * (1 + zielFaktor), ree.reeBasis);
     const zielBandKcal = teeBandKcal * (1 + zielFaktor);
-    const zielUnterReeBasis = zielHaupt < ree.reeBasis;
+
+    // Unabhängig von der rechnerischen Deckelung: bei Untergewicht ist eine
+    // weitere Gewichtsreduktion medizinisch nicht sinnvoll, auch wenn der
+    // Zielwert rechnerisch über dem Grundumsatz läge.
+    const zielBmiWarnung = eingabe.ziel === "lose" && ree.auswahl.bmi < 18.5;
 
     // Bei Adipositas (BMI >=30) führt Protein/kg-Gesamtgewicht zu überhöhten
     // Werten — falls FFM bekannt (gemessen oder aus KFA abgeleitet), wird sie
@@ -225,6 +239,8 @@ window.KBR.berechnung = (function (auswahl, modifikatoren) {
         bandKcal: zielBandKcal,
         label: GOAL_ADJUSTMENT[eingabe.ziel].label,
         unterReeBasis: zielUnterReeBasis,
+        gewuenschtHaupt: zielGewuenschtHaupt,
+        bmiWarnung: zielBmiWarnung,
       },
       fettabbau: berechneFettabbauKalorien(teeHaupt, ree.reeBasis),
       proteinErhalt: berechneProteinbedarf(proteinReferenzgewicht, 1.2, 1.6),

@@ -75,19 +75,67 @@ window.KBR.modifikatoren = (function () {
 
   // ---- PAL-wirksame Faktoren --------------------------------------------
 
+  // MET-Referenztabelle für die Sport-Auswahl im UI. Werte aus dem Compendium
+  // of Physical Activities (Ainsworth et al., 2024 Adult Compendium,
+  // pacompendium.com) — die Standardquelle für MET-Werte in der Sportwissenschaft.
+  // "Intensitätsstufen" (locker/moderat/intensiv) bilden echte, im Compendium
+  // separat geführte Varianten ab statt einer freien, nicht belegten 1–10-Skala.
+  const MET_AKTIVITAETEN = [
+    { id: "spazieren", kategorie: "Gehen & Wandern", label: "Spazieren (gemütlich)", met: 2.8 },
+    { id: "gehen_zuegig", kategorie: "Gehen & Wandern", label: "Gehen, zügig", met: 4.8 },
+    { id: "nordic_walking", kategorie: "Gehen & Wandern", label: "Nordic Walking", met: 5.3 },
+    { id: "wandern", kategorie: "Gehen & Wandern", label: "Wandern", met: 6.0 },
+    { id: "joggen_locker", kategorie: "Laufen", label: "Joggen, locker", met: 7.5 },
+    { id: "laufen_moderat", kategorie: "Laufen", label: "Laufen, moderat (~10 km/h)", met: 9.3 },
+    { id: "laufen_schnell", kategorie: "Laufen", label: "Laufen, schnell (~12 km/h)", met: 11.0 },
+    { id: "rad_locker", kategorie: "Radfahren", label: "Radfahren, locker", met: 4.0 },
+    { id: "rad_moderat", kategorie: "Radfahren", label: "Radfahren, moderat", met: 8.0 },
+    { id: "rad_zuegig", kategorie: "Radfahren", label: "Radfahren, zügig/Rennrad", met: 10.0 },
+    { id: "schwimmen_locker", kategorie: "Schwimmen", label: "Schwimmen, locker", met: 6.0 },
+    { id: "schwimmen_sportlich", kategorie: "Schwimmen", label: "Schwimmen, sportlich (Bahnen)", met: 9.8 },
+    { id: "kraft_moderat", kategorie: "Kraft & Konditionstraining", label: "Krafttraining, moderat", met: 3.5 },
+    { id: "kraft_intensiv", kategorie: "Kraft & Konditionstraining", label: "Krafttraining, intensiv (Grundübungen)", met: 5.0 },
+    { id: "kraft_sehr_intensiv", kategorie: "Kraft & Konditionstraining", label: "Krafttraining, sehr intensiv", met: 6.0 },
+    { id: "calisthenics_leicht", kategorie: "Kraft & Konditionstraining", label: "Calisthenics, leicht", met: 2.8 },
+    { id: "calisthenics_moderat", kategorie: "Kraft & Konditionstraining", label: "Calisthenics, moderat", met: 3.8 },
+    { id: "calisthenics_intensiv", kategorie: "Kraft & Konditionstraining", label: "Calisthenics, intensiv", met: 7.5 },
+    { id: "zirkel_leicht", kategorie: "Kraft & Konditionstraining", label: "Zirkeltraining, leicht", met: 3.5 },
+    { id: "zirkel_moderat", kategorie: "Kraft & Konditionstraining", label: "Zirkeltraining, moderat", met: 5.0 },
+    { id: "bootcamp", kategorie: "Kraft & Konditionstraining", label: "Bootcamp / Zirkeltraining, intensiv (inkl. Kettlebell)", met: 7.5 },
+    { id: "hiit", kategorie: "Kraft & Konditionstraining", label: "HIIT (Tabata, Burpees u. Ä.)", met: 11.0 },
+    { id: "yoga_hatha", kategorie: "Yoga", label: "Yoga, Hatha (ruhig)", met: 2.3 },
+    { id: "yoga_power", kategorie: "Yoga", label: "Yoga, Power/Vinyasa", met: 4.0 },
+    { id: "fussball_locker", kategorie: "Ballsport", label: "Fußball, locker", met: 7.0 },
+    { id: "fussball_wettkampf", kategorie: "Ballsport", label: "Fußball, Wettkampf", met: 9.5 },
+    { id: "tischtennis", kategorie: "Ballsport", label: "Tischtennis", met: 4.0 },
+    { id: "tennis_doppel", kategorie: "Ballsport", label: "Tennis, Doppel", met: 6.0 },
+    { id: "tennis_einzel", kategorie: "Ballsport", label: "Tennis, Einzel", met: 8.0 },
+    { id: "basketball_locker", kategorie: "Ballsport", label: "Basketball, locker", met: 6.0 },
+    { id: "basketball_wettkampf", kategorie: "Ballsport", label: "Basketball, Wettkampf", met: 8.0 },
+    { id: "volleyball", kategorie: "Ballsport", label: "Volleyball", met: 4.0 },
+    { id: "badminton_locker", kategorie: "Ballsport", label: "Badminton, locker", met: 5.5 },
+    { id: "badminton_wettkampf", kategorie: "Ballsport", label: "Badminton, Wettkampf", met: 9.0 },
+  ];
+  const MET_QUELLE =
+    "Compendium of Physical Activities (Ainsworth et al., 2024 Adult Compendium, pacompendium.com) — Standardreferenz für MET-Werte in der Sportwissenschaft.";
+
   /**
    * MET-basierte Sportberechnung als PAL-Äquivalent. Ersetzt die ganzheitliche
    * Aktivitätslevel-Schätzung (siehe berechnung.js/ui.js), statt sie additiv zu
    * ergänzen — ein separater "PAL-Zuschlag" auf Basis einer Schätzung ohne
    * echte Trainingsdaten wäre nicht literaturgestützt und würde bei ohnehin
    * sport-inklusiven PAL-Werten (FAO/WHO/UNU) Doppelzählung riskieren.
-   * Nettoeffekt (MET-1, da MET=1 dem Ruheumsatz entspricht) über die
-   * Trainingsstunden pro Woche, gemittelt auf den Tag, dann relativ zu REE_adj
-   * in eine PAL-Zuschlagsspanne umgerechnet.
+   *
+   * Nettoeffekt (MET-1, da MET=1 dem Ruheumsatz entspricht) je Aktivität über
+   * die Trainingsstunden pro Woche, über alle angegebenen Aktivitäten summiert,
+   * gemittelt auf den Tag, dann relativ zu REE_adj in ein PAL-Äquivalent umgerechnet.
+   * @param {{aktivitaeten: {metWert:number, stundenProWoche:number}[], weightKg:number, reeAdj:number}} p
    */
-  function sportMet({ metWert, stundenProEinheit, einheitenProWoche, weightKg, reeAdj }) {
-    if (!metWert || !stundenProEinheit || !einheitenProWoche || !reeAdj) return null;
-    const zusatzKcalProTag = ((metWert - 1) * weightKg * stundenProEinheit * einheitenProWoche) / 7;
+  function sportMet({ aktivitaeten, weightKg, reeAdj }) {
+    const gueltige = (aktivitaeten || []).filter((a) => a.metWert > 1 && a.stundenProWoche > 0);
+    if (!gueltige.length || !weightKg || !reeAdj) return null;
+    const zusatzKcalProTag =
+      gueltige.reduce((summe, a) => summe + (a.metWert - 1) * weightKg * a.stundenProWoche, 0) / 7;
     const zuschlag = zusatzKcalProTag / reeAdj;
     return { min: zuschlag, max: zuschlag };
   }
@@ -140,6 +188,8 @@ window.KBR.modifikatoren = (function () {
     schilddruese,
     fieber,
     sportMet,
+    MET_AKTIVITAETEN,
+    MET_QUELLE,
     schwangerschaftStillzeit,
     betaBlocker,
     HINWEISE,

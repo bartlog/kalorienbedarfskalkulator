@@ -103,20 +103,14 @@
               <label><input type="radio" name="sportModus" value="keine" checked> Keine genaueren Angaben (Schätzung oben verwenden)</label>
               <label><input type="radio" name="sportModus" value="met"> Genaue MET-Berechnung</label>
             </div>
-            <div class="field-row sub-field" id="feld-met" hidden>
-              <div class="field">
-                <label for="metWert">MET-Wert der Aktivität</label>
-                <input type="number" id="metWert" min="1" max="20" step="0.1">
-                <p class="field-hint"><abbr title="Metabolic Equivalent of Task">MET</abbr>: Vielfaches des Ruheumsatzes während der Aktivität. Richtwerte: lockeres Gehen ≈ 3, Radfahren mäßig ≈ 6–8, Joggen ≈ 8–10, HIIT ≈ 8–12 (stark schwankend je nach Intensität).</p>
-              </div>
-              <div class="field">
-                <label for="metStunden">Stunden pro Einheit</label>
-                <input type="number" id="metStunden" min="0.1" max="12" step="0.1">
-              </div>
-              <div class="field">
-                <label for="metEinheiten">Einheiten pro Woche</label>
-                <input type="number" id="metEinheiten" min="0" max="21" step="1">
-              </div>
+            <div class="sub-field" id="feld-met" hidden>
+              <p class="field-hint">
+                <abbr title="Metabolic Equivalent of Task">MET</abbr>: Vielfaches des Grundumsatzes während einer Aktivität. Werte
+                aus dem <em>Compendium of Physical Activities</em> (Standardreferenz der Sportwissenschaft, Details im Tab
+                „Methodik &amp; Quellen"). Wähle je Aktivität einen Eintrag und die Stunden pro Woche — bei mehreren
+                Sportarten erscheint automatisch eine neue Zeile.
+              </p>
+              <div id="met-liste"></div>
             </div>
             <p class="field-hint sub-field" id="hinweis-met-override" hidden>
               Bei genauer MET-Berechnung wird oben automatisch „Sitzend" als Alltags-Basis angenommen (Aktivitätslevel-Feld ist deaktiviert) — dein Training wird hier separat und präziser dazugerechnet.
@@ -137,13 +131,13 @@
 
             <div class="field">
               <label class="checkbox-label"><input type="checkbox" id="adaptiveThermogenese"> Seit längerem in Diät / Kalorienrestriktion</label>
-              <p class="field-hint">Senkt den Ruheumsatz um ca. 5–10 % (adaptive Thermogenese).</p>
+              <p class="field-hint">Senkt den Grundumsatz um ca. 5–10 % (adaptive Thermogenese).</p>
             </div>
 
             <div class="field">
               <label class="checkbox-label"><input type="checkbox" id="schilddruseAktiv"> Ärztlich diagnostizierte Schilddrüsen-Erkrankung</label>
               <div class="field sub-field" id="feld-schilddruse" hidden>
-                <label for="schilddruseProzent">Abweichung vom Ruheumsatz laut Diagnose (%)</label>
+                <label for="schilddruseProzent">Abweichung vom Grundumsatz laut Diagnose (%)</label>
                 <input type="number" id="schilddruseProzent" min="-10" max="30" step="1">
                 <p class="field-hint disclaimer-inline">Bitte nur nach ärztlicher Angabe ausfüllen — ersetzt keine ärztliche oder ernährungstherapeutische Beratung.</p>
               </div>
@@ -199,7 +193,7 @@
             <strong id="val-ziel">–</strong>
           </div>
           <div class="bar" id="bar-ziel"></div>
-          <p id="ziel-warnung" class="signal-text" hidden>Das Ziel würde den Ruheumsatz unterschreiten — aus Sicherheitsgründen wird kein Wert unter dem Grundumsatz ausgegeben. Bitte ärztliche/ernährungstherapeutische Beratung einholen.</p>
+          <div id="ziel-warnung" class="signal-text" hidden></div>
         </div>
 
         <h3 class="section-heading">Zusätzliche Referenzwerte</h3>
@@ -210,6 +204,7 @@
             <strong id="val-fettabbau">–</strong>
           </div>
           <div class="bar" id="bar-fettabbau"></div>
+          <p id="fettabbau-hinweis" class="signal-text" hidden>Auf den Grundumsatz gedeckelt (Sicherheitsgrenze) — ein rechnerisch niedrigeres Defizit wäre hier nicht sinnvoll.</p>
         </div>
 
         <div class="result-item">
@@ -250,6 +245,10 @@
     <section id="tab-methodik" role="tabpanel" hidden>
       <h2 class="section-heading">Verwendete Formeln</h2>
       <div id="methodik-formeln"></div>
+
+      <h2 class="section-heading">MET-Werte (Trainingsintensität)</h2>
+      <p class="field-hint" id="methodik-met-quelle"></p>
+      <div id="methodik-met"></div>
 
       <h2 class="section-heading">Nicht eingerechnete Faktoren</h2>
       <p class="field-hint">Diese Faktoren beeinflussen den Energiebedarf zwar grundsätzlich, fließen hier aber bewusst nicht in die Berechnung ein:</p>
