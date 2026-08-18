@@ -41,6 +41,10 @@ Nachträge während der Umsetzung (Notebook-Rückfragen des Nutzers):
 
 Tests: `tests.html` zeigt aktuell 40/40 grün.
 
+**2026-08-18 — komplette App zweisprachig (DE/EN):** Sprachumschalter oben rechts im Header (Buttons „DE"/„EN", `localStorage`-persistiert, `kbr:sprache`). Neues `js/i18n.js` als zentrales Übersetzungsmodul; `index.html` über `data-i18n`-Attribute angebunden, dynamisch erzeugte Texte (Formelauswahl-Begründung, aktive Modifikatoren, Ziel-Warnungen) wurden dafür in `auswahl.js`/`berechnung.js` sprachneutral gemacht (IDs/Rohwerte statt fertiger Sätze — `ui.js` formatiert). Der komplette Tipps-Tab (106 Zeilen) ist ebenfalls übersetzt — Nutzerentscheidung explizit für volle Abdeckung trotz höherem Pflegeaufwand (siehe Memory `feedback_komplette_app_uebersetzen`); künftige Sheet-Updates brauchen daher immer auch eine EN-Übersetzung der neuen/geänderten Zeile (siehe Memory `reference_tipps_spreadsheet`). Details zur Architektur (welche Datei was sprachneutral hält) stehen in CLAUDE.md.
+
+CSS-Bug dabei gefunden und gefixt: `<h1>` ist selbst ein Flex-Container ohne `min-width:0` und sprengte bei langen englischen Titeln auf schmalen Viewports die Kopfzeile — gleiches Muster wie der frühere `<fieldset>`-Bug.
+
 ## 2. notebooklm MCP-Server
 
 **Status: wieder entfernt (`claude mcp remove notebooklm`) — Login funktionierte nicht zuverlässig.**
