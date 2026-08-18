@@ -102,11 +102,11 @@ h1 {
   border-color: var(--color-accent);
 }
 
-.translation-notice {
-  margin: 0.4rem 0 0;
-  font-size: 0.78rem;
-  color: var(--color-muted);
-  font-style: italic;
+.subheader-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.25rem 1rem;
 }
 
 .subtitle {
@@ -114,6 +114,18 @@ h1 {
   color: var(--color-muted);
   font-size: 0.92rem;
   line-height: 1.4;
+  max-width: 55ch;
+}
+
+.translation-notice {
+  margin: 0 0 1.5rem;
+  flex: 0 0 auto;
+  width: 19rem;
+  font-size: 0.78rem;
+  color: var(--color-muted);
+  font-style: italic;
+  line-height: 1.4;
+  text-align: center;
 }
 
 .section-heading {
