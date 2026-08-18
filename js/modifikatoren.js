@@ -162,12 +162,17 @@ window.KBR.modifikatoren = (function () {
     {
       id: "tef",
       label: "Verdauung von Nahrung (TEF)",
-      grund: "Auch die Verdauung selbst verbraucht Energie. Dieser Anteil steckt aber schon in den Aktivitätsfaktoren oben — ihn zusätzlich abzuziehen würde ihn doppelt berücksichtigen.",
+      grund: "Auch die Verdauung selbst verbraucht Energie. Dieser Anteil steckt aber schon in den Aktivitätsfaktoren.",
     },
     {
       id: "schlafdauer",
       label: "Schlafdauer",
-      grund: "Der Grundumsatz gilt für einen vollen Tag inklusive Schlaf. Ein zusätzlicher Abzug für die Schlafzeit wäre daher doppelt gezählt.",
+      grund: "Der Grundumsatz gilt für einen vollen Tag inklusive Schlaf — ein pauschaler Abzug für die Schlafzeit wäre also doppelt gezählt. Chronischer Schlafmangel (z. B. dauerhaft 5 statt 7–8 Stunden) verändert den Energieumsatz selbst kaum messbar, beeinflusst aber über Hunger- und Sättigungshormone (mehr Ghrelin, weniger Leptin) den Appetit — das führt in der Praxis eher zu höherer Kalorienaufnahme als zu einem anderen Bedarf. Dafür lässt sich kein verlässlicher fester Faktor angeben.",
+    },
+    {
+      id: "stress",
+      label: "Subjektives Stresslevel",
+      grund: "Chronischer Stress erhöht den Cortisolspiegel, was Appetit, Wassereinlagerung und Fettverteilung beeinflussen kann. Die Studienlage liefert aber keinen verlässlichen, quantifizierbaren Faktor für den Kalorienbedarf — der Effekt läuft eher über Verhalten (Essverhalten, Schlaf, Bewegung) als über einen direkt messbaren Mehrverbrauch.",
     },
     {
       id: "koffein",
