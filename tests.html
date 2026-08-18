@@ -87,8 +87,12 @@
       "Kollisionsfall: adipöser Senior -> Müller (nicht Lührmann)"
     );
     assert(
-      selectREE({ gender: "female", age: 22, heightCm: 170, weightKg: 48 }).formelId === "mueller",
-      "Untergewicht (BMI<18.5) -> Müller"
+      selectREE({ gender: "female", age: 22, heightCm: 170, weightKg: 48 }).formelId === "mifflin",
+      "Untergewicht (BMI<18.5) -> Mifflin (Müller-Untergewicht entfernt, siehe formeln.js)"
+    );
+    assert(
+      selectREE({ gender: "female", age: 68, heightCm: 165, weightKg: 45 }).formelId === "luehrmann",
+      "Untergewichtiger Senior -> Lührmann (fällt durch, da keine Müller-Untergewicht-Stufe mehr existiert)"
     );
     assert(
       selectREE({ gender: "female", age: 68, heightCm: 165, weightKg: 68 }).formelId === "luehrmann",

@@ -80,6 +80,8 @@ Damit sind die beiden Kollisionen der Konzeption aufgelöst:
 
 Die Begründung wird im UI ausgegeben („Verwendete Formel: Cunningham 1991 — weil …").
 
+**Korrektur 2026-08-19:** Schritt 3 („BMI >=30 oder <18.5 → Müller") gilt inzwischen nur noch für BMI ≥30. Ein Testfall (40J/165cm/50kg, BMI 18,37) lieferte mit der Müller-Untergewicht-Stufe einen unplausiblen Grundumsatz von 820 kcal (Mifflin: 1170 kcal). Gegenprobe über die gesamte Untergewichts-Spanne zeigte 35–70 % Abweichung von Mifflin, während die Adipositas-Stufe an ihrer Grenze (BMI=30) nur ~2 % abweicht — Hinweis auf fehlerhaft transkribierte Untergewicht-Koeffizienten, nicht auf eine erwartbare Formeleigenschaft. Die Untergewicht-Stufe wurde daher aus `formeln.js`/`auswahl.js` entfernt; BMI<18,5 fällt jetzt durch auf Lührmann (Senior) bzw. Mifflin (Standard). Details siehe CLAUDE.md.
+
 **Katch-McArdle-Ergänzung** (Notebook-Rückfrage): Katch-McArdle (`370 + 21,6 × FFM`) ist rechnerisch identisch mit Cunningham 1991 — eine gemeinsame Funktion, im Formel-Dropdown als „Cunningham (1991) / Katch-McArdle" bezeichnet. Zwei Eingabewege im UI führen zur selben `ffmKg`: (A) FFM direkt in kg, (B) Körpergewicht + Körperfettanteil in % → `FFM = Gewicht × (1 − KFA/100)` (reine Hilfsfunktion `ffmAusKfa` in `formeln.js`).
 
 ### 2. Modifikator-Pipeline (`berechnung.js`)

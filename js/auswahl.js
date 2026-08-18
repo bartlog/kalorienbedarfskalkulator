@@ -75,12 +75,15 @@ window.KBR.auswahl = (function (formeln) {
       };
     }
 
-    if (bmi >= 30 || bmi < 18.5) {
+    // Nur Adipositas nutzt Müller — die frühere Untergewicht-Stufe (BMI<18,5)
+    // wurde entfernt, siehe Begründung bei muellerBmiGraduiert in formeln.js.
+    // Untergewicht fällt hier durch auf Lührmann (falls Senior) bzw. Mifflin.
+    if (bmi >= 30) {
       const entry = formeln.getById("mueller");
       return {
         formelId: entry.id,
         formelName: entry.name,
-        reeBasis: entry.fn({ gender: p.gender, age: p.age, weightKg: p.weightKg, bmi }),
+        reeBasis: entry.fn({ gender: p.gender, age: p.age, weightKg: p.weightKg }),
         begruendungId: "bmi_extreme",
         begruendungParams: { bmi },
         hinweise,

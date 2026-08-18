@@ -38,16 +38,18 @@ window.KBR.formeln = (function () {
   }
 
   // Müller et al. (2004), BMI-gestufte anthropometrische Gleichungen.
-  // Nur die beiden Stufen, die der Entscheidungsbaum tatsächlich ansteuert
-  // (Untergewicht / Adipositas) — Normalgewicht/Übergewicht werden hier nie
-  // erreicht, da diese Fälle über andere Zweige laufen (siehe auswahl.js).
+  // Nur die Adipositas-Stufe (BMI ≥30) wird vom Entscheidungsbaum angesteuert
+  // (siehe auswahl.js) — Normalgewicht/Übergewicht laufen über andere Zweige.
+  // Die ursprünglich ebenfalls implementierte Untergewicht-Stufe wurde entfernt:
+  // Gegenprobe gegen Mifflin-St-Jeor zeigte, dass sie über die gesamte
+  // Untergewichts-Spanne 35–70 % niedrigere REE-Werte lieferte (physiologisch
+  // unplausibel — die Adipositas-Stufe weicht an der Nachbargrenze BMI=30 nur
+  // ~2 % von Mifflin ab, die entfernte Untergewicht-Stufe war also vermutlich
+  // fehlerhaft transkribiert, nicht bloß eine erwartbare Formeleigenschaft).
   // Ergebnis der Originalgleichung liegt in MJ/Tag, ×239 in kcal/Tag umgerechnet.
-  function muellerBmiGraduiert({ gender, age, weightKg, bmi }) {
+  function muellerBmiGraduiert({ gender, age, weightKg }) {
     const s = gender === "male" ? 1 : 0;
-    const mjProTag =
-      bmi <= 18.5
-        ? 0.07122 * weightKg - 0.02149 * age + 0.82 * s + 0.731
-        : 0.05 * weightKg - 0.01586 * age + 1.103 * s + 2.924;
+    const mjProTag = 0.05 * weightKg - 0.01586 * age + 1.103 * s + 2.924;
     return mjProTag * 239;
   }
 
@@ -93,8 +95,8 @@ window.KBR.formeln = (function () {
       name: "Müller BMI-graduiert (2004)",
       fn: muellerBmiGraduiert,
       quelle: {
-        de: "Müller MJ et al. (2004) — anthropometrische, nach BMI gestufte Gleichungen; hier die Stufen Untergewicht (BMI ≤18,5) und Adipositas (BMI ≥30). Ergebnis ursprünglich in MJ/Tag, ×239 in kcal/Tag umgerechnet.",
-        en: "Müller MJ et al. (2004) — anthropometric equations graduated by BMI; the underweight (BMI ≤18.5) and obesity (BMI ≥30) tiers are used here. Result originally in MJ/day, converted to kcal/day (×239).",
+        de: "Müller MJ et al. (2004) — anthropometrische, nach BMI gestufte Gleichungen; hier die Adipositas-Stufe (BMI ≥30). Ergebnis ursprünglich in MJ/Tag, ×239 in kcal/Tag umgerechnet.",
+        en: "Müller MJ et al. (2004) — anthropometric equations graduated by BMI; the obesity tier (BMI ≥30) is used here. Result originally in MJ/day, converted to kcal/day (×239).",
       },
     },
     {
