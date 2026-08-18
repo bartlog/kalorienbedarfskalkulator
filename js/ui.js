@@ -317,19 +317,9 @@
 
   // ---- Ergebnis rendern -----------------------------------------------------
 
-  function renderSporttageHinweis(sportModus) {
-    const text =
-      sportModus === "keine"
-        ? "Sporttage: Die errechneten Werte enthalten noch kein Training — an Tagen mit Sport (insb. Cardio/HIIT) solltest du zusätzliche Kalorien einplanen, damit du nicht zu tief in ein Kaloriendefizit rutschst."
-        : "Sporttage: Die errechneten Werte sind Wochendurchschnitte inklusive deines angegebenen Trainings. An einzelnen besonders harten Tagen (insb. Cardio/HIIT) liegt der tatsächliche Bedarf trotzdem über diesem Durchschnitt — plane an solchen Tagen etwas zusätzlichen Spielraum ein.";
-    el("hint-sporttage").innerHTML = text.replace("Sporttage:", "<strong>Sporttage:</strong>");
-  }
-
   function renderErgebnis(r, eingabe) {
     const axisMaxKcal = Math.max(r.ree.max, r.tee.max, r.ziel.max, r.fettabbau.max) * 1.1;
     const axisMaxProtein = r.proteinAufbau.max * 1.15;
-
-    renderSporttageHinweis(eingabe.sport ? eingabe.sport.modus : "keine");
 
     el("val-ree").textContent = formatKcal(r.ree.haupt);
     renderBar("bar-ree", { min: r.ree.min, max: r.ree.max, haupt: r.ree.haupt, axisMin: 0, axisMax: axisMaxKcal });
