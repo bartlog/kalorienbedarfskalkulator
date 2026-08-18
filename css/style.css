@@ -309,7 +309,7 @@ select:disabled {
   text-align: left;
   vertical-align: top;
   padding: 0.55rem 0.65rem;
-  border-bottom: 1px solid var(--color-border);
+  border: 2px solid #fff;
 }
 
 .tipps-table th {
@@ -321,6 +321,30 @@ select:disabled {
 .tipps-table td:first-child {
   white-space: nowrap;
   font-weight: 600;
+}
+
+.tipps-stufe-top td {
+  background: #93c47d;
+}
+
+.tipps-stufe-gut td {
+  background: #b6d7a8;
+}
+
+.tipps-stufe-ok td {
+  background: #d9ead3;
+}
+
+.tipps-stufe-selten td {
+  background: #ffe599;
+}
+
+.tipps-stufe-vermeiden td {
+  background: #f9cb9c;
+}
+
+.tipps-stufe-restaurant td {
+  background: #a4c2f4;
 }
 
 .hinweis-liste {

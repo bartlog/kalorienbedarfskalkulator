@@ -230,6 +230,16 @@
       .join("");
   }
 
+  // Stufe-Werte (bzw. bei der Restaurant-Tabelle einheitlich "restaurant", da
+  // sie keine Bewertungsstufe hat) auf CSS-Klassen für die Zeilenfarbe abbilden.
+  const STUFE_KLASSEN = {
+    "Top-Auswahl": "top",
+    "Gute Auswahl": "gut",
+    OK: "ok",
+    Selten: "selten",
+    Vermeiden: "vermeiden",
+  };
+
   function renderTipps() {
     const container = el("tipps-abschnitte");
     if (!container || !window.KBR.tipps) return;
@@ -247,10 +257,12 @@
           .join("");
         const headHtml = abschnitt.spalten.map((s) => `<th>${escapeHtml(s)}</th>`).join("");
         const bodyHtml = abschnitt.zeilen
-          .map(
-            (zeile) =>
-              `<tr data-wert="${escapeHtml(zeile[0])}">${zeile.map((z) => `<td>${escapeHtml(z)}</td>`).join("")}</tr>`
-          )
+          .map((zeile) => {
+            const klasse = abschnitt.id === "restaurant" ? "restaurant" : STUFE_KLASSEN[zeile[0]] || "";
+            return `<tr data-wert="${escapeHtml(zeile[0])}" class="tipps-stufe-${klasse}">${zeile
+              .map((z) => `<td>${escapeHtml(z)}</td>`)
+              .join("")}</tr>`;
+          })
           .join("");
         return `
           <details class="advanced tipps-abschnitt">
