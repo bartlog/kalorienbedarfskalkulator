@@ -3,16 +3,23 @@
 
   const { berechne } = window.KBR.berechnung;
   const { REGISTRY } = window.KBR.formeln;
-  const { HINWEISE, MET_AKTIVITAETEN, MET_QUELLE } = window.KBR.modifikatoren;
+  const { HINWEIS_IDS, MET_AKTIVITAETEN } = window.KBR.modifikatoren;
   const { ffmAusKfa } = window.KBR.formeln;
   const speicher = window.KBR.speicher;
+  const i18n = window.KBR.i18n;
+  const { STUFE_LABELS } = window.KBR.tipps;
+
+  // Zuletzt berechnetes Ergebnis, für den Re-Render beim Sprachwechsel
+  // (Zahlenformat und alle dynamisch erzeugten Texte sind sprachabhängig).
+  let letztesErgebnis = null;
+  let letzteEingabe = null;
 
   function formatKcal(value) {
-    return `${Math.round(value).toLocaleString("de-DE")} kcal`;
+    return `${i18n.zahl(Math.round(value), 0)} kcal`;
   }
 
   function formatGramm(value) {
-    return `${Math.round(value).toLocaleString("de-DE")} g`;
+    return `${i18n.zahl(Math.round(value), 0)} g`;
   }
 
   function el(id) {
@@ -25,6 +32,48 @@
       .replace(/</g, "&lt;")
       .replace(/>/g, "&gt;")
       .replace(/"/g, "&quot;");
+  }
+
+  // ---- Sprache --------------------------------------------------------------
+
+  function metAktivitaetLabel(aktivitaetId) {
+    if (aktivitaetId === "sonstige") return i18n.t("met_sonstige_aktivitaet_label");
+    const eintrag = MET_AKTIVITAETEN.find((a) => a.id === aktivitaetId);
+    return eintrag ? i18n.t("met_aktivitaet_" + eintrag.id) : "";
+  }
+
+  function wendeSpracheAn() {
+    const sprache = i18n.getSprache();
+    document.documentElement.lang = sprache;
+    document.title = i18n.t("app_title");
+    el("translation-notice").hidden = sprache !== "en";
+
+    document.querySelectorAll(".lang-btn").forEach((btn) => {
+      btn.classList.toggle("is-active", btn.dataset.lang === sprache);
+    });
+
+    document.querySelectorAll("[data-i18n]").forEach((node) => {
+      node.innerHTML = i18n.t(node.getAttribute("data-i18n"));
+    });
+    document.querySelectorAll("[data-i18n-attr-aria-label]").forEach((node) => {
+      node.setAttribute("aria-label", i18n.t(node.getAttribute("data-i18n-attr-aria-label")));
+    });
+
+    renderHinweisListe();
+    renderMethodik();
+    renderTipps();
+
+    // Bestehende MET-Zeilen (Aktivitätsauswahl, Werte) neu aufbauen, damit die
+    // Options-Labels in der neuen Sprache erscheinen — Auswahl/Werte bleiben erhalten.
+    if (el("met-liste")) {
+      stelleMetZeilenWieder(leseMetZeilenRoh().filter((z) => z.auswahl));
+    }
+
+    // Ein bereits angezeigtes Ergebnis enthält viele dynamisch erzeugte,
+    // sprachabhängige Texte/Zahlen — bei Sprachwechsel neu rendern.
+    if (letztesErgebnis && !el("result").hidden) {
+      renderErgebnis(letztesErgebnis, letzteEingabe);
+    }
   }
 
   // ---- Tabs ---------------------------------------------------------------
@@ -120,31 +169,29 @@
     });
   }
 
-  // ---- Statische Listen (Hinweise, Formelquellen) --------------------------
-
   // ---- MET-Aktivitätsliste (dynamisch, Kategorie B) ------------------------
 
   function metAktivitaetOptionsHtml() {
-    const kategorien = [...new Set(MET_AKTIVITAETEN.map((a) => a.kategorie))];
-    const optgroups = kategorien
-      .map((kat) => {
-        const options = MET_AKTIVITAETEN.filter((a) => a.kategorie === kat)
-          .map((a) => `<option value="${a.id}">${a.label}</option>`)
+    const kategorieIds = [...new Set(MET_AKTIVITAETEN.map((a) => a.kategorieId))];
+    const optgroups = kategorieIds
+      .map((katId) => {
+        const options = MET_AKTIVITAETEN.filter((a) => a.kategorieId === katId)
+          .map((a) => `<option value="${a.id}">${escapeHtml(i18n.t("met_aktivitaet_" + a.id))}</option>`)
           .join("");
-        return `<optgroup label="${kat}">${options}</optgroup>`;
+        return `<optgroup label="${escapeHtml(i18n.t("met_kategorie_" + katId))}">${options}</optgroup>`;
       })
       .join("");
-    return `<option value="">– Aktivität wählen –</option>${optgroups}<option value="sonstige">Sonstige (MET manuell)</option>`;
+    return `<option value="">${escapeHtml(i18n.t("met_option_placeholder"))}</option>${optgroups}<option value="sonstige">${escapeHtml(i18n.t("met_option_sonstige"))}</option>`;
   }
 
   function neueMetZeile() {
     const row = document.createElement("div");
     row.className = "met-zeile";
     row.innerHTML = `
-      <select class="met-aktivitaet" aria-label="Aktivität">${metAktivitaetOptionsHtml()}</select>
-      <input type="number" class="met-manuell" placeholder="MET-Wert" min="1" max="20" step="0.1" hidden aria-label="MET-Wert manuell">
-      <input type="number" class="met-stunden" placeholder="Std/Woche" min="0.25" max="30" step="0.25" aria-label="Stunden pro Woche">
-      <button type="button" class="met-entfernen" aria-label="Zeile entfernen">×</button>
+      <select class="met-aktivitaet" aria-label="${escapeHtml(i18n.t("met_aria_aktivitaet"))}">${metAktivitaetOptionsHtml()}</select>
+      <input type="number" class="met-manuell" placeholder="${escapeHtml(i18n.t("met_placeholder_manuell"))}" min="1" max="20" step="0.1" hidden aria-label="${escapeHtml(i18n.t("met_aria_manuell"))}">
+      <input type="number" class="met-stunden" placeholder="${escapeHtml(i18n.t("met_placeholder_stunden"))}" min="0.25" max="30" step="0.25" aria-label="${escapeHtml(i18n.t("met_aria_stunden"))}">
+      <button type="button" class="met-entfernen" aria-label="${escapeHtml(i18n.t("met_aria_entfernen"))}">×</button>
     `;
     const select = row.querySelector(".met-aktivitaet");
     const manuell = row.querySelector(".met-manuell");
@@ -177,8 +224,7 @@
         const stunden = row.querySelector(".met-stunden");
         const aktivitaet = MET_AKTIVITAETEN.find((a) => a.id === select.value);
         const metWert = select.value === "sonstige" ? Number(manuell.value) : aktivitaet ? aktivitaet.met : NaN;
-        const label = select.value === "sonstige" ? "Sonstige Aktivität" : aktivitaet ? aktivitaet.label : "";
-        return { metWert, stundenProWoche: Number(stunden.value) || 0, label };
+        return { metWert, stundenProWoche: Number(stunden.value) || 0, aktivitaetId: select.value };
       })
       .filter((z) => z.metWert > 1 && z.stundenProWoche > 0);
   }
@@ -207,68 +253,70 @@
     liste.appendChild(neueMetZeile());
   }
 
+  // ---- Statische Listen (Hinweise, Formelquellen, Tipps) --------------------
+
   function renderHinweisListe() {
     const liste = el("liste-nicht-gerechnet");
-    liste.innerHTML = HINWEISE.map((h) => `<li><strong>${h.label}:</strong> ${h.grund}</li>`).join("");
+    liste.innerHTML = HINWEIS_IDS.map(
+      (id) => `<li><strong>${i18n.t("hinweis_" + id + "_label")}:</strong> ${i18n.t("hinweis_" + id + "_grund")}</li>`
+    ).join("");
   }
 
   function renderMethodik() {
     const container = el("methodik-formeln");
+    const sprache = i18n.getSprache();
     container.innerHTML = REGISTRY.map(
-      (f) => `<div class="formel-eintrag"><h3>${f.name}</h3><p>${f.quelle}</p></div>`
+      (f) => `<div class="formel-eintrag"><h3>${f.name}</h3><p>${f.quelle[sprache]}</p></div>`
     ).join("");
 
-    el("methodik-met-quelle").textContent = MET_QUELLE;
-    const kategorien = [...new Set(MET_AKTIVITAETEN.map((a) => a.kategorie))];
-    el("methodik-met").innerHTML = kategorien
-      .map((kat) => {
-        const zeilen = MET_AKTIVITAETEN.filter((a) => a.kategorie === kat)
-          .map((a) => `<li>${a.label}: <strong>${a.met.toFixed(1).replace(".", ",")} MET</strong></li>`)
+    el("methodik-met-quelle").textContent = i18n.t("met_quelle");
+    const kategorieIds = [...new Set(MET_AKTIVITAETEN.map((a) => a.kategorieId))];
+    el("methodik-met").innerHTML = kategorieIds
+      .map((katId) => {
+        const zeilen = MET_AKTIVITAETEN.filter((a) => a.kategorieId === katId)
+          .map((a) => `<li>${escapeHtml(i18n.t("met_aktivitaet_" + a.id))}: <strong>${i18n.zahlNatuerlich(a.met)} MET</strong></li>`)
           .join("");
-        return `<div class="formel-eintrag"><h3>${kat}</h3><ul class="hinweis-liste">${zeilen}</ul></div>`;
+        return `<div class="formel-eintrag"><h3>${escapeHtml(i18n.t("met_kategorie_" + katId))}</h3><ul class="hinweis-liste">${zeilen}</ul></div>`;
       })
       .join("");
   }
 
-  // Stufe-Werte (bzw. bei der Restaurant-Tabelle einheitlich "restaurant", da
-  // sie keine Bewertungsstufe hat) auf CSS-Klassen für die Zeilenfarbe abbilden.
-  const STUFE_KLASSEN = {
-    "Top-Auswahl": "top",
-    "Gute Auswahl": "gut",
-    OK: "ok",
-    Selten: "selten",
-    Vermeiden: "vermeiden",
-  };
-
   function renderTipps() {
     const container = el("tipps-abschnitte");
     if (!container || !window.KBR.tipps) return;
+    const sprache = i18n.getSprache();
     const abschnitte = window.KBR.tipps.ABSCHNITTE;
 
     container.innerHTML = abschnitte
       .map((abschnitt) => {
-        const filterLabel = abschnitt.spalten[0];
-        const werte = [];
+        const spalten = [abschnitt.spalte1, abschnitt.spalte2, abschnitt.spalte3].filter(Boolean);
+        const filterLabel = spalten[0][sprache];
+        const stufenCodes = [];
         abschnitt.zeilen.forEach((zeile) => {
-          if (!werte.includes(zeile[0])) werte.push(zeile[0]);
+          if (!stufenCodes.includes(zeile.stufe)) stufenCodes.push(zeile.stufe);
         });
-        const optionsHtml = [`<option value="">Alle</option>`]
-          .concat(werte.map((w) => `<option value="${escapeHtml(w)}">${escapeHtml(w)}</option>`))
+        const optionsHtml = [`<option value="">${escapeHtml(i18n.t("tipps_alle"))}</option>`]
+          .concat(
+            stufenCodes.map(
+              (code) => `<option value="${code}">${escapeHtml(STUFE_LABELS[code][sprache])}</option>`
+            )
+          )
           .join("");
-        const headHtml = abschnitt.spalten.map((s) => `<th>${escapeHtml(s)}</th>`).join("");
+        const headHtml = spalten.map((s) => `<th>${escapeHtml(s[sprache])}</th>`).join("");
         const bodyHtml = abschnitt.zeilen
           .map((zeile) => {
-            const klasse = abschnitt.id === "restaurant" ? "restaurant" : STUFE_KLASSEN[zeile[0]] || "";
-            return `<tr data-wert="${escapeHtml(zeile[0])}" class="tipps-stufe-${klasse}">${zeile
+            const klasse = abschnitt.id === "restaurant" ? "restaurant" : zeile.stufe;
+            const zellen = [STUFE_LABELS[zeile.stufe][sprache], ...zeile[sprache]];
+            return `<tr data-wert="${zeile.stufe}" class="tipps-stufe-${klasse}">${zellen
               .map((z) => `<td>${escapeHtml(z)}</td>`)
               .join("")}</tr>`;
           })
           .join("");
         return `
           <details class="advanced tipps-abschnitt">
-            <summary>${escapeHtml(abschnitt.titel)} <span class="tipps-anzahl">(${abschnitt.zeilen.length})</span></summary>
+            <summary>${escapeHtml(abschnitt.titel[sprache])} <span class="tipps-anzahl">(${abschnitt.zeilen.length})</span></summary>
             <div class="field tipps-filter">
-              <label class="field-label" for="tipps-filter-${abschnitt.id}">Filtern nach ${escapeHtml(filterLabel)}</label>
+              <label class="field-label" for="tipps-filter-${abschnitt.id}">${i18n.t("tipps_filtern_nach", { spalte: escapeHtml(filterLabel) })}</label>
               <select id="tipps-filter-${abschnitt.id}" class="tipps-filter-select" data-target="tipps-tabelle-${abschnitt.id}">${optionsHtml}</select>
             </div>
             <div class="tipps-table-wrap">
@@ -387,9 +435,59 @@
       </svg>`;
   }
 
+  // ---- Formel-Begründung & aktive Modifikatoren (sprachabhängige Formatierung) ---
+
+  function formatiereBegruendung(formel) {
+    const params =
+      formel.begruendungParams && formel.begruendungParams.bmi !== undefined
+        ? { bmi: i18n.zahl(formel.begruendungParams.bmi, 1) }
+        : undefined;
+    return i18n.t("begruendung_" + formel.begruendungId, params);
+  }
+
+  function formatiereModifikator(eintrag) {
+    switch (eintrag.id) {
+      case "adaptive_thermogenese":
+        return i18n.t("mod_adaptive_thermogenese");
+      case "schilddruese":
+        return i18n.t("mod_schilddruese", {
+          vorzeichen: eintrag.prozent >= 0 ? "+" : "",
+          prozent: i18n.zahlNatuerlich(eintrag.prozent),
+        });
+      case "fieber":
+        return i18n.t("mod_fieber", {
+          temp: i18n.zahlNatuerlich(eintrag.temp),
+          delta: i18n.zahl(eintrag.delta, 1),
+        });
+      case "sport_met": {
+        const details = eintrag.aktivitaeten
+          .map((a) =>
+            i18n.t("mod_sport_aktivitaet_eintrag", {
+              label: metAktivitaetLabel(a.aktivitaetId),
+              stunden: i18n.zahlNatuerlich(a.stundenProWoche),
+              met: i18n.zahlNatuerlich(a.metWert),
+            })
+          )
+          .join(", ");
+        return i18n.t("mod_sport_met", { details, zuschlag: i18n.zahl(eintrag.zuschlag, 2) });
+      }
+      case "schwangerschaft":
+        return i18n.t("mod_schwangerschaft");
+      case "stillzeit":
+        return i18n.t("mod_stillzeit");
+      case "beta_blocker":
+        return i18n.t("mod_beta_blocker");
+      default:
+        return "";
+    }
+  }
+
   // ---- Ergebnis rendern -----------------------------------------------------
 
   function renderErgebnis(r, eingabe) {
+    letztesErgebnis = r;
+    letzteEingabe = eingabe;
+
     const axisMaxKcal = Math.max(r.ree.max, r.tee.max, r.ziel.max, r.fettabbau.max) * 1.1;
     const axisMaxProtein = r.proteinAufbau.max * 1.15;
 
@@ -399,20 +497,16 @@
     el("val-tee").textContent = formatKcal(r.tee.haupt);
     renderBar("bar-tee", { min: r.tee.min, max: r.tee.max, haupt: r.tee.haupt, axisMin: 0, axisMax: axisMaxKcal });
 
-    el("val-ziel-label").textContent = r.ziel.label;
+    el("val-ziel-label").textContent = i18n.t("goal_label_" + eingabe.ziel);
     el("val-ziel").textContent = formatKcal(r.ziel.haupt);
     renderBar("bar-ziel", { min: r.ziel.min, max: r.ziel.max, haupt: r.ziel.haupt, axisMin: 0, axisMax: axisMaxKcal, warn: r.ziel.unterReeBasis || r.ziel.bmiWarnung });
 
     const zielWarnungTexte = [];
     if (r.ziel.unterReeBasis) {
-      zielWarnungTexte.push(
-        `Das gewünschte Kaloriendefizit (${formatKcal(r.ziel.gewuenschtHaupt)}) würde den Grundumsatz unterschreiten — aus Sicherheitsgründen wurde das Ziel auf den Grundumsatz angehoben. Ein größeres Defizit wird nicht empfohlen.`
-      );
+      zielWarnungTexte.push(i18n.t("ziel_warnung_defizit", { betrag: formatKcal(r.ziel.gewuenschtHaupt) }));
     }
     if (r.ziel.bmiWarnung) {
-      zielWarnungTexte.push(
-        "Dein BMI liegt im Untergewichtsbereich — eine weitere Gewichtsreduktion wird hier nicht empfohlen. Bitte sprich vorher mit einer Ärztin/einem Arzt oder einer Ernährungsfachkraft."
-      );
+      zielWarnungTexte.push(i18n.t("ziel_warnung_bmi"));
     }
     const zielWarnung = el("ziel-warnung");
     zielWarnung.innerHTML = zielWarnungTexte.map((t) => `<p>${t}</p>`).join("");
@@ -442,24 +536,28 @@
 
     const detailTeile = [];
     detailTeile.push(
-      `<p><strong>Verwendete Formel:</strong> ${r.formel.name} (BMI ${r.formel.bmi.toFixed(1)})<br>${r.formel.begruendung}</p>`
+      `<p>${i18n.t("detail_formel", {
+        name: r.formel.name,
+        bmi: i18n.zahl(r.formel.bmi, 1),
+        begruendung: formatiereBegruendung(r.formel),
+      })}</p>`
     );
     if (r.formel.hinweise.length) {
-      detailTeile.push(`<p class="signal-text">${r.formel.hinweise.join(" ")}</p>`);
+      detailTeile.push(
+        `<p class="signal-text">${r.formel.hinweise.map((id) => i18n.t("hinweis_auswahl_" + id)).join(" ")}</p>`
+      );
     }
-    detailTeile.push(`<p class="quelle-text">${r.formel.quelle}</p>`);
+    detailTeile.push(`<p class="quelle-text">${r.formel.quelle[i18n.getSprache()]}</p>`);
     detailTeile.push(
-      `<p><strong>Bandbreite:</strong> REE ±${Math.round(r.ree.bandKcal)} kcal, TEE ±${Math.round(r.tee.bandKcal)} kcal — dominiert von der Formelunsicherheit selbst (Mifflin-artige Schätzformeln: ±10 % / ±200 kcal), bevor überhaupt ein Modifikator greift.</p>`
+      `<p>${i18n.t("detail_bandbreite", { ree: Math.round(r.ree.bandKcal), tee: Math.round(r.tee.bandKcal) })}</p>`
     );
     if (r.proteinBasis === "ffm") {
-      detailTeile.push(
-        `<p>Proteinbedarf wurde auf Basis der fettfreien Masse berechnet (nicht des Gesamtgewichts) — bei BMI ≥30 vermeidet das eine Überschätzung.</p>`
-      );
+      detailTeile.push(`<p>${i18n.t("detail_protein_ffm")}</p>`);
     }
     if (r.aktiveModifikatoren.length) {
       detailTeile.push(
-        `<p><strong>Aktive Modifikatoren:</strong></p><ul class="hinweis-liste">${r.aktiveModifikatoren
-          .map((m) => `<li>${m}</li>`)
+        `<p><strong>${i18n.t("detail_modifikatoren_heading")}</strong></p><ul class="hinweis-liste">${r.aktiveModifikatoren
+          .map((m) => `<li>${formatiereModifikator(m)}</li>`)
           .join("")}</ul>`
       );
     }
@@ -528,10 +626,15 @@
     initTabs();
     initConditionalFields();
     initMetListe();
-    renderHinweisListe();
-    renderMethodik();
-    renderTipps();
+    wendeSpracheAn();
     fuelleFormularAus(speicher.laden());
+
+    document.querySelectorAll(".lang-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        i18n.setSprache(btn.dataset.lang);
+        wendeSpracheAn();
+      });
+    });
 
     el("calc-form").addEventListener("submit", (event) => {
       event.preventDefault();
@@ -556,17 +659,21 @@
       el("speichernAktiv").checked = false;
     });
 
-    const titelOriginal = document.title;
     el("printBtn").addEventListener("click", () => {
+      const titelOriginal = document.title;
       const heute = new Date();
       const pad = (n) => String(n).padStart(2, "0");
       const datum = `${heute.getFullYear()}-${pad(heute.getMonth() + 1)}-${pad(heute.getDate())}`;
       // Browser schlagen im "Als PDF speichern"-Dialog meist document.title als Dateinamen vor.
-      document.title = `Kalorienbedarfsrechner_${datum}`;
+      document.title = `${i18n.t("print_dateiname_praefix")}_${datum}`;
       window.print();
-    });
-    window.addEventListener("afterprint", () => {
-      document.title = titelOriginal;
+      window.addEventListener(
+        "afterprint",
+        () => {
+          document.title = titelOriginal;
+        },
+        { once: true }
+      );
     });
   }
 

@@ -39,9 +39,9 @@ window.KBR.modifikatoren = (function () {
   }
 
   const REE_FAKTOREN = [
-    { id: "adaptiveThermogenese", achse: "kalorienrestriktion", label: "Adaptive Thermogenese (Diät-Historie)", berechne: adaptiveThermogenese },
-    { id: "schilddruese", achse: "stoffwechsel", label: "Schilddrüsen-Diagnose", berechne: schilddruese },
-    { id: "fieber", achse: "akutkrankheit", label: "Fieber", berechne: fieber },
+    { id: "adaptiveThermogenese", achse: "kalorienrestriktion", berechne: adaptiveThermogenese },
+    { id: "schilddruese", achse: "stoffwechsel", berechne: schilddruese },
+    { id: "fieber", achse: "akutkrankheit", berechne: fieber },
   ];
 
   /**
@@ -80,44 +80,45 @@ window.KBR.modifikatoren = (function () {
   // pacompendium.com) — die Standardquelle für MET-Werte in der Sportwissenschaft.
   // "Intensitätsstufen" (locker/moderat/intensiv) bilden echte, im Compendium
   // separat geführte Varianten ab statt einer freien, nicht belegten 1–10-Skala.
+  // label/kategorie sind bewusst nicht hier hinterlegt (sprachneutral) — die
+  // Anzeigetexte pro Sprache liegen in i18n.js unter met_aktivitaet_<id> bzw.
+  // met_kategorie_<kategorieId>, ui.js löst sie beim Rendern auf.
   const MET_AKTIVITAETEN = [
-    { id: "spazieren", kategorie: "Gehen & Wandern", label: "Spazieren (gemütlich)", met: 2.8 },
-    { id: "gehen_zuegig", kategorie: "Gehen & Wandern", label: "Gehen, zügig", met: 4.8 },
-    { id: "nordic_walking", kategorie: "Gehen & Wandern", label: "Nordic Walking", met: 5.3 },
-    { id: "wandern", kategorie: "Gehen & Wandern", label: "Wandern", met: 6.0 },
-    { id: "joggen_locker", kategorie: "Laufen", label: "Joggen, locker", met: 7.5 },
-    { id: "laufen_moderat", kategorie: "Laufen", label: "Laufen, moderat (~10 km/h)", met: 9.3 },
-    { id: "laufen_schnell", kategorie: "Laufen", label: "Laufen, schnell (~12 km/h)", met: 11.0 },
-    { id: "rad_locker", kategorie: "Radfahren", label: "Radfahren, locker", met: 4.0 },
-    { id: "rad_moderat", kategorie: "Radfahren", label: "Radfahren, moderat", met: 8.0 },
-    { id: "rad_zuegig", kategorie: "Radfahren", label: "Radfahren, zügig/Rennrad", met: 10.0 },
-    { id: "schwimmen_locker", kategorie: "Schwimmen", label: "Schwimmen, locker", met: 6.0 },
-    { id: "schwimmen_sportlich", kategorie: "Schwimmen", label: "Schwimmen, sportlich (Bahnen)", met: 9.8 },
-    { id: "kraft_moderat", kategorie: "Kraft & Konditionstraining", label: "Krafttraining, moderat", met: 3.5 },
-    { id: "kraft_intensiv", kategorie: "Kraft & Konditionstraining", label: "Krafttraining, intensiv (Grundübungen)", met: 5.0 },
-    { id: "kraft_sehr_intensiv", kategorie: "Kraft & Konditionstraining", label: "Krafttraining, sehr intensiv", met: 6.0 },
-    { id: "calisthenics_leicht", kategorie: "Kraft & Konditionstraining", label: "Calisthenics, leicht", met: 2.8 },
-    { id: "calisthenics_moderat", kategorie: "Kraft & Konditionstraining", label: "Calisthenics, moderat", met: 3.8 },
-    { id: "calisthenics_intensiv", kategorie: "Kraft & Konditionstraining", label: "Calisthenics, intensiv", met: 7.5 },
-    { id: "zirkel_leicht", kategorie: "Kraft & Konditionstraining", label: "Zirkeltraining, leicht", met: 3.5 },
-    { id: "zirkel_moderat", kategorie: "Kraft & Konditionstraining", label: "Zirkeltraining, moderat", met: 5.0 },
-    { id: "bootcamp", kategorie: "Kraft & Konditionstraining", label: "Bootcamp / Zirkeltraining, intensiv (inkl. Kettlebell)", met: 7.5 },
-    { id: "hiit", kategorie: "Kraft & Konditionstraining", label: "HIIT (Tabata, Burpees u. Ä.)", met: 11.0 },
-    { id: "yoga_hatha", kategorie: "Yoga", label: "Yoga, Hatha (ruhig)", met: 2.3 },
-    { id: "yoga_power", kategorie: "Yoga", label: "Yoga, Power/Vinyasa", met: 4.0 },
-    { id: "fussball_locker", kategorie: "Ballsport", label: "Fußball, locker", met: 7.0 },
-    { id: "fussball_wettkampf", kategorie: "Ballsport", label: "Fußball, Wettkampf", met: 9.5 },
-    { id: "tischtennis", kategorie: "Ballsport", label: "Tischtennis", met: 4.0 },
-    { id: "tennis_doppel", kategorie: "Ballsport", label: "Tennis, Doppel", met: 6.0 },
-    { id: "tennis_einzel", kategorie: "Ballsport", label: "Tennis, Einzel", met: 8.0 },
-    { id: "basketball_locker", kategorie: "Ballsport", label: "Basketball, locker", met: 6.0 },
-    { id: "basketball_wettkampf", kategorie: "Ballsport", label: "Basketball, Wettkampf", met: 8.0 },
-    { id: "volleyball", kategorie: "Ballsport", label: "Volleyball", met: 4.0 },
-    { id: "badminton_locker", kategorie: "Ballsport", label: "Badminton, locker", met: 5.5 },
-    { id: "badminton_wettkampf", kategorie: "Ballsport", label: "Badminton, Wettkampf", met: 9.0 },
+    { id: "spazieren", kategorieId: "gehen_wandern", met: 2.8 },
+    { id: "gehen_zuegig", kategorieId: "gehen_wandern", met: 4.8 },
+    { id: "nordic_walking", kategorieId: "gehen_wandern", met: 5.3 },
+    { id: "wandern", kategorieId: "gehen_wandern", met: 6.0 },
+    { id: "joggen_locker", kategorieId: "laufen", met: 7.5 },
+    { id: "laufen_moderat", kategorieId: "laufen", met: 9.3 },
+    { id: "laufen_schnell", kategorieId: "laufen", met: 11.0 },
+    { id: "rad_locker", kategorieId: "radfahren", met: 4.0 },
+    { id: "rad_moderat", kategorieId: "radfahren", met: 8.0 },
+    { id: "rad_zuegig", kategorieId: "radfahren", met: 10.0 },
+    { id: "schwimmen_locker", kategorieId: "schwimmen", met: 6.0 },
+    { id: "schwimmen_sportlich", kategorieId: "schwimmen", met: 9.8 },
+    { id: "kraft_moderat", kategorieId: "kraft", met: 3.5 },
+    { id: "kraft_intensiv", kategorieId: "kraft", met: 5.0 },
+    { id: "kraft_sehr_intensiv", kategorieId: "kraft", met: 6.0 },
+    { id: "calisthenics_leicht", kategorieId: "kraft", met: 2.8 },
+    { id: "calisthenics_moderat", kategorieId: "kraft", met: 3.8 },
+    { id: "calisthenics_intensiv", kategorieId: "kraft", met: 7.5 },
+    { id: "zirkel_leicht", kategorieId: "kraft", met: 3.5 },
+    { id: "zirkel_moderat", kategorieId: "kraft", met: 5.0 },
+    { id: "bootcamp", kategorieId: "kraft", met: 7.5 },
+    { id: "hiit", kategorieId: "kraft", met: 11.0 },
+    { id: "yoga_hatha", kategorieId: "yoga", met: 2.3 },
+    { id: "yoga_power", kategorieId: "yoga", met: 4.0 },
+    { id: "fussball_locker", kategorieId: "ballsport", met: 7.0 },
+    { id: "fussball_wettkampf", kategorieId: "ballsport", met: 9.5 },
+    { id: "tischtennis", kategorieId: "ballsport", met: 4.0 },
+    { id: "tennis_doppel", kategorieId: "ballsport", met: 6.0 },
+    { id: "tennis_einzel", kategorieId: "ballsport", met: 8.0 },
+    { id: "basketball_locker", kategorieId: "ballsport", met: 6.0 },
+    { id: "basketball_wettkampf", kategorieId: "ballsport", met: 8.0 },
+    { id: "volleyball", kategorieId: "ballsport", met: 4.0 },
+    { id: "badminton_locker", kategorieId: "ballsport", met: 5.5 },
+    { id: "badminton_wettkampf", kategorieId: "ballsport", met: 9.0 },
   ];
-  const MET_QUELLE =
-    "Compendium of Physical Activities (Ainsworth et al., 2024 Adult Compendium, pacompendium.com) — Standardreferenz für MET-Werte in der Sportwissenschaft.";
 
   /**
    * MET-basierte Sportberechnung als PAL-Äquivalent. Ersetzt die ganzheitliche
@@ -158,33 +159,9 @@ window.KBR.modifikatoren = (function () {
 
   // ---- Nur Hinweis, nicht gerechnet --------------------------------------
 
-  const HINWEISE = [
-    {
-      id: "tef",
-      label: "Verdauung von Nahrung (TEF)",
-      grund: "Auch die Verdauung selbst verbraucht Energie. Dieser Anteil steckt aber schon in den Aktivitätsfaktoren.",
-    },
-    {
-      id: "schlafdauer",
-      label: "Schlafdauer",
-      grund: "Der Grundumsatz gilt für einen vollen Tag inklusive Schlaf — ein pauschaler Abzug für die Schlafzeit wäre also doppelt gezählt. Chronischer Schlafmangel (z. B. dauerhaft 5 statt 7–8 Stunden) verändert den Energieumsatz selbst kaum messbar, beeinflusst aber über Hunger- und Sättigungshormone (mehr Ghrelin, weniger Leptin) den Appetit — das führt in der Praxis eher zu höherer Kalorienaufnahme als zu einem anderen Bedarf. Dafür lässt sich kein verlässlicher fester Faktor angeben.",
-    },
-    {
-      id: "stress",
-      label: "Subjektives Stresslevel",
-      grund: "Chronischer Stress erhöht den Cortisolspiegel, was Appetit, Wassereinlagerung und Fettverteilung beeinflussen kann. Die Studienlage liefert aber keinen verlässlichen, quantifizierbaren Faktor für den Kalorienbedarf — der Effekt läuft eher über Verhalten (Essverhalten, Schlaf, Bewegung) als über einen direkt messbaren Mehrverbrauch.",
-    },
-    {
-      id: "koffein",
-      label: "Koffein",
-      grund: "Koffein regt den Stoffwechsel für ein paar Stunden leicht an. Dieser kurze Effekt lässt sich nicht sinnvoll auf den gesamten Tag hochrechnen.",
-    },
-    {
-      id: "lutealphase",
-      label: "Zyklusphase (2. Zyklushälfte)",
-      grund: "In der zweiten Zyklushälfte steigt der Energiebedarf für ca. zwei Wochen leicht an (ca. 40–70 kcal/Tag). Das liegt innerhalb der ohnehin vorhandenen Schwankungsbreite der Berechnung und gleicht sich über den Monat wieder aus.",
-    },
-  ];
+  // Anzeigetexte (label/grund) liegen sprachneutral in i18n.js unter
+  // hinweis_<id>_label / hinweis_<id>_grund — ui.js löst sie beim Rendern auf.
+  const HINWEIS_IDS = ["tef", "schlafdauer", "stress", "koffein", "lutealphase"];
 
   return {
     REE_FAKTOREN,
@@ -194,10 +171,9 @@ window.KBR.modifikatoren = (function () {
     fieber,
     sportMet,
     MET_AKTIVITAETEN,
-    MET_QUELLE,
     schwangerschaftStillzeit,
     betaBlocker,
-    HINWEISE,
+    HINWEIS_IDS,
     clamp,
   };
 })();

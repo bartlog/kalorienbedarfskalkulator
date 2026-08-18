@@ -57,41 +57,54 @@ window.KBR.formeln = (function () {
     return 757 + 11.9 * weightKg - 3.7 * age + 178 * s;
   }
 
+  // Formelnamen (Eigennamen/Studien) bleiben sprachneutral; `quelle` enthält
+  // neben der bloßen Zitation auch beschreibenden Fließtext und wird daher
+  // als {de, en} geführt — ui.js wählt die aktuelle Sprache beim Rendern.
   const REGISTRY = [
     {
       id: "mifflin",
       name: "Mifflin-St-Jeor",
       fn: mifflinStJeor,
-      quelle:
-        "Mifflin MD, St Jeor ST et al. (1990), American Journal of Clinical Nutrition — Standardformel, validiert an einer breiten gesunden Erwachsenenpopulation. Standardschätzfehler ≈ ±10 % (±200 kcal).",
+      quelle: {
+        de: "Mifflin MD, St Jeor ST et al. (1990), American Journal of Clinical Nutrition — Standardformel, validiert an einer breiten gesunden Erwachsenenpopulation. Standardschätzfehler ≈ ±10 % (±200 kcal).",
+        en: "Mifflin MD, St Jeor ST et al. (1990), American Journal of Clinical Nutrition — the standard formula, validated on a broad healthy adult population. Standard error of estimate ≈ ±10% (±200 kcal).",
+      },
     },
     {
       id: "cunningham",
       name: "Cunningham (1991) / Katch-McArdle",
       fn: cunningham,
-      quelle:
-        "Cunningham JJ (1991), American Journal of Clinical Nutrition — REE = 370 + 21,6 × FFM. Rechnerisch identisch mit der als \"Katch-McArdle-Formel\" bekannten Gleichung. FFM entweder direkt gemessen (DXA/BIA/ADP) oder aus Körpergewicht und Körperfettanteil abgeleitet.",
+      quelle: {
+        de: "Cunningham JJ (1991), American Journal of Clinical Nutrition — REE = 370 + 21,6 × FFM. Rechnerisch identisch mit der als \"Katch-McArdle-Formel\" bekannten Gleichung. FFM entweder direkt gemessen (DXA/BIA/ADP) oder aus Körpergewicht und Körperfettanteil abgeleitet.",
+        en: "Cunningham JJ (1991), American Journal of Clinical Nutrition — REE = 370 + 21.6 × FFM. Mathematically identical to the equation known as the \"Katch-McArdle formula\". FFM either measured directly (DXA/BIA/ADP) or derived from body weight and body fat percentage.",
+      },
     },
     {
       id: "tenhaaf",
       name: "Ten Haaf & Weijs (2014)",
       fn: tenHaaf,
-      quelle:
-        "Ten Haaf T, Weijs PJM (2014), PLOS ONE 9(9):e108460 — FFM-basierte Gleichung, validiert an Freizeitsportlern von 18–35 Jahren.",
+      quelle: {
+        de: "Ten Haaf T, Weijs PJM (2014), PLOS ONE 9(9):e108460 — FFM-basierte Gleichung, validiert an Freizeitsportlern von 18–35 Jahren.",
+        en: "Ten Haaf T, Weijs PJM (2014), PLOS ONE 9(9):e108460 — FFM-based equation, validated on recreational athletes aged 18–35.",
+      },
     },
     {
       id: "mueller",
       name: "Müller BMI-graduiert (2004)",
       fn: muellerBmiGraduiert,
-      quelle:
-        "Müller MJ et al. (2004) — anthropometrische, nach BMI gestufte Gleichungen; hier die Stufen Untergewicht (BMI ≤18,5) und Adipositas (BMI ≥30). Ergebnis ursprünglich in MJ/Tag, ×239 in kcal/Tag umgerechnet.",
+      quelle: {
+        de: "Müller MJ et al. (2004) — anthropometrische, nach BMI gestufte Gleichungen; hier die Stufen Untergewicht (BMI ≤18,5) und Adipositas (BMI ≥30). Ergebnis ursprünglich in MJ/Tag, ×239 in kcal/Tag umgerechnet.",
+        en: "Müller MJ et al. (2004) — anthropometric equations graduated by BMI; the underweight (BMI ≤18.5) and obesity (BMI ≥30) tiers are used here. Result originally in MJ/day, converted to kcal/day (×239).",
+      },
     },
     {
       id: "luehrmann",
       name: "Lührmann et al. (2002)",
       fn: luehrmann,
-      quelle:
-        "Lührmann PM et al. (2002) — Geriatrie/Senioren ab ca. 60–65 Jahren, an einer deutschen Seniorenpopulation validiert.",
+      quelle: {
+        de: "Lührmann PM et al. (2002) — Geriatrie/Senioren ab ca. 60–65 Jahren, an einer deutschen Seniorenpopulation validiert.",
+        en: "Lührmann PM et al. (2002) — geriatrics/seniors from approx. 60–65 years, validated on a German senior population.",
+      },
     },
   ];
 

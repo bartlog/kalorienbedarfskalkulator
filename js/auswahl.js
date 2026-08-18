@@ -3,7 +3,9 @@ window.KBR = window.KBR || {};
 /*
  * Formelauswahl — Präzedenzbaum, siehe PLAN.md Abschnitt 1.
  * Leitprinzip: gemessene Datenqualität schlägt Populationszugehörigkeit.
- * Reine Funktion, kein DOM-Zugriff.
+ * Reine Funktion, kein DOM-Zugriff — Begründungen/Hinweise werden als
+ * sprachneutrale IDs zurückgegeben (begruendungId/hinweise), die ui.js
+ * über i18n.js in die passende Sprache übersetzt.
  */
 window.KBR.auswahl = (function (formeln) {
   "use strict";
@@ -23,7 +25,7 @@ window.KBR.auswahl = (function (formeln) {
    * @param {number} [p.ffmKg] - gemessene fettfreie Masse, nur relevant wenn ffmMeasured
    * @param {boolean} [p.istSportler] - Freizeitsportler (für Ten-Haaf-Validierungspopulation)
    * @param {boolean} [p.schwangerschaftStillzeit]
-   * @returns {{ formelId: string, formelName: string, reeBasis: number, begruendung: string, hinweise: string[], quelle: string, bmi: number }}
+   * @returns {{ formelId: string, formelName: string, reeBasis: number, begruendungId: string, begruendungParams: object|undefined, hinweise: string[], quelle: string, bmi: number }}
    */
   function selectREE(p) {
     const bmi = calculateBmi(p.weightKg, p.heightCm);
@@ -32,9 +34,7 @@ window.KBR.auswahl = (function (formeln) {
     if (p.ffmMeasured && p.ffmKg) {
       const ausserhalbValidierung = p.age > 65 || bmi >= 35;
       if (ausserhalbValidierung) {
-        hinweise.push(
-          "Außerhalb der Validierungspopulation der gewählten Formel (Alter >65 oder BMI ≥35) — Ergebnis mit größerer Unsicherheit behaftet."
-        );
+        hinweise.push("outside_validation");
       }
 
       if (p.istSportler && p.age >= 18 && p.age <= 35) {
@@ -43,8 +43,7 @@ window.KBR.auswahl = (function (formeln) {
           formelId: entry.id,
           formelName: entry.name,
           reeBasis: entry.fn({ ffmKg: p.ffmKg }),
-          begruendung:
-            "FFM gemessen, Freizeitsportler 18–35 Jahre — Ten-Haaf-Gleichung deckt genau diese Validierungspopulation ab.",
+          begruendungId: "ffm_athlete",
           hinweise,
           quelle: entry.quelle,
           bmi,
@@ -56,8 +55,7 @@ window.KBR.auswahl = (function (formeln) {
         formelId: entry.id,
         formelName: entry.name,
         reeBasis: entry.fn({ ffmKg: p.ffmKg }),
-        begruendung:
-          "FFM gemessen; Cunningham bildet Alters- und Adipositaseffekte direkt über die fettfreie Masse ab — Proxy-Korrekturen anderer Formeln sind damit überflüssig.",
+        begruendungId: "ffm_measured",
         hinweise,
         quelle: entry.quelle,
         bmi,
@@ -70,8 +68,8 @@ window.KBR.auswahl = (function (formeln) {
         formelId: entry.id,
         formelName: entry.name,
         reeBasis: entry.fn(p),
-        begruendung: "Schwangerschaft/Stillzeit — Mifflin-St-Jeor als Standard verwendet.",
-        hinweise: ["Nicht an Schwangeren/Stillenden validiert — Ergebnis mit zusätzlicher Unsicherheit."],
+        begruendungId: "pregnancy",
+        hinweise: ["pregnancy_not_validated"],
         quelle: entry.quelle,
         bmi,
       };
@@ -83,10 +81,8 @@ window.KBR.auswahl = (function (formeln) {
         formelId: entry.id,
         formelName: entry.name,
         reeBasis: entry.fn({ gender: p.gender, age: p.age, weightKg: p.weightKg, bmi }),
-        begruendung:
-          "Extremgewicht (BMI " +
-          bmi.toFixed(1) +
-          ") dominiert den Ruheumsatz; Müller enthält Alter bereits als Term und ist nach BMI gestuft.",
+        begruendungId: "bmi_extreme",
+        begruendungParams: { bmi },
         hinweise,
         quelle: entry.quelle,
         bmi,
@@ -99,7 +95,7 @@ window.KBR.auswahl = (function (formeln) {
         formelId: entry.id,
         formelName: entry.name,
         reeBasis: entry.fn(p),
-        begruendung: "Alter ≥65 Jahre — Lührmann ist an einer deutschen Seniorenpopulation validiert.",
+        begruendungId: "age_senior",
         hinweise,
         quelle: entry.quelle,
         bmi,
@@ -111,7 +107,7 @@ window.KBR.auswahl = (function (formeln) {
       formelId: entry.id,
       formelName: entry.name,
       reeBasis: entry.fn(p),
-      begruendung: "Standardfall ohne gemessene FFM, Schwangerschaft, Extremgewicht oder Senioren-Alter.",
+      begruendungId: "default",
       hinweise,
       quelle: entry.quelle,
       bmi,

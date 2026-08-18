@@ -8,10 +8,11 @@ window.KBR = window.KBR || {};
 window.KBR.berechnung = (function (auswahl, modifikatoren) {
   "use strict";
 
+  // Anzeigetext pro Ziel liegt sprachneutral in i18n.js unter goal_label_<id>.
   const GOAL_ADJUSTMENT = {
-    lose: { factor: -0.2, label: "Kalorienziel zum Abnehmen" },
-    maintain: { factor: 0, label: "Kalorienziel zum Halten" },
-    gain: { factor: 0.15, label: "Kalorienziel zum Zunehmen" },
+    lose: { factor: -0.2 },
+    maintain: { factor: 0 },
+    gain: { factor: 0.15 },
   };
 
   const FORMEL_UNSICHERHEIT_RELATIV = 0.1; // Mifflin SEE ≈ ±10 %, als generelle Formelunsicherheit angesetzt
@@ -127,36 +128,28 @@ window.KBR.berechnung = (function (auswahl, modifikatoren) {
     };
   }
 
+  // Liefert sprachneutrale Einträge {id, ...rohe Zahlenwerte} statt fertiger
+  // Sätze — ui.js formatiert sie über i18n.js in die aktuelle Sprache (Zahlen-
+  // /Vorzeichenformatierung ist Anzeigelogik, gehört also dorthin, nicht hierher).
   function sammleAktiveModifikatoren(eingabe, ree, pal, teeAdditiv) {
     const liste = [];
     if (eingabe.adaptiveThermogeneseAktiv) {
-      liste.push("Adaptive Thermogenese (Diät-Historie): REE ×0,90–0,95");
+      liste.push({ id: "adaptive_thermogenese" });
     }
     if (eingabe.schilddruese && eingabe.schilddruese.aktiv) {
-      const p = eingabe.schilddruese.faktorProzent;
-      liste.push(`Schilddrüsen-Diagnose: REE ${p >= 0 ? "+" : ""}${p} %`);
+      liste.push({ id: "schilddruese", prozent: eingabe.schilddruese.faktorProzent });
     }
     if (eingabe.fieber && eingabe.fieber.aktiv) {
-      const deltaT = eingabe.fieber.temperaturC - 37;
-      liste.push(`Fieber (${eingabe.fieber.temperaturC} °C, Δ${deltaT.toFixed(1)} °C über 37 °C): REE +10–13 % pro °C`);
+      liste.push({ id: "fieber", temp: eingabe.fieber.temperaturC, delta: eingabe.fieber.temperaturC - 37 });
     }
     if (pal.sportModus === "met" && pal.sportAktivitaeten && pal.sportAktivitaeten.length) {
-      const details = pal.sportAktivitaeten
-        .map((a) => `${a.label} (${a.stundenProWoche.toString().replace(".", ",")} h/Woche, ${a.metWert.toString().replace(".", ",")} MET)`)
-        .join(", ");
-      liste.push(
-        `Sport (MET-Berechnung, ersetzt Aktivitätslevel-Schätzung): ${details} — PAL-Äquivalent +${pal.sportZuschlagMin.toFixed(2)}`
-      );
+      liste.push({ id: "sport_met", aktivitaeten: pal.sportAktivitaeten, zuschlag: pal.sportZuschlagMin });
     }
     if (teeAdditiv.schwangerschaft) {
-      liste.push(
-        eingabe.schwangerschaftStillzeit === "schwanger"
-          ? "Schwangerschaft: TEE +250 kcal"
-          : "Stillzeit: TEE +500 kcal"
-      );
+      liste.push({ id: eingabe.schwangerschaftStillzeit === "schwanger" ? "schwangerschaft" : "stillzeit" });
     }
     if (teeAdditiv.betaBlocker) {
-      liste.push("Beta-Blocker: TEE −50…−100 kcal (chronisch, daher trotz kleiner Größenordnung eingerechnet)");
+      liste.push({ id: "beta_blocker" });
     }
     return liste;
   }
@@ -225,7 +218,8 @@ window.KBR.berechnung = (function (auswahl, modifikatoren) {
       formel: {
         id: ree.auswahl.formelId,
         name: ree.auswahl.formelName,
-        begruendung: ree.auswahl.begruendung,
+        begruendungId: ree.auswahl.begruendungId,
+        begruendungParams: ree.auswahl.begruendungParams,
         hinweise: ree.auswahl.hinweise,
         quelle: ree.auswahl.quelle,
         bmi: ree.auswahl.bmi,
@@ -237,7 +231,6 @@ window.KBR.berechnung = (function (auswahl, modifikatoren) {
         min: zielMin,
         max: zielMax,
         bandKcal: zielBandKcal,
-        label: GOAL_ADJUSTMENT[eingabe.ziel].label,
         unterReeBasis: zielUnterReeBasis,
         gewuenschtHaupt: zielGewuenschtHaupt,
         bmiWarnung: zielBmiWarnung,
@@ -247,7 +240,7 @@ window.KBR.berechnung = (function (auswahl, modifikatoren) {
       proteinAufbau: berechneProteinbedarf(proteinReferenzgewicht, 1.6, 2.0),
       proteinBasis: proteinBasisFfm ? "ffm" : "gewicht",
       aktiveModifikatoren: sammleAktiveModifikatoren(eingabe, ree, pal, teeAdditiv),
-      hinweiseNichtGerechnet: modifikatoren.HINWEISE,
+      hinweiseNichtGerechnet: modifikatoren.HINWEIS_IDS,
     };
   }
 

@@ -3,59 +3,66 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Kalorienbedarfsrechner</title>
+  <title data-i18n="app_title">Kalorienbedarfskalkulator</title>
   <link rel="icon" type="image/svg+xml" href="kalorienbedarfskalkulator-favicon.svg">
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
   <main class="card">
-    <h1><img src="kalorienbedarfskalkulator-favicon.svg" alt="" class="h1-icon">Kalorienbedarfskalkulator <span class="beta-tag">[beta]</span></h1>
-    <p class="subtitle">Berechne deinen täglichen Kalorien- und Proteinbedarf — alles läuft lokal in deinem Browser, nichts wird übertragen.</p>
+    <div class="header-row">
+      <h1><img src="kalorienbedarfskalkulator-favicon.svg" alt="" class="h1-icon"><span data-i18n="app_title">Kalorienbedarfskalkulator</span> <span class="beta-tag">[beta]</span></h1>
+      <div class="lang-switch" role="group" data-i18n-attr-aria-label="lang_switch_aria">
+        <button type="button" id="lang-btn-de" class="lang-btn" data-lang="de">DE</button>
+        <button type="button" id="lang-btn-en" class="lang-btn" data-lang="en">EN</button>
+      </div>
+    </div>
+    <p class="subtitle" data-i18n="app_subtitle">Berechne deinen täglichen Kalorien- und Proteinbedarf — alles läuft lokal in deinem Browser, nichts wird übertragen.</p>
+    <p id="translation-notice" class="translation-notice" hidden>Note: the English text was machine-translated and has not been manually reviewed.</p>
 
     <nav class="tabs" role="tablist">
-      <button type="button" id="tab-btn-rechner" class="tab-btn is-active" role="tab" aria-selected="true" aria-controls="tab-rechner">Rechner</button>
-      <button type="button" id="tab-btn-methodik" class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-methodik">Methodik &amp; Quellen</button>
-      <button type="button" id="tab-btn-ueber" class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-ueber">Über</button>
-      <button type="button" id="tab-btn-tipps" class="tab-btn tab-btn-right" role="tab" aria-selected="false" aria-controls="tab-tipps">Tipps</button>
+      <button type="button" id="tab-btn-rechner" class="tab-btn is-active" role="tab" aria-selected="true" aria-controls="tab-rechner" data-i18n="tab_rechner">Rechner</button>
+      <button type="button" id="tab-btn-methodik" class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-methodik" data-i18n="tab_methodik">Methodik &amp; Quellen</button>
+      <button type="button" id="tab-btn-ueber" class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-ueber" data-i18n="tab_ueber">Über</button>
+      <button type="button" id="tab-btn-tipps" class="tab-btn tab-btn-right" role="tab" aria-selected="false" aria-controls="tab-tipps" data-i18n="tab_tipps">Tipps</button>
     </nav>
 
     <section id="tab-rechner" role="tabpanel">
       <form id="calc-form" novalidate>
-        <h2 class="section-heading">Basisangaben</h2>
+        <h2 class="section-heading" data-i18n="heading_basisangaben">Basisangaben</h2>
 
         <div class="field">
-          <span class="field-label">Geschlecht</span>
+          <span class="field-label" data-i18n="feld_geschlecht_label">Geschlecht</span>
           <div class="radio-group">
-            <label><input type="radio" name="gender" value="male" checked> Männlich</label>
-            <label><input type="radio" name="gender" value="female"> Weiblich</label>
+            <label><input type="radio" name="gender" value="male" checked> <span data-i18n="geschlecht_maennlich">Männlich</span></label>
+            <label><input type="radio" name="gender" value="female"> <span data-i18n="geschlecht_weiblich">Weiblich</span></label>
           </div>
         </div>
 
         <div class="field">
-          <label for="age">Alter (Jahre)</label>
+          <label for="age" data-i18n="feld_alter_label">Alter (Jahre)</label>
           <input type="number" id="age" name="age" min="10" max="120" step="1" required>
         </div>
 
         <div class="field">
-          <label for="height">Größe (cm)</label>
+          <label for="height" data-i18n="feld_groesse_label">Größe (cm)</label>
           <input type="number" id="height" name="height" min="100" max="250" step="0.1" required>
         </div>
 
         <div class="field">
-          <label for="weight">Gewicht (kg)</label>
+          <label for="weight" data-i18n="feld_gewicht_label">Gewicht (kg)</label>
           <input type="number" id="weight" name="weight" min="30" max="300" step="0.1" required>
         </div>
 
         <div class="field">
-          <label for="activity">Aktivitätslevel (Alltag inkl. gewohntem Training)</label>
+          <label for="activity" data-i18n="feld_aktivitaet_label">Aktivitätslevel (Alltag inkl. gewohntem Training)</label>
           <select id="activity" name="activity" required>
-            <option value="1.2">Sitzend (kaum Bewegung, kein regelmäßiger Sport)</option>
-            <option value="1.375">Leicht aktiv (Alltag + ca. 1–3× Sport/Woche)</option>
-            <option value="1.55" selected>Mäßig aktiv (Alltag + ca. 3–5× Sport/Woche)</option>
-            <option value="1.725">Sehr aktiv (Alltag + ca. 6–7× Sport/Woche)</option>
-            <option value="1.9">Extrem aktiv (körperlich fordernde Arbeit + intensiver Sport)</option>
+            <option value="1.2" data-i18n="aktivitaet_opt_sitzend">Sitzend (kaum Bewegung, kein regelmäßiger Sport)</option>
+            <option value="1.375" data-i18n="aktivitaet_opt_leicht">Leicht aktiv (Alltag + ca. 1–3× Sport/Woche)</option>
+            <option value="1.55" selected data-i18n="aktivitaet_opt_maessig">Mäßig aktiv (Alltag + ca. 3–5× Sport/Woche)</option>
+            <option value="1.725" data-i18n="aktivitaet_opt_sehr">Sehr aktiv (Alltag + ca. 6–7× Sport/Woche)</option>
+            <option value="1.9" data-i18n="aktivitaet_opt_extrem">Extrem aktiv (körperlich fordernde Arbeit + intensiver Sport)</option>
           </select>
-          <p class="field-hint">
+          <p class="field-hint" data-i18n="feld_aktivitaet_hint">
             Ganzheitliche Einschätzung nach dem <abbr title="Physical Activity Level">PAL</abbr>-Konzept: ein Vielfaches deines Grundumsatzes, das
             deinen gesamten Tagesdurchschnitt beschreibt — Alltag <strong>und</strong> dein gewohntes Trainingspensum zusammen. Wenn du unten bei
             „Sport/Training" eine genaue MET-Berechnung angibst, ersetzt diese die Trainings-Schätzung hier (siehe dort).
@@ -63,51 +70,51 @@
         </div>
 
         <div class="field">
-          <label for="goal">Ziel</label>
+          <label for="goal" data-i18n="feld_ziel_label">Ziel</label>
           <select id="goal" name="goal">
-            <option value="lose">Gewicht verlieren</option>
-            <option value="maintain" selected>Gewicht halten</option>
-            <option value="gain">Gewicht zunehmen</option>
+            <option value="lose" data-i18n="ziel_opt_lose">Gewicht verlieren</option>
+            <option value="maintain" selected data-i18n="ziel_opt_maintain">Gewicht halten</option>
+            <option value="gain" data-i18n="ziel_opt_gain">Gewicht zunehmen</option>
           </select>
         </div>
 
         <details class="advanced">
-          <summary>Erweiterte Angaben — nur ausfüllen, falls bekannt</summary>
+          <summary data-i18n="erweiterte_summary">Erweiterte Angaben — nur ausfüllen, falls bekannt</summary>
 
           <fieldset class="field-group">
-            <legend>Fettfreie Masse (FFM)</legend>
-            <p class="field-hint">Falls bekannt, ermöglicht das eine präzisere Formel (Cunningham 1991 / Katch-McArdle).</p>
+            <legend data-i18n="ffm_legend">Fettfreie Masse (FFM)</legend>
+            <p class="field-hint" data-i18n="ffm_hint">Falls bekannt, ermöglicht das eine präzisere Formel (Cunningham 1991 / Katch-McArdle).</p>
             <div class="radio-group vertical">
-              <label><input type="radio" name="ffmModus" value="keine" checked> Keine Angabe</label>
-              <label><input type="radio" name="ffmModus" value="direkt"> FFM direkt bekannt (z. B. DXA/BIA/ADP)</label>
-              <label><input type="radio" name="ffmModus" value="kfa"> Körperfettanteil bekannt</label>
+              <label><input type="radio" name="ffmModus" value="keine" checked> <span data-i18n="ffm_opt_keine">Keine Angabe</span></label>
+              <label><input type="radio" name="ffmModus" value="direkt"> <span data-i18n="ffm_opt_direkt">FFM direkt bekannt (z. B. DXA/BIA/ADP)</span></label>
+              <label><input type="radio" name="ffmModus" value="kfa"> <span data-i18n="ffm_opt_kfa">Körperfettanteil bekannt</span></label>
             </div>
             <div class="field sub-field" id="feld-ffm-direkt" hidden>
-              <label for="ffmDirekt">Fettfreie Masse (kg)</label>
+              <label for="ffmDirekt" data-i18n="ffm_direkt_label">Fettfreie Masse (kg)</label>
               <input type="number" id="ffmDirekt" min="10" max="150" step="0.1">
             </div>
             <div class="field sub-field" id="feld-ffm-kfa" hidden>
-              <label for="kfaProzent">Körperfettanteil (%)</label>
+              <label for="kfaProzent" data-i18n="ffm_kfa_label">Körperfettanteil (%)</label>
               <input type="number" id="kfaProzent" min="3" max="60" step="0.1">
             </div>
             <div class="field sub-field" id="feld-ist-sportler" hidden>
-              <label class="checkbox-label"><input type="checkbox" id="istSportler"> Freizeitsportler:in (regelmäßiges Training)</label>
+              <label class="checkbox-label"><input type="checkbox" id="istSportler"> <span data-i18n="ffm_sportler_label">Freizeitsportler:in (regelmäßiges Training)</span></label>
             </div>
           </fieldset>
 
           <fieldset class="field-group">
-            <legend>Sport / Training</legend>
-            <p class="field-hint">
+            <legend data-i18n="sport_legend">Sport / Training</legend>
+            <p class="field-hint" data-i18n="sport_hint">
               Die Aktivitätslevel-Auswahl oben ist eine grobe, ganzheitliche Schätzung inkl. Training. Falls du deine
               Trainingsdaten genau kennst, kannst du sie stattdessen hier präzise angeben — das <strong>ersetzt</strong> die
               Trainings-Schätzung oben (kein zusätzlicher Aufschlag, sonst Doppelzählung).
             </p>
             <div class="radio-group vertical">
-              <label><input type="radio" name="sportModus" value="keine" checked> Keine genaueren Angaben (Schätzung oben verwenden)</label>
-              <label><input type="radio" name="sportModus" value="met"> Genaue MET-Berechnung</label>
+              <label><input type="radio" name="sportModus" value="keine" checked> <span data-i18n="sport_opt_keine">Keine genaueren Angaben (Schätzung oben verwenden)</span></label>
+              <label><input type="radio" name="sportModus" value="met"> <span data-i18n="sport_opt_met">Genaue MET-Berechnung</span></label>
             </div>
             <div class="sub-field" id="feld-met" hidden>
-              <p class="field-hint">
+              <p class="field-hint" data-i18n="met_hint">
                 <abbr title="Metabolic Equivalent of Task">MET</abbr>: Vielfaches des Grundumsatzes während einer Aktivität. Werte
                 aus dem <em>Compendium of Physical Activities</em> (Standardreferenz der Sportwissenschaft, Details im Tab
                 „Methodik &amp; Quellen"). Wähle je Aktivität einen Eintrag und die Stunden pro Woche — bei mehreren
@@ -115,45 +122,45 @@
               </p>
               <div id="met-liste"></div>
             </div>
-            <p class="field-hint sub-field" id="hinweis-met-override" hidden>
+            <p class="field-hint sub-field" id="hinweis-met-override" hidden data-i18n="hinweis_met_override">
               Bei genauer MET-Berechnung wird oben automatisch „Sitzend" als Alltags-Basis angenommen (Aktivitätslevel-Feld ist deaktiviert) — dein Training wird hier separat und präziser dazugerechnet.
             </p>
           </fieldset>
 
           <fieldset class="field-group">
-            <legend>Weitere Faktoren</legend>
+            <legend data-i18n="weitere_legend">Weitere Faktoren</legend>
 
             <div class="field" id="feld-schwangerschaft">
-              <label for="schwangerschaftStillzeit">Schwangerschaft / Stillzeit</label>
+              <label for="schwangerschaftStillzeit" data-i18n="schwangerschaft_label">Schwangerschaft / Stillzeit</label>
               <select id="schwangerschaftStillzeit">
-                <option value="">Keine Angabe</option>
-                <option value="schwanger">Schwangerschaft</option>
-                <option value="stillzeit">Stillzeit</option>
+                <option value="" data-i18n="schwangerschaft_opt_keine">Keine Angabe</option>
+                <option value="schwanger" data-i18n="schwangerschaft_opt_schwanger">Schwangerschaft</option>
+                <option value="stillzeit" data-i18n="schwangerschaft_opt_stillzeit">Stillzeit</option>
               </select>
             </div>
 
             <div class="field">
-              <label class="checkbox-label"><input type="checkbox" id="adaptiveThermogenese"> Seit längerem in Diät / Kalorienrestriktion</label>
-              <p class="field-hint">Senkt den Grundumsatz um ca. 5–10 % (adaptive Thermogenese).</p>
+              <label class="checkbox-label"><input type="checkbox" id="adaptiveThermogenese"> <span data-i18n="diaet_label">Seit längerem in Diät / Kalorienrestriktion</span></label>
+              <p class="field-hint" data-i18n="diaet_hint">Senkt den Grundumsatz um ca. 5–10 % (adaptive Thermogenese).</p>
             </div>
 
             <div class="field">
-              <label class="checkbox-label"><input type="checkbox" id="schilddruseAktiv"> Ärztlich diagnostizierte Schilddrüsen-Erkrankung</label>
+              <label class="checkbox-label"><input type="checkbox" id="schilddruseAktiv"> <span data-i18n="schilddruese_label">Ärztlich diagnostizierte Schilddrüsen-Erkrankung</span></label>
               <div class="field sub-field" id="feld-schilddruse" hidden>
-                <label for="schilddruseProzent">Abweichung vom Grundumsatz laut Diagnose (%)</label>
+                <label for="schilddruseProzent" data-i18n="schilddruese_prozent_label">Abweichung vom Grundumsatz laut Diagnose (%)</label>
                 <input type="number" id="schilddruseProzent" min="-10" max="30" step="1">
-                <p class="field-hint disclaimer-inline">Bitte nur nach ärztlicher Angabe ausfüllen — ersetzt keine ärztliche oder ernährungstherapeutische Beratung.</p>
+                <p class="field-hint disclaimer-inline" data-i18n="schilddruese_disclaimer">Bitte nur nach ärztlicher Angabe ausfüllen — ersetzt keine ärztliche oder ernährungstherapeutische Beratung.</p>
               </div>
             </div>
 
             <div class="field">
-              <label class="checkbox-label"><input type="checkbox" id="betaBlockerAktiv"> Einnahme von Beta-Blockern</label>
+              <label class="checkbox-label"><input type="checkbox" id="betaBlockerAktiv"> <span data-i18n="betablocker_label">Einnahme von Beta-Blockern</span></label>
             </div>
 
             <div class="field">
-              <label class="checkbox-label"><input type="checkbox" id="fieberAktiv"> Aktuell Fieber</label>
+              <label class="checkbox-label"><input type="checkbox" id="fieberAktiv"> <span data-i18n="fieber_label">Aktuell Fieber</span></label>
               <div class="field sub-field" id="feld-fieber" hidden>
-                <label for="fieberTemperatur">Körpertemperatur (°C)</label>
+                <label for="fieberTemperatur" data-i18n="fieber_temp_label">Körpertemperatur (°C)</label>
                 <input type="number" id="fieberTemperatur" min="37" max="42" step="0.1">
               </div>
             </div>
@@ -161,22 +168,22 @@
         </details>
 
         <div class="field">
-          <label class="checkbox-label"><input type="checkbox" id="speichernAktiv"> Eingaben auf diesem Gerät speichern</label>
-          <p class="field-hint">
+          <label class="checkbox-label"><input type="checkbox" id="speichernAktiv"> <span data-i18n="speichern_label">Eingaben auf diesem Gerät speichern</span></label>
+          <p class="field-hint" data-i18n="speichern_hint">
             Speichert deine Eingaben (nicht das Ergebnis) über <code>localStorage</code> direkt in diesem Browser auf diesem
             Gerät — kein Cache, keine automatische Löschung durch den Browser. Die Daten bleiben, bis du „Daten löschen"
             klickst oder die Website-Daten manuell in den Browser-Einstellungen leerst. Es wird nichts an einen Server übertragen.
           </p>
-          <button type="button" id="datenLoeschenBtn" class="link-btn">Gespeicherte Daten löschen</button>
+          <button type="button" id="datenLoeschenBtn" class="link-btn" data-i18n="speichern_loeschen_btn">Gespeicherte Daten löschen</button>
         </div>
 
-        <button type="submit">Berechnen</button>
+        <button type="submit" data-i18n="submit_btn">Berechnen</button>
       </form>
 
       <section id="result" class="result" hidden aria-live="polite">
         <div class="result-item">
           <div class="result-row">
-            <span>Grundumsatz (REE)</span>
+            <span data-i18n="result_ree_label">Grundumsatz (REE)</span>
             <strong id="val-ree">–</strong>
           </div>
           <div class="bar" id="bar-ree"></div>
@@ -184,7 +191,7 @@
 
         <div class="result-item">
           <div class="result-row">
-            <span>Gesamtumsatz (TEE)</span>
+            <span data-i18n="result_tee_label">Gesamtumsatz (TEE)</span>
             <strong id="val-tee">–</strong>
           </div>
           <div class="bar" id="bar-tee"></div>
@@ -199,20 +206,20 @@
           <div id="ziel-warnung" class="signal-text" hidden></div>
         </div>
 
-        <h3 class="section-heading">Zusätzliche Referenzwerte</h3>
+        <h3 class="section-heading" data-i18n="result_zusatz_heading">Zusätzliche Referenzwerte</h3>
 
         <div class="result-item">
           <div class="result-row">
-            <span>Kalorienbedarf für Fettabbau</span>
+            <span data-i18n="result_fettabbau_label">Kalorienbedarf für Fettabbau</span>
             <strong id="val-fettabbau">–</strong>
           </div>
           <div class="bar" id="bar-fettabbau"></div>
-          <p id="fettabbau-hinweis" class="signal-text" hidden>Auf den Grundumsatz gedeckelt (Sicherheitsgrenze) — ein rechnerisch niedrigeres Defizit wäre hier nicht sinnvoll.</p>
+          <p id="fettabbau-hinweis" class="signal-text" hidden data-i18n="result_fettabbau_hinweis">Auf den Grundumsatz gedeckelt (Sicherheitsgrenze) — ein rechnerisch niedrigeres Defizit wäre hier nicht sinnvoll.</p>
         </div>
 
         <div class="result-item">
           <div class="result-row">
-            <span>Proteinbedarf für Muskelerhalt</span>
+            <span data-i18n="result_protein_erhalt_label">Proteinbedarf für Muskelerhalt</span>
             <strong id="val-protein-erhalt">–</strong>
           </div>
           <div class="bar" id="bar-protein-erhalt"></div>
@@ -220,37 +227,37 @@
 
         <div class="result-item">
           <div class="result-row">
-            <span>Proteinbedarf für Muskelaufbau</span>
+            <span data-i18n="result_protein_aufbau_label">Proteinbedarf für Muskelaufbau</span>
             <strong id="val-protein-aufbau">–</strong>
           </div>
           <div class="bar" id="bar-protein-aufbau"></div>
         </div>
 
         <div class="hint-box">
-          <p><strong>Sporttage:</strong> Die errechneten Kalorienziele basieren auf deinem angegebenen Aktivitätslevel bzw. deinen angegebenen durchschnittlichen Sportaktivitäten pro Woche — in Wochen mit zusätzlichen oder härteren Sporteinheiten (insb. Cardio/HIIT) solltest du zusätzliche Kalorien einplanen, damit du nicht zu tief in ein Kaloriendefizit rutschst.</p>
-          <p><strong>Body Recomposition:</strong> Um gleichzeitig Körperfett abzubauen und Muskeln aufzubauen, ist neben ausreichend Protein insbesondere Krafttraining notwendig. Eine mittelfristige Steigerung der Muskelmasse erhöht zudem den Grundumsatz — die Kalkulation sollte daher regelmäßig aktualisiert werden.</p>
+          <p data-i18n="hint_sporttage"><strong>Sporttage:</strong> Die errechneten Kalorienziele basieren auf deinem angegebenen Aktivitätslevel bzw. deinen angegebenen durchschnittlichen Sportaktivitäten pro Woche — in Wochen mit zusätzlichen oder härteren Sporteinheiten (insb. Cardio/HIIT) solltest du zusätzliche Kalorien einplanen, damit du nicht zu tief in ein Kaloriendefizit rutschst.</p>
+          <p data-i18n="hint_recomposition"><strong>Body Recomposition:</strong> Um gleichzeitig Körperfett abzubauen und Muskeln aufzubauen, ist neben ausreichend Protein insbesondere Krafttraining notwendig. Eine mittelfristige Steigerung der Muskelmasse erhöht zudem den Grundumsatz — die Kalkulation sollte daher regelmäßig aktualisiert werden.</p>
         </div>
 
         <details class="result-details">
-          <summary>Details zur Berechnung (Bandbreite, Formel, Modifikatoren)</summary>
+          <summary data-i18n="result_details_summary">Details zur Berechnung (Bandbreite, Formel, Modifikatoren)</summary>
           <div id="detail-inhalt"></div>
         </details>
 
-        <button type="button" id="printBtn" class="secondary-btn">Ergebnis als PDF speichern</button>
+        <button type="button" id="printBtn" class="secondary-btn" data-i18n="print_btn">Ergebnis als PDF speichern</button>
       </section>
 
-      <p class="disclaimer">
+      <p class="disclaimer" data-i18n="disclaimer">
         Diese Berechnung liefert eine grobe Orientierung basierend auf anthropometrischen Schätzformeln (Standardschätzfehler ±10 % / ±200 kcal).
         Sie ersetzt keine individuelle ärztliche oder ernährungstherapeutische Beratung — insbesondere bei medizinischen Angaben (Medikation, Schilddrüse, Schwangerschaft).
       </p>
     </section>
 
     <section id="tab-methodik" role="tabpanel" hidden>
-      <h2 class="section-heading">Verwendete Formeln</h2>
+      <h2 class="section-heading" data-i18n="methodik_formeln_heading">Verwendete Formeln</h2>
       <div id="methodik-formeln"></div>
 
-      <h2 class="section-heading">Das PAL-Konzept</h2>
-      <p class="field-hint">
+      <h2 class="section-heading" data-i18n="methodik_pal_heading">Das PAL-Konzept</h2>
+      <p class="field-hint" data-i18n="methodik_pal_text">
         <abbr title="Physical Activity Level">PAL</abbr> steht für „Physical Activity Level" und beschreibt, wievielmal höher
         dein tatsächlicher Tagesverbrauch im Vergleich zum Grundumsatz liegt — als ein einziger Durchschnittswert über
         den ganzen Tag, Alltag und Training zusammen. Ein PAL von 1,2 bedeutet z. B. kaum Bewegung, ein PAL von 1,9 sehr
@@ -260,32 +267,32 @@
         kennt, kann stattdessen die MET-Berechnung nutzen (siehe unten).
       </p>
 
-      <h2 class="section-heading">MET-Werte (Trainingsintensität)</h2>
+      <h2 class="section-heading" data-i18n="methodik_met_heading">MET-Werte (Trainingsintensität)</h2>
       <p class="field-hint" id="methodik-met-quelle"></p>
       <div id="methodik-met"></div>
 
-      <h2 class="section-heading">Nicht eingerechnete Faktoren</h2>
-      <p class="field-hint">Diese Faktoren beeinflussen den Energiebedarf zwar grundsätzlich, fließen hier aber bewusst nicht in die Berechnung ein:</p>
+      <h2 class="section-heading" data-i18n="methodik_nicht_heading">Nicht eingerechnete Faktoren</h2>
+      <p class="field-hint" data-i18n="methodik_nicht_intro">Diese Faktoren beeinflussen den Energiebedarf zwar grundsätzlich, fließen hier aber bewusst nicht in die Berechnung ein:</p>
       <ul id="liste-nicht-gerechnet" class="hinweis-liste"></ul>
 
-      <h2 class="section-heading">Wann dieser Rechner nicht ausreicht</h2>
+      <h2 class="section-heading" data-i18n="methodik_grenzen_heading">Wann dieser Rechner nicht ausreicht</h2>
       <ul class="hinweis-liste">
-        <li>Organgewichte/MRT-Volumetrie oder indirekte Kalorimetrie als Goldstandard sind hier nicht abbildbar.</li>
-        <li>Tumorkachexie und ähnliche klinische Sonderfälle werden von keiner der Formeln erfasst.</li>
-        <li>Bei BMI &lt;16 oder &gt;40, schweren Traumata oder Verbrennungen: bitte klinische Abklärung statt Selbstberechnung.</li>
+        <li data-i18n="methodik_grenzen_li1">Organgewichte/MRT-Volumetrie oder indirekte Kalorimetrie als Goldstandard sind hier nicht abbildbar.</li>
+        <li data-i18n="methodik_grenzen_li2">Tumorkachexie und ähnliche klinische Sonderfälle werden von keiner der Formeln erfasst.</li>
+        <li data-i18n="methodik_grenzen_li3">Bei BMI &lt;16 oder &gt;40, schweren Traumata oder Verbrennungen: bitte klinische Abklärung statt Selbstberechnung.</li>
       </ul>
     </section>
 
     <section id="tab-ueber" role="tabpanel" hidden>
-      <h2 class="section-heading">Über dieses Projekt</h2>
-      <p class="field-hint">
+      <h2 class="section-heading" data-i18n="ueber_heading">Über dieses Projekt</h2>
+      <p class="field-hint" data-i18n="ueber_intro">
         Der Kalorienbedarfsrechner ist ein quelloffenes Projekt — der vollständige Quellcode ist frei einsehbar auf
         <a href="https://github.com/bartlog/kalorienbedarfskalkulator" target="_blank" rel="noopener">GitHub</a>.
         Alle verwendeten Formeln und Modifikatoren beruhen auf wissenschaftlichen Studien (siehe Reiter „Methodik &amp;
         Quellen") und wurden anhand mehrerer Testfälle überprüft. Trotzdem übernimmt dieses Tool keine Gewähr für
         Richtigkeit oder Vollständigkeit und ersetzt keine medizinische oder ernährungswissenschaftliche Beratung.
       </p>
-      <p class="field-hint">
+      <p class="field-hint" data-i18n="ueber_autor">
         <strong>Autor:</strong> Heiko Bartlog —
         <a href="https://bartlog.de" target="_blank" rel="noopener">bartlog.de</a><br>
         Entstanden mithilfe von Gemini (Deep Research, Grobkonzeption, Testfälle) und Claude Code.
@@ -293,8 +300,8 @@
     </section>
 
     <section id="tab-tipps" role="tabpanel" hidden>
-      <h2 class="section-heading">Praxis-Tipps für Fettabbau &amp; Recomposition</h2>
-      <p class="field-hint">
+      <h2 class="section-heading" data-i18n="tipps_heading">Praxis-Tipps für Fettabbau &amp; Recomposition</h2>
+      <p class="field-hint" data-i18n="tipps_intro">
         Eine kuratierte Sammlung praktischer Hebel — von Ernährung über Training bis Restaurantbesuche. Diese
         Empfehlungen ergänzen die Kalorien- und Proteinwerte oben, ersetzen aber keine individuelle medizinische
         oder ernährungswissenschaftliche Beratung. Jeder Abschnitt lässt sich über die Auswahl unterhalb des Titels
@@ -310,6 +317,7 @@
   <script src="js/berechnung.js"></script>
   <script src="js/speicher.js"></script>
   <script src="js/tipps-daten.js"></script>
+  <script src="js/i18n.js"></script>
   <script src="js/ui.js"></script>
 </body>
 </html>
