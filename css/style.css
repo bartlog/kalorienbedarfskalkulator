@@ -451,7 +451,8 @@ button[type="submit"]:hover {
   .secondary-btn,
   .link-btn,
   #datenLoeschenBtn,
-  #tab-methodik {
+  #tab-methodik,
+  #tab-ueber {
     display: none !important;
   }
 

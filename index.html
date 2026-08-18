@@ -15,6 +15,7 @@
     <nav class="tabs" role="tablist">
       <button type="button" id="tab-btn-rechner" class="tab-btn is-active" role="tab" aria-selected="true" aria-controls="tab-rechner">Rechner</button>
       <button type="button" id="tab-btn-methodik" class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-methodik">Methodik &amp; Quellen</button>
+      <button type="button" id="tab-btn-ueber" class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-ueber">Über</button>
     </nav>
 
     <section id="tab-rechner" role="tabpanel">
@@ -272,6 +273,22 @@
         <li>Tumorkachexie und ähnliche klinische Sonderfälle werden von keiner der Formeln erfasst.</li>
         <li>Bei BMI &lt;16 oder &gt;40, schweren Traumata oder Verbrennungen: bitte klinische Abklärung statt Selbstberechnung.</li>
       </ul>
+    </section>
+
+    <section id="tab-ueber" role="tabpanel" hidden>
+      <h2 class="section-heading">Über dieses Projekt</h2>
+      <p class="field-hint">
+        Der Kalorienbedarfsrechner ist ein quelloffenes Projekt — der vollständige Quellcode ist frei einsehbar auf
+        <a href="https://github.com/bartlog/kalorienbedarfskalkulator" target="_blank" rel="noopener">GitHub</a>.
+        Alle verwendeten Formeln und Modifikatoren beruhen auf wissenschaftlichen Studien (siehe Reiter „Methodik &amp;
+        Quellen") und wurden anhand mehrerer Testfälle überprüft. Trotzdem übernimmt dieses Tool keine Gewähr für
+        Richtigkeit oder Vollständigkeit und ersetzt keine medizinische oder ernährungswissenschaftliche Beratung.
+      </p>
+      <p class="field-hint">
+        <strong>Autor:</strong> Heiko Bartlog —
+        <a href="https://bartlog.de" target="_blank" rel="noopener">bartlog.de</a><br>
+        Entstanden mithilfe von Gemini (Deep Research, Grobkonzeption, Testfälle) und Claude Code.
+      </p>
     </section>
   </main>
 

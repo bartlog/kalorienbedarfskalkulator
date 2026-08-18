@@ -25,6 +25,7 @@
     const tabs = [
       { btn: el("tab-btn-rechner"), panel: el("tab-rechner") },
       { btn: el("tab-btn-methodik"), panel: el("tab-methodik") },
+      { btn: el("tab-btn-ueber"), panel: el("tab-ueber") },
     ];
     tabs.forEach(({ btn, panel }) => {
       btn.addEventListener("click", () => {
