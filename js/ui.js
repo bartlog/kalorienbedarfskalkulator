@@ -119,7 +119,7 @@
     const optgroups = kategorien
       .map((kat) => {
         const options = MET_AKTIVITAETEN.filter((a) => a.kategorie === kat)
-          .map((a) => `<option value="${a.id}">${a.label} (${a.met.toFixed(1).replace(".", ",")} MET)</option>`)
+          .map((a) => `<option value="${a.id}">${a.label}</option>`)
           .join("");
         return `<optgroup label="${kat}">${options}</optgroup>`;
       })
