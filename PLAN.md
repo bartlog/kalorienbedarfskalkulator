@@ -93,8 +93,8 @@ Feste Reihenfolge in vier Stufen:
 5. **Zielanpassung** zuletzt (Abnehmen/Halten/Zunehmen)
 
 Guards gegen unplausibles Aufschaukeln:
-- Gleichgerichtete Faktoren derselben Wirkachse werden **nicht multipliziert — nur der stärkste zählt** (Diät-Historie und Schlafmangel messen dasselbe Defizit).
-- **PAL-Zuschlag und MET-Berechnung sind exklusiv** (Radio-Button, nicht Checkbox) — sonst wird Sport doppelt gezählt.
+- Gleichgerichtete Faktoren derselben Wirkachse werden **nicht multipliziert — nur der stärkste zählt** (bislang inert, da aktuell keine zwei aktiven REE-Faktoren dieselbe Achse teilen — siehe `modifikatoren.js`).
+- **Aktivitätslevel (ganzheitlich, inkl. Sport) und MET-Berechnung sind exklusiv**, nicht additiv (Radio-Button). Kein separater "PAL-Zuschlag" mehr: Ein pauschaler Aufschlag ohne echte Trainingsdaten wäre nicht literaturgestützt, da die klassischen PAL-Werte (FAO/WHO/UNU) bereits als *ganzheitliche* Kategorie inkl. typischem Sportverhalten validiert sind — addiert man einen weiteren Sport-Zuschlag drauf, zählt das Training potenziell doppelt. Wählt der Nutzer die genaue MET-Berechnung, wird das Aktivitätslevel-Feld im UI automatisch auf "Sitzend" fixiert und deaktiviert (`ui.js: anwendenMetUeberschreibung`) — die MET-Berechnung *ersetzt* die Schätzung, statt sie zu ergänzen.
 - Globale Plausibilitätsgrenze: `TEE ∈ [1.0 × REE_basis, 2.5 × REE_basis]`
 - Zielkalorien nie unter `REE_basis` — bei Unterschreitung Warnhinweis statt Zahl.
 
@@ -106,8 +106,8 @@ Jeder Eintrag trägt ein Feld `wirkung: 'ree' | 'pal' | 'tee' | 'hinweis'`.
 
 | Faktor | Wirkung |
 |---|---|
-| Basis-PAL (Beruf) | `pal` 1,2–2,4 |
-| Sport (PAL-Zuschlag **oder** MET) | `pal` +0,1…+0,2 / MET × kg × h |
+| Aktivitätslevel (Alltag inkl. gewohntem Training) | `pal` 1,2–1,9, ganzheitliche Selbsteinschätzung |
+| Sport, genau (MET-Berechnung) — **ersetzt** obige Schätzung | `pal` MET × kg × h, umgerechnet in PAL-Äquivalent |
 | Adaptive Thermogenese (Diät-Historie) | `ree` −5 bis −10 % |
 | Schwangerschaft / Stillzeit | `tee` +250 / +500 kcal |
 | Schilddrüsen-Diagnose (ärztlich, optional) | `ree` −10…+30 %, hinter Disclaimer |
@@ -135,11 +135,12 @@ Der aufklappbare Bereich transportiert genau diese Botschaft: *„±200 kcal For
 
 ### 5. UI
 
-- **Struktur — zwei Tabs**: **„Rechner"** (Formular + Ergebnis) und **„Methodik & Quellen"** (statisch: alle fünf REE-Formeln aus der `formeln.js`-Registry mit ihrem `quelle`-Feld — Autor, Jahr, Validierungspopulation —, direkt darunter das bisherige Kategorie-C-Info-Panel „Wann dieser Rechner nicht ausreicht"). Kein Router nötig, kein neues File: zwei `<section>`-Blöcke in `index.html`, Umschalten per `hidden`-Attribut in `ui.js`.
-- **Progressive Disclosure** (im Rechner-Tab): Kategorie A immer sichtbar; B in aufklappbaren `<details>`-Blöcken („Erweiterte Angaben — nur ausfüllen, falls bekannt").
-- **Ergebnis**: REE / TEE / Zielkalorien als Einzelwerte, **zusätzlich grafisch** — je Wert ein horizontaler Balken mit Marker für den Hauptwert und Schattierung für die Bandbreite (Inline-SVG oder reines CSS, **keine Chart-Bibliothek**, bleibt abhängigkeitsfrei). Direkt neben/unter dem Grundumsatz zusätzlich die Referenzwerte aus Abschnitt 6 (Fettabbau-Kalorien, Proteinbedarf Erhalt/Aufbau), gleiche Balken-Darstellung, plus die beiden statischen Hinweistexte (Sporttage, Body Recomposition). Darunter `<details>` mit dem Zahlenwert der Bandbreite, gewählter Formel + Begründung, aktiven Modifikatoren und den nicht eingerechneten Faktoren samt Grund.
-- **Speichern**: Checkbox „Eingaben auf diesem Gerät speichern" (Standard: aus), `localStorage`, sichtbarer „Daten löschen"-Button.
-- **PDF-Export**: `window.print()` plus `@media print`-Stylesheet mit `@page { size: A4; margin: 2cm; }` für ein sauberes DIN-A4-Layout (Formular und Tab-Navigation ausblenden, Ergebnis inkl. Grafik + Formel + Disclaimer drucken). Bewusst **keine** PDF-Bibliothek — hält die Seite abhängigkeitsfrei und offlinefähig, der Browser-Druckdialog bietet „Als PDF speichern" (rein lokal, kein Upload).
+- **Struktur — zwei Tabs**: **„Rechner"** (Formular + Ergebnis) und **„Methodik & Quellen"** (statisch: alle fünf REE-Formeln aus der `formeln.js`-Registry mit ihrem `quelle`-Feld — Autor, Jahr, Validierungspopulation —, darunter die „Nicht eingerechneten Faktoren" (laienfreundlich erklärt, aus `modifikatoren.js: HINWEISE`) und das bisherige Kategorie-C-Info-Panel „Wann dieser Rechner nicht ausreicht"). Kein Router nötig, kein neues File: zwei `<section>`-Blöcke in `index.html`, Umschalten per `hidden`-Attribut in `ui.js`.
+- **Progressive Disclosure** (im Rechner-Tab): Kategorie A immer sichtbar; B in aufklappbaren `<details>`-Blöcken („Erweiterte Angaben — nur ausfüllen, falls bekannt"). Schwangerschaft/Stillzeit-Feld nur sichtbar, wenn Geschlecht = weiblich (`ui.js: aktualisiereSchwangerschaftSichtbarkeit`), Wert wird beim Ausblenden zurückgesetzt.
+- **PAL/MET erklärt**: Kurze `field-hint`-Texte direkt an den Feldern statt nur im Methodik-Tab — PAL („Vielfaches deines Grundumsatzes, ganzheitlicher Tagesdurchschnitt inkl. Training") und MET („Vielfaches des Ruheumsatzes während einer Aktivität", mit Richtwerten) werden dort erklärt, wo sie eingegeben werden.
+- **Ergebnis**: REE / TEE / Zielkalorien als Einzelwerte, **zusätzlich grafisch** — je Wert ein horizontaler Balken mit Marker für den Hauptwert und Schattierung für die Bandbreite (Inline-SVG oder reines CSS, **keine Chart-Bibliothek**, bleibt abhängigkeitsfrei). Direkt neben/unter dem Grundumsatz zusätzlich die Referenzwerte aus Abschnitt 6 (Fettabbau-Kalorien, Proteinbedarf Erhalt/Aufbau), gleiche Balken-Darstellung, plus zwei Hinweistexte: „Sporttage" (Text hängt davon ab, ob Sport angegeben wurde — reine Nulleingabe vs. Wochendurchschnitt-Variabilität, siehe `ui.js: renderSporttageHinweis`) und „Body Recomposition" (statisch). Darunter `<details>` mit dem Zahlenwert der Bandbreite, gewählter Formel + Begründung und aktiven Modifikatoren.
+- **Speichern**: Checkbox „Eingaben auf diesem Gerät speichern" (Standard: aus) mit erklärendem Text direkt daneben (localStorage, kein Cache, keine automatische Löschung, nichts wird übertragen), `localStorage`, sichtbarer „Daten löschen"-Button.
+- **PDF-Export**: `window.print()` plus `@media print`-Stylesheet. Rand **nicht** über `@page { margin }` (browser-/druckdialogabhängig unzuverlässig — ergab in der Praxis 0 Rand trotz gesetztem Wert), sondern robust über `@page { margin: 0 }` + `padding: 2cm` auf `.card` im Box-Modell, das unabhängig von der Druckdialog-Randeinstellung greift. Dateinamensvorschlag über `document.title` (die meisten Browser nutzen den Titel als Vorschlag im „Speichern"-Dialog): vor `window.print()` auf `Kalorienbedarfsrechner_JJJJ-MM-TT` (aktuelles Datum) gesetzt, nach `afterprint` zurückgesetzt. Bewusst **keine** PDF-Bibliothek — hält die Seite abhängigkeitsfrei und offlinefähig.
 - **Disclaimer** verschärfen: Bei medizinischen Feldern (Medikation, Schilddrüse, Schwangerschaft) rückt das Tool in Richtung Gesundheitsaussage — expliziter Hinweis, dass es keine ärztliche oder ernährungstherapeutische Beratung ersetzt.
 
 ### 6. Zusätzliche Referenzwerte (Fettabbau-Kalorien & Proteinbedarf)
@@ -188,7 +189,7 @@ Quellen (auch im Methodik-Tab, Abschnitt 5): ISSN Position Stand Protein & Exerc
 
 ## Verifikation
 
-- **`tests.html` im Browser öffnen** (läuft ohne npm, ohne Server): Referenzwerte gegen von Hand gerechnete Mifflin-/Cunningham-Ergebnisse; Kollisionsfälle des Auswahlbaums (70-jähriger Athlet mit FFM → Cunningham; adipöser Senior → Müller); Clamp-Grenzen; Nachweis, dass PAL-Zuschlag und MET sich gegenseitig ausschließen.
+- **`tests.html` im Browser öffnen** (läuft ohne npm, ohne Server): Referenzwerte gegen von Hand gerechnete Mifflin-/Cunningham-Ergebnisse; Kollisionsfälle des Auswahlbaums (70-jähriger Athlet mit FFM → Cunningham; adipöser Senior → Müller); Clamp-Grenzen; Nachweis, dass die MET-Berechnung die Aktivitätslevel-Schätzung ersetzt statt sie zu ergänzen.
 - **`index.html` per Doppelklick öffnen** — muss ohne lokalen Server funktionieren (das ist der Grund für die klassischen Scripts; ein `type="module"` würde hier an CORS scheitern).
 - Durchklicken: leeres Formular, nur Kategorie A, A+B vollständig, Extremwerte (BMI 15 / BMI 45) → Plausibilitätsgrenzen und Hinweise greifen.
 - Speichern-Checkbox an/aus, Reload, „Daten löschen"; Druckvorschau auf sauberes DIN-A4-Layout prüfen (kein Formular/Tab-Nav auf dem Ausdruck, Grafik bleibt lesbar).

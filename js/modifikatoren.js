@@ -75,13 +75,12 @@ window.KBR.modifikatoren = (function () {
 
   // ---- PAL-wirksame Faktoren --------------------------------------------
 
-  function sportPalZuschlag({ aktiv }) {
-    if (!aktiv) return null;
-    return { min: 0.1, max: 0.2 };
-  }
-
   /**
-   * MET-basierte Sportberechnung als PAL-Äquivalent, exklusiv zu sportPalZuschlag.
+   * MET-basierte Sportberechnung als PAL-Äquivalent. Ersetzt die ganzheitliche
+   * Aktivitätslevel-Schätzung (siehe berechnung.js/ui.js), statt sie additiv zu
+   * ergänzen — ein separater "PAL-Zuschlag" auf Basis einer Schätzung ohne
+   * echte Trainingsdaten wäre nicht literaturgestützt und würde bei ohnehin
+   * sport-inklusiven PAL-Werten (FAO/WHO/UNU) Doppelzählung riskieren.
    * Nettoeffekt (MET-1, da MET=1 dem Ruheumsatz entspricht) über die
    * Trainingsstunden pro Woche, gemittelt auf den Tag, dann relativ zu REE_adj
    * in eine PAL-Zuschlagsspanne umgerechnet.
@@ -112,10 +111,26 @@ window.KBR.modifikatoren = (function () {
   // ---- Nur Hinweis, nicht gerechnet --------------------------------------
 
   const HINWEISE = [
-    { id: "tef", label: "TEF / Makronährstoffverteilung", grund: "Bereits in der Definition von PAL und TEE enthalten — additive Zählung wäre Doppelzählung." },
-    { id: "schlafdauer", label: "Schlafdauer", grund: "Der 24-h-REE enthält die Schlafphase bereits — Doppelzählung bei zusätzlichem Abzug." },
-    { id: "koffein", label: "Koffein", grund: "Akuter 1–3-Stunden-Effekt, nicht sinnvoll auf den 24-h-Bedarf hochrechenbar." },
-    { id: "lutealphase", label: "Lutealphase", grund: "Temporär (~14 Tage) und mit 40–70 kcal unterhalb des Formelrauschens von Mifflin-St-Jeor (±200 kcal); gleicht sich im Monatsmittel aus." },
+    {
+      id: "tef",
+      label: "Verdauung von Nahrung (TEF)",
+      grund: "Auch die Verdauung selbst verbraucht Energie. Dieser Anteil steckt aber schon in den Aktivitätsfaktoren oben — ihn zusätzlich abzuziehen würde ihn doppelt berücksichtigen.",
+    },
+    {
+      id: "schlafdauer",
+      label: "Schlafdauer",
+      grund: "Der Grundumsatz gilt für einen vollen Tag inklusive Schlaf. Ein zusätzlicher Abzug für die Schlafzeit wäre daher doppelt gezählt.",
+    },
+    {
+      id: "koffein",
+      label: "Koffein",
+      grund: "Koffein regt den Stoffwechsel für ein paar Stunden leicht an. Dieser kurze Effekt lässt sich nicht sinnvoll auf den gesamten Tag hochrechnen.",
+    },
+    {
+      id: "lutealphase",
+      label: "Zyklusphase (2. Zyklushälfte)",
+      grund: "In der zweiten Zyklushälfte steigt der Energiebedarf für ca. zwei Wochen leicht an (ca. 40–70 kcal/Tag). Das liegt innerhalb der ohnehin vorhandenen Schwankungsbreite der Berechnung und gleicht sich über den Monat wieder aus.",
+    },
   ];
 
   return {
@@ -124,7 +139,6 @@ window.KBR.modifikatoren = (function () {
     adaptiveThermogenese,
     schilddruese,
     fieber,
-    sportPalZuschlag,
     sportMet,
     schwangerschaftStillzeit,
     betaBlocker,

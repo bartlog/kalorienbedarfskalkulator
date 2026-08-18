@@ -130,20 +130,19 @@
     (function () {
       const r = berechne({
         gender: "male", age: 25, heightCm: 190, weightKg: 100,
-        basisPAL: 1.9, ziel: "gain", sport: { modus: "pal" },
+        basisPAL: 1.9, ziel: "gain", sport: { modus: "met", metWert: 10, stundenProEinheit: 1.5, einheitenProWoche: 5 },
       });
       assert(r.tee.haupt <= r.ree.basis * 2.5 + 0.01, "TEE bleibt innerhalb der globalen Plausibilitätsgrenze (<= 2.5x REE_basis)");
       assert(r.tee.haupt >= r.ree.basis * 1.0 - 0.01, "TEE bleibt innerhalb der globalen Plausibilitätsgrenze (>= 1.0x REE_basis)");
     })();
     (function () {
-      // PAL-Zuschlag und MET sind exklusiv (Radio, nicht Checkbox) -> unterschiedliche Ergebnisse je nach modus
+      // MET-Berechnung ersetzt die Aktivitätslevel-Schätzung, statt sie additiv zu ergänzen
+      // (kein separater "PAL-Zuschlag" mehr -> kein Doppelzählungsrisiko mit dem ganzheitlichen PAL)
       const basis = { gender: "male", age: 30, heightCm: 178, weightKg: 75, basisPAL: 1.375, ziel: "maintain" };
       const rKeine = berechne({ ...basis, sport: { modus: "keine" } });
-      const rPal = berechne({ ...basis, sport: { modus: "pal" } });
       const rMet = berechne({ ...basis, sport: { modus: "met", metWert: 9, stundenProEinheit: 1, einheitenProWoche: 3 } });
-      assert(rPal.tee.haupt > rKeine.tee.haupt, "PAL-Zuschlag erhöht TEE gegenüber 'keine'");
       assert(rMet.tee.haupt > rKeine.tee.haupt, "MET-Berechnung erhöht TEE gegenüber 'keine'");
-      assert(rPal.tee.haupt !== rMet.tee.haupt, "PAL-Zuschlag und MET liefern unterschiedliche (nicht addierte) Ergebnisse");
+      assert(window.KBR.modifikatoren.sportPalZuschlag === undefined, "sportPalZuschlag wurde entfernt (kein additiver PAL-Zuschlag mehr)");
     })();
     (function () {
       const r = berechne({

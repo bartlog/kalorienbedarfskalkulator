@@ -143,6 +143,13 @@ select:focus {
   outline-offset: 1px;
 }
 
+input[type="number"]:disabled,
+select:disabled {
+  background: var(--color-highlight-bg);
+  color: var(--color-muted);
+  cursor: not-allowed;
+}
+
 .radio-group {
   display: flex;
   gap: 1.25rem;
@@ -371,9 +378,13 @@ button[type="submit"]:hover {
 /* ---- Druck / PDF-Export (DIN A4) ------------------------------------------ */
 
 @media print {
+  /* margin:0 auf @page + Rand als Padding auf .card statt @page margin:
+     @page margin wird je nach Browser/Druckdialog-Einstellung ("Standard"
+     vs. "Keine" vs. "Minimal") unzuverlässig übernommen — Padding im
+     Box-Modell greift dagegen immer, unabhängig vom Druckdialog. */
   @page {
     size: A4;
-    margin: 2cm;
+    margin: 0;
   }
 
   body {
@@ -385,7 +396,7 @@ button[type="submit"]:hover {
     max-width: none;
     box-shadow: none;
     border-radius: 0;
-    padding: 0;
+    padding: 2cm;
   }
 
   .tabs,

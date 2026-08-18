@@ -70,10 +70,11 @@ window.KBR.berechnung = (function (auswahl, modifikatoren) {
 
   function berechnePalMitBand(eingabe, reeAdjHaupt) {
     const basisPAL = eingabe.basisPAL;
+    // Die MET-Berechnung ersetzt die Aktivitätslevel-Schätzung (basisPAL wird
+    // dafür im UI auf "Sitzend" fixiert) — kein separater additiver "PAL-Zuschlag"
+    // mehr, um Doppelzählung mit dem ganzheitlichen Aktivitätslevel auszuschließen.
     let sportZuschlag = null;
-    if (eingabe.sport && eingabe.sport.modus === "pal") {
-      sportZuschlag = modifikatoren.sportPalZuschlag({ aktiv: true });
-    } else if (eingabe.sport && eingabe.sport.modus === "met") {
+    if (eingabe.sport && eingabe.sport.modus === "met") {
       sportZuschlag = modifikatoren.sportMet({
         metWert: eingabe.sport.metWert,
         stundenProEinheit: eingabe.sport.stundenProEinheit,
@@ -140,10 +141,8 @@ window.KBR.berechnung = (function (auswahl, modifikatoren) {
       const deltaT = eingabe.fieber.temperaturC - 37;
       liste.push(`Fieber (${eingabe.fieber.temperaturC} °C, Δ${deltaT.toFixed(1)} °C über 37 °C): REE +10–13 % pro °C`);
     }
-    if (pal.sportModus === "pal") {
-      liste.push("Sport (PAL-Zuschlag): PAL +0,10–0,20");
-    } else if (pal.sportModus === "met") {
-      liste.push(`Sport (MET-Berechnung): PAL-Äquivalent +${pal.sportZuschlagMin.toFixed(2)}`);
+    if (pal.sportModus === "met") {
+      liste.push(`Sport (MET-Berechnung, ersetzt Aktivitätslevel-Schätzung): PAL-Äquivalent +${pal.sportZuschlagMin.toFixed(2)}`);
     }
     if (teeAdditiv.schwangerschaft) {
       liste.push(

@@ -44,14 +44,19 @@
         </div>
 
         <div class="field">
-          <label for="activity">Aktivitätslevel (Beruf/Alltag)</label>
+          <label for="activity">Aktivitätslevel (Alltag inkl. gewohntem Training)</label>
           <select id="activity" name="activity" required>
-            <option value="1.2">Sitzend (kaum Bewegung)</option>
-            <option value="1.375">Leicht aktiv (1–3x Sport/Woche)</option>
-            <option value="1.55" selected>Mäßig aktiv (3–5x Sport/Woche)</option>
-            <option value="1.725">Sehr aktiv (6–7x Sport/Woche)</option>
-            <option value="1.9">Extrem aktiv (körperliche Arbeit + Sport)</option>
+            <option value="1.2">Sitzend (kaum Bewegung, kein regelmäßiger Sport)</option>
+            <option value="1.375">Leicht aktiv (Alltag + ca. 1–3× Sport/Woche)</option>
+            <option value="1.55" selected>Mäßig aktiv (Alltag + ca. 3–5× Sport/Woche)</option>
+            <option value="1.725">Sehr aktiv (Alltag + ca. 6–7× Sport/Woche)</option>
+            <option value="1.9">Extrem aktiv (körperlich fordernde Arbeit + intensiver Sport)</option>
           </select>
+          <p class="field-hint">
+            Ganzheitliche Einschätzung nach dem <abbr title="Physical Activity Level">PAL</abbr>-Konzept: ein Vielfaches deines Grundumsatzes, das
+            deinen gesamten Tagesdurchschnitt beschreibt — Alltag <strong>und</strong> dein gewohntes Trainingspensum zusammen. Wenn du unten bei
+            „Sport/Training" eine genaue MET-Berechnung angibst, ersetzt diese die Trainings-Schätzung hier (siehe dort).
+          </p>
         </div>
 
         <div class="field">
@@ -89,16 +94,20 @@
 
           <fieldset class="field-group">
             <legend>Sport / Training</legend>
-            <p class="field-hint">Zusätzlich zum Aktivitätslevel oben — entweder PAL-Zuschlag oder MET-Berechnung, nicht beides (sonst Doppelzählung).</p>
+            <p class="field-hint">
+              Die Aktivitätslevel-Auswahl oben ist eine grobe, ganzheitliche Schätzung inkl. Training. Falls du deine
+              Trainingsdaten genau kennst, kannst du sie stattdessen hier präzise angeben — das <strong>ersetzt</strong> die
+              Trainings-Schätzung oben (kein zusätzlicher Aufschlag, sonst Doppelzählung).
+            </p>
             <div class="radio-group vertical">
-              <label><input type="radio" name="sportModus" value="keine" checked> Keine Zusatzangabe</label>
-              <label><input type="radio" name="sportModus" value="pal"> Einfacher PAL-Zuschlag</label>
+              <label><input type="radio" name="sportModus" value="keine" checked> Keine genaueren Angaben (Schätzung oben verwenden)</label>
               <label><input type="radio" name="sportModus" value="met"> Genaue MET-Berechnung</label>
             </div>
             <div class="field-row sub-field" id="feld-met" hidden>
               <div class="field">
                 <label for="metWert">MET-Wert der Aktivität</label>
                 <input type="number" id="metWert" min="1" max="20" step="0.1">
+                <p class="field-hint"><abbr title="Metabolic Equivalent of Task">MET</abbr>: Vielfaches des Ruheumsatzes während der Aktivität. Richtwerte: lockeres Gehen ≈ 3, Radfahren mäßig ≈ 6–8, Joggen ≈ 8–10, HIIT ≈ 8–12 (stark schwankend je nach Intensität).</p>
               </div>
               <div class="field">
                 <label for="metStunden">Stunden pro Einheit</label>
@@ -109,12 +118,15 @@
                 <input type="number" id="metEinheiten" min="0" max="21" step="1">
               </div>
             </div>
+            <p class="field-hint sub-field" id="hinweis-met-override" hidden>
+              Bei genauer MET-Berechnung wird oben automatisch „Sitzend" als Alltags-Basis angenommen (Aktivitätslevel-Feld ist deaktiviert) — dein Training wird hier separat und präziser dazugerechnet.
+            </p>
           </fieldset>
 
           <fieldset class="field-group">
             <legend>Weitere Faktoren</legend>
 
-            <div class="field">
+            <div class="field" id="feld-schwangerschaft">
               <label for="schwangerschaftStillzeit">Schwangerschaft / Stillzeit</label>
               <select id="schwangerschaftStillzeit">
                 <option value="">Keine Angabe</option>
@@ -149,16 +161,15 @@
               </div>
             </div>
           </fieldset>
-
-          <fieldset class="field-group">
-            <legend>Nicht eingerechnete Faktoren</legend>
-            <p class="field-hint">Diese Faktoren sind Teil der ursprünglichen Konzeption, fließen aber bewusst nicht in die Berechnung ein:</p>
-            <ul id="liste-nicht-gerechnet" class="hinweis-liste"></ul>
-          </fieldset>
         </details>
 
         <div class="field">
           <label class="checkbox-label"><input type="checkbox" id="speichernAktiv"> Eingaben auf diesem Gerät speichern</label>
+          <p class="field-hint">
+            Speichert deine Eingaben (nicht das Ergebnis) über <code>localStorage</code> direkt in diesem Browser auf diesem
+            Gerät — kein Cache, keine automatische Löschung durch den Browser. Die Daten bleiben, bis du „Daten löschen"
+            klickst oder die Website-Daten manuell in den Browser-Einstellungen leerst. Es wird nichts an einen Server übertragen.
+          </p>
           <button type="button" id="datenLoeschenBtn" class="link-btn">Gespeicherte Daten löschen</button>
         </div>
 
@@ -218,7 +229,7 @@
         </div>
 
         <div class="hint-box">
-          <p><strong>Sporttage:</strong> Die errechneten Werte sind Basiswerte — Sporteinheiten (insb. Cardio/HIIT) steigern den kurzfristigen Kalorienumsatz. An Tagen mit hartem Training sollten daher zusätzliche Kalorien vorgesehen werden, um nicht zu tief in das Kaloriendefizit abzurutschen.</p>
+          <p id="hint-sporttage"></p>
           <p><strong>Body Recomposition:</strong> Um gleichzeitig Körperfett abzubauen und Muskeln aufzubauen, ist neben ausreichend Protein insbesondere Krafttraining notwendig. Eine mittelfristige Steigerung der Muskelmasse erhöht zudem den Grundumsatz — die Kalkulation sollte daher regelmäßig aktualisiert werden.</p>
         </div>
 
@@ -239,6 +250,10 @@
     <section id="tab-methodik" role="tabpanel" hidden>
       <h2 class="section-heading">Verwendete Formeln</h2>
       <div id="methodik-formeln"></div>
+
+      <h2 class="section-heading">Nicht eingerechnete Faktoren</h2>
+      <p class="field-hint">Diese Faktoren beeinflussen den Energiebedarf zwar grundsätzlich, fließen hier aber bewusst nicht in die Berechnung ein:</p>
+      <ul id="liste-nicht-gerechnet" class="hinweis-liste"></ul>
 
       <h2 class="section-heading">Wann dieser Rechner nicht ausreicht</h2>
       <ul class="hinweis-liste">

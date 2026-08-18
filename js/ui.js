@@ -39,6 +39,39 @@
 
   // ---- Progressive Disclosure innerhalb Kategorie B ------------------------
 
+  // Bei genauer MET-Berechnung ersetzt das Training die Aktivitätslevel-Schätzung
+  // oben (statt sie zu ergänzen) — daher wird das Feld auf "Sitzend" fixiert und
+  // deaktiviert, damit nicht doppelt gezählt wird. Vorheriger Wert wird für den
+  // Fall gemerkt, dass der Nutzer wieder auf "Keine genaueren Angaben" wechselt.
+  function anwendenMetUeberschreibung(istMet) {
+    const activitySelect = el("activity");
+    const hinweis = el("hinweis-met-override");
+    if (istMet) {
+      if (activitySelect.dataset.vorherigerWert === undefined) {
+        activitySelect.dataset.vorherigerWert = activitySelect.value;
+      }
+      activitySelect.value = "1.2";
+      activitySelect.disabled = true;
+      hinweis.hidden = false;
+    } else {
+      activitySelect.disabled = false;
+      if (activitySelect.dataset.vorherigerWert !== undefined) {
+        activitySelect.value = activitySelect.dataset.vorherigerWert;
+        delete activitySelect.dataset.vorherigerWert;
+      }
+      hinweis.hidden = true;
+    }
+  }
+
+  function aktualisiereSchwangerschaftSichtbarkeit() {
+    const gender = document.querySelector('input[name="gender"]:checked').value;
+    const feld = el("feld-schwangerschaft");
+    feld.hidden = gender === "male";
+    if (feld.hidden) {
+      el("schwangerschaftStillzeit").value = "";
+    }
+  }
+
   function initConditionalFields() {
     const ffmRadios = document.querySelectorAll('input[name="ffmModus"]');
     const feldDirekt = el("feld-ffm-direkt");
@@ -57,9 +90,16 @@
     const feldMet = el("feld-met");
     sportRadios.forEach((r) =>
       r.addEventListener("change", () => {
-        feldMet.hidden = document.querySelector('input[name="sportModus"]:checked').value !== "met";
+        const istMet = document.querySelector('input[name="sportModus"]:checked').value === "met";
+        feldMet.hidden = !istMet;
+        anwendenMetUeberschreibung(istMet);
       })
     );
+
+    document
+      .querySelectorAll('input[name="gender"]')
+      .forEach((r) => r.addEventListener("change", aktualisiereSchwangerschaftSichtbarkeit));
+    aktualisiereSchwangerschaftSichtbarkeit();
 
     el("schilddruseAktiv").addEventListener("change", (e) => {
       el("feld-schilddruse").hidden = !e.target.checked;
@@ -191,9 +231,19 @@
 
   // ---- Ergebnis rendern -----------------------------------------------------
 
-  function renderErgebnis(r) {
+  function renderSporttageHinweis(sportModus) {
+    const text =
+      sportModus === "keine"
+        ? "Sporttage: Die errechneten Werte enthalten noch kein Training — an Tagen mit Sport (insb. Cardio/HIIT) solltest du zusätzliche Kalorien einplanen, damit du nicht zu tief in ein Kaloriendefizit rutschst."
+        : "Sporttage: Die errechneten Werte sind Wochendurchschnitte inklusive deines angegebenen Trainings. An einzelnen besonders harten Tagen (insb. Cardio/HIIT) liegt der tatsächliche Bedarf trotzdem über diesem Durchschnitt — plane an solchen Tagen etwas zusätzlichen Spielraum ein.";
+    el("hint-sporttage").innerHTML = text.replace("Sporttage:", "<strong>Sporttage:</strong>");
+  }
+
+  function renderErgebnis(r, eingabe) {
     const axisMaxKcal = Math.max(r.ree.max, r.tee.max, r.ziel.unterReeBasis ? r.ree.max : r.ziel.max, r.fettabbau.max) * 1.1;
     const axisMaxProtein = r.proteinAufbau.max * 1.15;
+
+    renderSporttageHinweis(eingabe.sport ? eingabe.sport.modus : "keine");
 
     el("val-ree").textContent = formatKcal(r.ree.haupt);
     renderBar("bar-ree", { min: r.ree.min, max: r.ree.max, haupt: r.ree.haupt, axisMin: 0, axisMax: axisMaxKcal });
@@ -265,9 +315,15 @@
 
   // ---- Speichern / Laden -----------------------------------------------------
 
+  function setzeRadioFallsVorhanden(name, value) {
+    if (!value) return;
+    const radio = document.querySelector(`input[name="${name}"][value="${value}"]`);
+    if (radio) radio.checked = true;
+  }
+
   function fuelleFormularAus(gespeichert) {
     if (!gespeichert) return;
-    document.querySelector(`input[name="gender"][value="${gespeichert.gender}"]`).checked = true;
+    setzeRadioFallsVorhanden("gender", gespeichert.gender);
     el("age").value = gespeichert.age || "";
     el("height").value = gespeichert.height || "";
     el("weight").value = gespeichert.weight || "";
@@ -275,7 +331,7 @@
     el("goal").value = gespeichert.goal || "maintain";
 
     if (gespeichert.ffmModus) {
-      document.querySelector(`input[name="ffmModus"][value="${gespeichert.ffmModus}"]`).checked = true;
+      setzeRadioFallsVorhanden("ffmModus", gespeichert.ffmModus);
       el("feld-ffm-direkt").hidden = gespeichert.ffmModus !== "direkt";
       el("feld-ffm-kfa").hidden = gespeichert.ffmModus !== "kfa";
       el("feld-ist-sportler").hidden = gespeichert.ffmModus === "keine";
@@ -284,15 +340,20 @@
     el("kfaProzent").value = gespeichert.kfaProzent || "";
     el("istSportler").checked = !!gespeichert.istSportler;
 
-    if (gespeichert.sportModus) {
-      document.querySelector(`input[name="sportModus"][value="${gespeichert.sportModus}"]`).checked = true;
-      el("feld-met").hidden = gespeichert.sportModus !== "met";
-    }
+    // "pal" gab es in einer früheren Version — fällt hier stillschweigend auf
+    // "keine" zurück, falls noch in alten gespeicherten Daten vorhanden.
+    const sportModus = gespeichert.sportModus === "met" ? "met" : "keine";
+    setzeRadioFallsVorhanden("sportModus", sportModus);
+    el("feld-met").hidden = sportModus !== "met";
+    anwendenMetUeberschreibung(sportModus === "met");
     el("metWert").value = gespeichert.metWert || "";
     el("metStunden").value = gespeichert.metStunden || "";
     el("metEinheiten").value = gespeichert.metEinheiten || "";
 
-    el("schwangerschaftStillzeit").value = gespeichert.schwangerschaftStillzeit || "";
+    aktualisiereSchwangerschaftSichtbarkeit();
+    if (!el("feld-schwangerschaft").hidden) {
+      el("schwangerschaftStillzeit").value = gespeichert.schwangerschaftStillzeit || "";
+    }
     el("adaptiveThermogenese").checked = !!gespeichert.adaptiveThermogeneseAktiv;
 
     el("schilddruseAktiv").checked = !!gespeichert.schilddruseAktiv;
@@ -331,7 +392,7 @@
       }
 
       const ergebnis = berechne(eingabe);
-      renderErgebnis(ergebnis);
+      renderErgebnis(ergebnis, eingabe);
       el("result").scrollIntoView({ behavior: "smooth", block: "start" });
     });
 
@@ -340,8 +401,17 @@
       el("speichernAktiv").checked = false;
     });
 
+    const titelOriginal = document.title;
     el("printBtn").addEventListener("click", () => {
+      const heute = new Date();
+      const pad = (n) => String(n).padStart(2, "0");
+      const datum = `${heute.getFullYear()}-${pad(heute.getMonth() + 1)}-${pad(heute.getDate())}`;
+      // Browser schlagen im "Als PDF speichern"-Dialog meist document.title als Dateinamen vor.
+      document.title = `Kalorienbedarfsrechner_${datum}`;
       window.print();
+    });
+    window.addEventListener("afterprint", () => {
+      document.title = titelOriginal;
     });
   }
 
