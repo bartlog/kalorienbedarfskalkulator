@@ -19,6 +19,14 @@
     return document.getElementById(id);
   }
 
+  function escapeHtml(value) {
+    return String(value)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+  }
+
   // ---- Tabs ---------------------------------------------------------------
 
   function initTabs() {
@@ -26,6 +34,7 @@
       { btn: el("tab-btn-rechner"), panel: el("tab-rechner") },
       { btn: el("tab-btn-methodik"), panel: el("tab-methodik") },
       { btn: el("tab-btn-ueber"), panel: el("tab-ueber") },
+      { btn: el("tab-btn-tipps"), panel: el("tab-tipps") },
     ];
     tabs.forEach(({ btn, panel }) => {
       btn.addEventListener("click", () => {
@@ -219,6 +228,56 @@
         return `<div class="formel-eintrag"><h3>${kat}</h3><ul class="hinweis-liste">${zeilen}</ul></div>`;
       })
       .join("");
+  }
+
+  function renderTipps() {
+    const container = el("tipps-abschnitte");
+    if (!container || !window.KBR.tipps) return;
+    const abschnitte = window.KBR.tipps.ABSCHNITTE;
+
+    container.innerHTML = abschnitte
+      .map((abschnitt) => {
+        const filterLabel = abschnitt.spalten[0];
+        const werte = [];
+        abschnitt.zeilen.forEach((zeile) => {
+          if (!werte.includes(zeile[0])) werte.push(zeile[0]);
+        });
+        const optionsHtml = [`<option value="">Alle</option>`]
+          .concat(werte.map((w) => `<option value="${escapeHtml(w)}">${escapeHtml(w)}</option>`))
+          .join("");
+        const headHtml = abschnitt.spalten.map((s) => `<th>${escapeHtml(s)}</th>`).join("");
+        const bodyHtml = abschnitt.zeilen
+          .map(
+            (zeile) =>
+              `<tr data-wert="${escapeHtml(zeile[0])}">${zeile.map((z) => `<td>${escapeHtml(z)}</td>`).join("")}</tr>`
+          )
+          .join("");
+        return `
+          <details class="advanced tipps-abschnitt">
+            <summary>${escapeHtml(abschnitt.titel)} <span class="tipps-anzahl">(${abschnitt.zeilen.length})</span></summary>
+            <div class="field tipps-filter">
+              <label class="field-label" for="tipps-filter-${abschnitt.id}">Filtern nach ${escapeHtml(filterLabel)}</label>
+              <select id="tipps-filter-${abschnitt.id}" class="tipps-filter-select" data-target="tipps-tabelle-${abschnitt.id}">${optionsHtml}</select>
+            </div>
+            <div class="tipps-table-wrap">
+              <table class="tipps-table" id="tipps-tabelle-${abschnitt.id}">
+                <thead><tr>${headHtml}</tr></thead>
+                <tbody>${bodyHtml}</tbody>
+              </table>
+            </div>
+          </details>`;
+      })
+      .join("");
+
+    container.querySelectorAll(".tipps-filter-select").forEach((select) => {
+      select.addEventListener("change", () => {
+        const tabelle = el(select.dataset.target);
+        const wert = select.value;
+        tabelle.querySelectorAll("tbody tr").forEach((tr) => {
+          tr.hidden = wert !== "" && tr.dataset.wert !== wert;
+        });
+      });
+    });
   }
 
   // ---- Eingabe aus dem Formular einsammeln ---------------------------------
@@ -459,6 +518,7 @@
     initMetListe();
     renderHinweisListe();
     renderMethodik();
+    renderTipps();
     fuelleFormularAus(speicher.laden());
 
     el("calc-form").addEventListener("submit", (event) => {

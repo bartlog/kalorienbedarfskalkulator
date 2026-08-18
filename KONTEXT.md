@@ -33,9 +33,13 @@ Nachträge während der Umsetzung (Notebook-Rückfragen des Nutzers):
 
 **CSS-Bug gefunden und gefixt:** `[hidden]`-Attribut wurde von `.field { display: flex }` überstimmt (gleiche Spezifität, Cascade-Reihenfolge) — dadurch waren Ergebnis-Sektion und alle bedingten Unterfelder immer sichtbar, unabhängig vom JS-Zustand. Fix: `[hidden] { display: none !important; }` in `css/style.css`. Vor dem Fix per Playwright-Screenshot entdeckt.
 
-Lokales Git-Repository wurde initialisiert und der komplette Stand committed (`git log` zeigt einen Commit „Ausbau zum evidenzbasierten Kalorienbedarfsrechner"). **Noch offen:** Verbindung zu einem GitHub-Remote — Nutzer legt ein leeres Repository an (ohne README/.gitignore), dann `git remote add origin <URL>` + Push (nach Freigabe), danach GitHub Pages unter Settings → Pages auf `main`/root einstellen.
+**Status: live auf GitHub Pages** unter `https://bartlog.github.io/kalorienbedarfskalkulator/` (Repo: `https://github.com/bartlog/kalorienbedarfskalkulator`). Remote verbunden, mehrere Push-Runden seit Live-Gang: PDF-Export-Ränder gefixt (`@page margin:0` + `.card{padding:2cm}` statt `@page margin`, da browserabhängig unzuverlässig), Dateinamensvorschlag beim PDF-Export, `<fieldset>`-`min-width:min-content`-Layoutbug gefixt, Favicon eingebunden, diverse Textkorrekturen (Terminologie „Grundumsatz", Proteinbedarf-Labels).
 
-**Nächster Schritt:** Auf die GitHub-Repo-URL vom Nutzer warten, dann Remote verbinden und (nach Rückfrage) pushen.
+**2026-08-18 — zwei weitere Tabs ergänzt:**
+- **„Über"** (statischer Text: Open-Source-Hinweis + GitHub-Link, wissenschaftliche Grundlage + Haftungsausschluss, Autor Heiko Bartlog/bartlog.de, Tools Gemini + Claude Code).
+- **„Tipps"** (rechtsbündig via `margin-left:auto` auf dem Tab-Button, siehe CLAUDE.md): 5 aufklappbare, nach Stufe/Phase filterbare Tabellen mit Body-Recomposition-Empfehlungen (Hebel, Lebensmittel, Restaurant-Verhalten, Sport, Supplemente). Daten kommen aus `js/tipps-daten.js`, einem manuell aktualisierten Snapshot eines privaten Google-Sheets des Nutzers — Update-Workflow und fileId stehen im globalen Memory (`reference_tipps_spreadsheet`), nicht im Repo, da das Sheet nicht öffentlich ist.
+
+Tests: `tests.html` zeigt aktuell 40/40 grün.
 
 ## 2. notebooklm MCP-Server
 

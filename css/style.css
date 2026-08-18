@@ -91,6 +91,12 @@ h1 {
   font-weight: 600;
 }
 
+/* margin-left:auto schiebt diesen Tab an den rechten Rand der Flex-Leiste,
+   wodurch der gesamte verbleibende Platz als Lücke zu den anderen Tabs entsteht. */
+.tab-btn.tab-btn-right {
+  margin-left: auto;
+}
+
 /* ---- Formularfelder ---------------------------------------------------- */
 
 .field {
@@ -249,6 +255,57 @@ select:disabled {
   font-size: 0.95rem;
   padding: 0 0.1rem;
   margin-bottom: 0.3rem;
+}
+
+/* ---- Tipps-Tab (Body Recomposition) ------------------------------------- */
+
+.tipps-abschnitt {
+  margin-bottom: 0.75rem;
+}
+
+.tipps-anzahl {
+  color: var(--color-muted);
+  font-weight: 400;
+  font-size: 0.85em;
+}
+
+.tipps-filter {
+  margin: 0.75rem 0 0;
+}
+
+.tipps-filter select {
+  max-width: 100%;
+}
+
+.tipps-table-wrap {
+  overflow-x: auto;
+  margin-top: 0.75rem;
+}
+
+.tipps-table {
+  width: 100%;
+  min-width: 640px;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.tipps-table th,
+.tipps-table td {
+  text-align: left;
+  vertical-align: top;
+  padding: 0.55rem 0.65rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.tipps-table th {
+  background: var(--color-highlight-bg);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.tipps-table td:first-child {
+  white-space: nowrap;
+  font-weight: 600;
 }
 
 .hinweis-liste {
@@ -452,7 +509,8 @@ button[type="submit"]:hover {
   .link-btn,
   #datenLoeschenBtn,
   #tab-methodik,
-  #tab-ueber {
+  #tab-ueber,
+  #tab-tipps {
     display: none !important;
   }
 

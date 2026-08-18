@@ -16,6 +16,7 @@
       <button type="button" id="tab-btn-rechner" class="tab-btn is-active" role="tab" aria-selected="true" aria-controls="tab-rechner">Rechner</button>
       <button type="button" id="tab-btn-methodik" class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-methodik">Methodik &amp; Quellen</button>
       <button type="button" id="tab-btn-ueber" class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-ueber">Über</button>
+      <button type="button" id="tab-btn-tipps" class="tab-btn tab-btn-right" role="tab" aria-selected="false" aria-controls="tab-tipps">Tipps</button>
     </nav>
 
     <section id="tab-rechner" role="tabpanel">
@@ -290,6 +291,17 @@
         Entstanden mithilfe von Gemini (Deep Research, Grobkonzeption, Testfälle) und Claude Code.
       </p>
     </section>
+
+    <section id="tab-tipps" role="tabpanel" hidden>
+      <h2 class="section-heading">Praxis-Tipps für Fettabbau &amp; Recomposition</h2>
+      <p class="field-hint">
+        Eine kuratierte Sammlung praktischer Hebel — von Ernährung über Training bis Restaurantbesuche. Diese
+        Empfehlungen ergänzen die Kalorien- und Proteinwerte oben, ersetzen aber keine individuelle medizinische
+        oder ernährungswissenschaftliche Beratung. Jeder Abschnitt lässt sich über die Auswahl unterhalb des Titels
+        nach Einstufung filtern.
+      </p>
+      <div id="tipps-abschnitte"></div>
+    </section>
   </main>
 
   <script src="js/formeln.js"></script>
@@ -297,6 +309,7 @@
   <script src="js/modifikatoren.js"></script>
   <script src="js/berechnung.js"></script>
   <script src="js/speicher.js"></script>
+  <script src="js/tipps-daten.js"></script>
   <script src="js/ui.js"></script>
 </body>
 </html>
