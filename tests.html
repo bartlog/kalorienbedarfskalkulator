@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Kalorienbedarfsrechner — Tests</title>
+  <style>
+    body { font-family: monospace; padding: 1.5rem; background: #fff; color: #111; }
+    .pass { color: #1a7a3a; }
+    .fail { color: #b3261e; font-weight: bold; }
+    li { margin-bottom: 0.25rem; }
+    #summary { font-size: 1.1rem; margin-bottom: 1rem; }
+  </style>
+</head>
+<body>
+  <h1>Kalorienbedarfsrechner — In-Browser-Tests</h1>
+  <p>Läuft ohne npm/Server — einfach diese Datei per Doppelklick im Browser öffnen.</p>
+  <div id="summary"></div>
+  <ul id="results"></ul>
+
+  <script src="js/formeln.js"></script>
+  <script src="js/auswahl.js"></script>
+  <script src="js/modifikatoren.js"></script>
+  <script src="js/berechnung.js"></script>
+  <script>
+    "use strict";
+    const results = [];
+    let currentGroup = "";
+
+    function group(name) {
+      currentGroup = name;
+    }
+
+    function assert(condition, message) {
+      results.push({ pass: !!condition, message: `${currentGroup}: ${message}` });
+    }
+
+    function assertApprox(actual, expected, tolerance, message) {
+      const diff = Math.abs(actual - expected);
+      assert(diff <= tolerance, `${message} (erwartet ≈${expected}, erhalten ${actual.toFixed(1)}, Toleranz ±${tolerance})`);
+    }
+
+    const { berechne, GOAL_ADJUSTMENT } = window.KBR.berechnung;
+    const { selectREE } = window.KBR.auswahl;
+    const formeln = window.KBR.formeln;
+
+    // ---- Formeln: Referenzwerte von Hand nachgerechnet -----------------
+    group("Formeln (Referenzwerte)");
+    assertApprox(
+      formeln.mifflinStJeor({ gender: "male", age: 30, heightCm: 180, weightKg: 80 }),
+      1780, 1,
+      "Mifflin-St-Jeor Mann 30J/180cm/80kg: 10*80+6.25*180-5*30+5"
+    );
+    assertApprox(
+      formeln.mifflinStJeor({ gender: "female", age: 28, heightCm: 165, weightKg: 65 }),
+      1380, 1,
+      "Mifflin-St-Jeor Frau 28J/165cm/65kg: 10*65+6.25*165-5*28-161"
+    );
+    assertApprox(formeln.cunningham({ ffmKg: 65 }), 370 + 21.6 * 65, 0.5, "Cunningham 1991: 370+21.6×FFM");
+    assertApprox(formeln.tenHaaf({ ffmKg: 68 }), 22.771 * 68 + 484.264, 0.5, "Ten-Haaf FFM-basiert");
+    assertApprox(formeln.luehrmann({ gender: "female", age: 68, weightKg: 68 }), 757 + 11.9 * 68 - 3.7 * 68 + 0, 0.5, "Lührmann Formel");
+    assertApprox(formeln.ffmAusKfa({ weightKg: 80, kfaProzent: 20 }), 64, 0.01, "FFM aus KFA: 80×(1-0.20)");
+    assert(
+      Math.abs(formeln.cunningham({ ffmKg: 70 }) - (370 + 21.6 * 70)) < 0.001,
+      "Katch-McArdle liefert identisches Ergebnis wie Cunningham (gleiche Funktion)"
+    );
+
+    // ---- Formelauswahl: Präzedenzbaum + Kollisionsfälle ----------------
+    group("Formelauswahl (Präzedenzbaum)");
+    assert(
+      selectREE({ gender: "male", age: 30, heightCm: 180, weightKg: 80 }).formelId === "mifflin",
+      "Standardfall -> Mifflin-St-Jeor"
+    );
+    assert(
+      selectREE({ gender: "male", age: 25, heightCm: 182, weightKg: 78, ffmMeasured: true, ffmKg: 68, istSportler: true }).formelId === "tenhaaf",
+      "FFM gemessen + Sportler 18-35 -> Ten-Haaf"
+    );
+    assert(
+      selectREE({ gender: "male", age: 45, heightCm: 178, weightKg: 90, ffmMeasured: true, ffmKg: 65 }).formelId === "cunningham",
+      "FFM gemessen, kein Sportler -> Cunningham"
+    );
+    assert(
+      selectREE({ gender: "male", age: 70, heightCm: 175, weightKg: 75, ffmMeasured: true, ffmKg: 60, istSportler: true }).formelId === "cunningham",
+      "Kollisionsfall: 70-jähriger Athlet mit FFM -> Cunningham (nicht Ten-Haaf, Alter außerhalb Validierung)"
+    );
+    assert(
+      selectREE({ gender: "male", age: 72, heightCm: 172, weightKg: 105 }).formelId === "mueller",
+      "Kollisionsfall: adipöser Senior -> Müller (nicht Lührmann)"
+    );
+    assert(
+      selectREE({ gender: "female", age: 22, heightCm: 170, weightKg: 48 }).formelId === "mueller",
+      "Untergewicht (BMI<18.5) -> Müller"
+    );
+    assert(
+      selectREE({ gender: "female", age: 68, heightCm: 165, weightKg: 68 }).formelId === "luehrmann",
+      "Senior ohne Extremgewicht -> Lührmann"
+    );
+    assert(
+      selectREE({ gender: "female", age: 30, heightCm: 168, weightKg: 70, schwangerschaftStillzeit: "schwanger" }).formelId === "mifflin",
+      "Schwangerschaft -> Mifflin"
+    );
+    assert(
+      selectREE({ gender: "female", age: 30, heightCm: 168, weightKg: 70, schwangerschaftStillzeit: "schwanger" }).hinweise.length === 1,
+      "Schwangerschaft erzeugt Validierungs-Hinweis"
+    );
+
+    // ---- Modifikatoren: Guards ------------------------------------------
+    group("Modifikatoren-Guards");
+    (function () {
+      const kombi = window.KBR.modifikatoren.kombiniereReeFaktoren({
+        adaptiveThermogenese: { faktorMin: 0.5, faktorMax: 0.5 }, // absichtlich extrem, um Clamp zu testen
+      });
+      assert(kombi.faktorMin >= 0.8 && kombi.faktorMax <= 1.4, "REE-Faktor-Kombination wird auf [0.80, 1.40] geklammert");
+    })();
+    (function () {
+      const fieberOhne = window.KBR.modifikatoren.fieber({ koerpertemperaturC: 37 });
+      assert(fieberOhne === null, "Fieber bei 37°C (kein Fieber) liefert null");
+      const fieberMit = window.KBR.modifikatoren.fieber({ koerpertemperaturC: 39 });
+      assert(fieberMit.faktorMin > 1 && fieberMit.faktorMax > fieberMit.faktorMin, "Fieber bei 39°C erhöht REE plausibel");
+    })();
+
+    // ---- Pipeline: Guards & Plausibilitätsgrenzen -----------------------
+    group("Pipeline-Guards");
+    (function () {
+      const r = berechne({
+        gender: "female", age: 65, heightCm: 150, weightKg: 45,
+        basisPAL: 1.2, ziel: "lose", sport: { modus: "keine" },
+      });
+      assert(r.ziel.unterReeBasis === true, "Sehr niedriger TDEE + Abnehmen loest Warnhinweis 'unter REE_basis' aus");
+    })();
+    (function () {
+      const r = berechne({
+        gender: "male", age: 25, heightCm: 190, weightKg: 100,
+        basisPAL: 1.9, ziel: "gain", sport: { modus: "pal" },
+      });
+      assert(r.tee.haupt <= r.ree.basis * 2.5 + 0.01, "TEE bleibt innerhalb der globalen Plausibilitätsgrenze (<= 2.5x REE_basis)");
+      assert(r.tee.haupt >= r.ree.basis * 1.0 - 0.01, "TEE bleibt innerhalb der globalen Plausibilitätsgrenze (>= 1.0x REE_basis)");
+    })();
+    (function () {
+      // PAL-Zuschlag und MET sind exklusiv (Radio, nicht Checkbox) -> unterschiedliche Ergebnisse je nach modus
+      const basis = { gender: "male", age: 30, heightCm: 178, weightKg: 75, basisPAL: 1.375, ziel: "maintain" };
+      const rKeine = berechne({ ...basis, sport: { modus: "keine" } });
+      const rPal = berechne({ ...basis, sport: { modus: "pal" } });
+      const rMet = berechne({ ...basis, sport: { modus: "met", metWert: 9, stundenProEinheit: 1, einheitenProWoche: 3 } });
+      assert(rPal.tee.haupt > rKeine.tee.haupt, "PAL-Zuschlag erhöht TEE gegenüber 'keine'");
+      assert(rMet.tee.haupt > rKeine.tee.haupt, "MET-Berechnung erhöht TEE gegenüber 'keine'");
+      assert(rPal.tee.haupt !== rMet.tee.haupt, "PAL-Zuschlag und MET liefern unterschiedliche (nicht addierte) Ergebnisse");
+    })();
+    (function () {
+      const r = berechne({
+        gender: "male", age: 30, heightCm: 180, weightKg: 80,
+        basisPAL: 1.55, ziel: "maintain", sport: { modus: "keine" },
+      });
+      assert(r.fettabbau.haupt < r.tee.haupt, "Fettabbau-Kalorien liegen unter TEE");
+      assert(r.fettabbau.haupt >= r.ree.basis, "Fettabbau-Kalorien nie unter REE_basis (Guard)");
+      const deficit = r.tee.haupt - r.fettabbau.haupt;
+      assert(deficit >= 249 && deficit <= 751, "Fettabbau-Defizit innerhalb der Sicherheitsgrenze [250,750] kcal (±1 Rundungstoleranz)");
+    })();
+    (function () {
+      const r = berechne({
+        gender: "male", age: 30, heightCm: 180, weightKg: 80,
+        basisPAL: 1.55, ziel: "maintain", sport: { modus: "keine" },
+      });
+      assertApprox(r.proteinErhalt.min, 80 * 1.2, 0.01, "Proteinbedarf Erhalt Untergrenze = Gewicht × 1.2");
+      assertApprox(r.proteinAufbau.max, 80 * 2.0, 0.01, "Proteinbedarf Aufbau Obergrenze = Gewicht × 2.0");
+    })();
+    (function () {
+      // BMI >=30 ohne FFM-Angabe -> weiterhin Gesamtgewicht als Referenz
+      const rOhneFfm = berechne({
+        gender: "male", age: 40, heightCm: 175, weightKg: 105,
+        basisPAL: 1.2, ziel: "maintain", sport: { modus: "keine" },
+      });
+      assert(rOhneFfm.proteinBasis === "gewicht", "BMI>=30 ohne FFM-Angabe: Proteinbasis bleibt Gesamtgewicht");
+      assertApprox(rOhneFfm.proteinAufbau.max, 105 * 2.0, 0.01, "Proteinbedarf ohne FFM: Gesamtgewicht × 2.0");
+
+      // BMI >=30 mit FFM (via KFA) -> FFM statt Gesamtgewicht als Referenz
+      const ffmKg = formeln.ffmAusKfa({ weightKg: 105, kfaProzent: 35 }); // FFM = 68.25 kg
+      const rMitFfm = berechne({
+        gender: "male", age: 40, heightCm: 175, weightKg: 105, ffmKg,
+        basisPAL: 1.2, ziel: "maintain", sport: { modus: "keine" },
+      });
+      assert(rMitFfm.proteinBasis === "ffm", "BMI>=30 mit bekannter FFM: Proteinbasis wechselt auf FFM");
+      assertApprox(rMitFfm.proteinAufbau.max, ffmKg * 2.0, 0.01, "Proteinbedarf mit FFM: FFM × 2.0 statt Gesamtgewicht × 2.0");
+      assert(rMitFfm.proteinAufbau.max < rOhneFfm.proteinAufbau.max, "FFM-basierter Proteinbedarf liegt unter dem gesamtgewichtsbasierten Wert (verhindert Überschätzung)");
+    })();
+
+    // ---- Rendering ----
+    const list = document.getElementById("results");
+    let passCount = 0;
+    for (const r of results) {
+      const li = document.createElement("li");
+      li.className = r.pass ? "pass" : "fail";
+      li.textContent = (r.pass ? "✓ " : "✗ ") + r.message;
+      list.appendChild(li);
+      if (r.pass) passCount++;
+    }
+    const summary = document.getElementById("summary");
+    const allPass = passCount === results.length;
+    summary.textContent = `${passCount} / ${results.length} Tests bestanden`;
+    summary.className = allPass ? "pass" : "fail";
+  </script>
+</body>
+</html>

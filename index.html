@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kalorienbedarfsrechner</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <main class="card">
+    <h1>Kalorienbedarfsrechner</h1>
+    <p class="subtitle">Berechne deinen täglichen Kalorien- und Proteinbedarf — alles läuft lokal in deinem Browser, nichts wird übertragen.</p>
+
+    <nav class="tabs" role="tablist">
+      <button type="button" id="tab-btn-rechner" class="tab-btn is-active" role="tab" aria-selected="true" aria-controls="tab-rechner">Rechner</button>
+      <button type="button" id="tab-btn-methodik" class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-methodik">Methodik &amp; Quellen</button>
+    </nav>
+
+    <section id="tab-rechner" role="tabpanel">
+      <form id="calc-form" novalidate>
+        <h2 class="section-heading">Basisangaben</h2>
+
+        <div class="field">
+          <span class="field-label">Geschlecht</span>
+          <div class="radio-group">
+            <label><input type="radio" name="gender" value="male" checked> Männlich</label>
+            <label><input type="radio" name="gender" value="female"> Weiblich</label>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="age">Alter (Jahre)</label>
+          <input type="number" id="age" name="age" min="10" max="120" step="1" required>
+        </div>
+
+        <div class="field">
+          <label for="height">Größe (cm)</label>
+          <input type="number" id="height" name="height" min="100" max="250" step="0.1" required>
+        </div>
+
+        <div class="field">
+          <label for="weight">Gewicht (kg)</label>
+          <input type="number" id="weight" name="weight" min="30" max="300" step="0.1" required>
+        </div>
+
+        <div class="field">
+          <label for="activity">Aktivitätslevel (Beruf/Alltag)</label>
+          <select id="activity" name="activity" required>
+            <option value="1.2">Sitzend (kaum Bewegung)</option>
+            <option value="1.375">Leicht aktiv (1–3x Sport/Woche)</option>
+            <option value="1.55" selected>Mäßig aktiv (3–5x Sport/Woche)</option>
+            <option value="1.725">Sehr aktiv (6–7x Sport/Woche)</option>
+            <option value="1.9">Extrem aktiv (körperliche Arbeit + Sport)</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="goal">Ziel</label>
+          <select id="goal" name="goal">
+            <option value="lose">Gewicht verlieren</option>
+            <option value="maintain" selected>Gewicht halten</option>
+            <option value="gain">Gewicht zunehmen</option>
+          </select>
+        </div>
+
+        <details class="advanced">
+          <summary>Erweiterte Angaben — nur ausfüllen, falls bekannt</summary>
+
+          <fieldset class="field-group">
+            <legend>Fettfreie Masse (FFM)</legend>
+            <p class="field-hint">Falls bekannt, ermöglicht das eine präzisere Formel (Cunningham 1991 / Katch-McArdle).</p>
+            <div class="radio-group vertical">
+              <label><input type="radio" name="ffmModus" value="keine" checked> Keine Angabe</label>
+              <label><input type="radio" name="ffmModus" value="direkt"> FFM direkt bekannt (z. B. DXA/BIA/ADP)</label>
+              <label><input type="radio" name="ffmModus" value="kfa"> Körperfettanteil bekannt</label>
+            </div>
+            <div class="field sub-field" id="feld-ffm-direkt" hidden>
+              <label for="ffmDirekt">Fettfreie Masse (kg)</label>
+              <input type="number" id="ffmDirekt" min="10" max="150" step="0.1">
+            </div>
+            <div class="field sub-field" id="feld-ffm-kfa" hidden>
+              <label for="kfaProzent">Körperfettanteil (%)</label>
+              <input type="number" id="kfaProzent" min="3" max="60" step="0.1">
+            </div>
+            <div class="field sub-field" id="feld-ist-sportler" hidden>
+              <label class="checkbox-label"><input type="checkbox" id="istSportler"> Freizeitsportler:in (regelmäßiges Training)</label>
+            </div>
+          </fieldset>
+
+          <fieldset class="field-group">
+            <legend>Sport / Training</legend>
+            <p class="field-hint">Zusätzlich zum Aktivitätslevel oben — entweder PAL-Zuschlag oder MET-Berechnung, nicht beides (sonst Doppelzählung).</p>
+            <div class="radio-group vertical">
+              <label><input type="radio" name="sportModus" value="keine" checked> Keine Zusatzangabe</label>
+              <label><input type="radio" name="sportModus" value="pal"> Einfacher PAL-Zuschlag</label>
+              <label><input type="radio" name="sportModus" value="met"> Genaue MET-Berechnung</label>
+            </div>
+            <div class="field-row sub-field" id="feld-met" hidden>
+              <div class="field">
+                <label for="metWert">MET-Wert der Aktivität</label>
+                <input type="number" id="metWert" min="1" max="20" step="0.1">
+              </div>
+              <div class="field">
+                <label for="metStunden">Stunden pro Einheit</label>
+                <input type="number" id="metStunden" min="0.1" max="12" step="0.1">
+              </div>
+              <div class="field">
+                <label for="metEinheiten">Einheiten pro Woche</label>
+                <input type="number" id="metEinheiten" min="0" max="21" step="1">
+              </div>
+            </div>
+          </fieldset>
+
+          <fieldset class="field-group">
+            <legend>Weitere Faktoren</legend>
+
+            <div class="field">
+              <label for="schwangerschaftStillzeit">Schwangerschaft / Stillzeit</label>
+              <select id="schwangerschaftStillzeit">
+                <option value="">Keine Angabe</option>
+                <option value="schwanger">Schwangerschaft</option>
+                <option value="stillzeit">Stillzeit</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label class="checkbox-label"><input type="checkbox" id="adaptiveThermogenese"> Seit längerem in Diät / Kalorienrestriktion</label>
+              <p class="field-hint">Senkt den Ruheumsatz um ca. 5–10 % (adaptive Thermogenese).</p>
+            </div>
+
+            <div class="field">
+              <label class="checkbox-label"><input type="checkbox" id="schilddruseAktiv"> Ärztlich diagnostizierte Schilddrüsen-Erkrankung</label>
+              <div class="field sub-field" id="feld-schilddruse" hidden>
+                <label for="schilddruseProzent">Abweichung vom Ruheumsatz laut Diagnose (%)</label>
+                <input type="number" id="schilddruseProzent" min="-10" max="30" step="1">
+                <p class="field-hint disclaimer-inline">Bitte nur nach ärztlicher Angabe ausfüllen — ersetzt keine ärztliche oder ernährungstherapeutische Beratung.</p>
+              </div>
+            </div>
+
+            <div class="field">
+              <label class="checkbox-label"><input type="checkbox" id="betaBlockerAktiv"> Einnahme von Beta-Blockern</label>
+            </div>
+
+            <div class="field">
+              <label class="checkbox-label"><input type="checkbox" id="fieberAktiv"> Aktuell Fieber</label>
+              <div class="field sub-field" id="feld-fieber" hidden>
+                <label for="fieberTemperatur">Körpertemperatur (°C)</label>
+                <input type="number" id="fieberTemperatur" min="37" max="42" step="0.1">
+              </div>
+            </div>
+          </fieldset>
+
+          <fieldset class="field-group">
+            <legend>Nicht eingerechnete Faktoren</legend>
+            <p class="field-hint">Diese Faktoren sind Teil der ursprünglichen Konzeption, fließen aber bewusst nicht in die Berechnung ein:</p>
+            <ul id="liste-nicht-gerechnet" class="hinweis-liste"></ul>
+          </fieldset>
+        </details>
+
+        <div class="field">
+          <label class="checkbox-label"><input type="checkbox" id="speichernAktiv"> Eingaben auf diesem Gerät speichern</label>
+          <button type="button" id="datenLoeschenBtn" class="link-btn">Gespeicherte Daten löschen</button>
+        </div>
+
+        <button type="submit">Berechnen</button>
+      </form>
+
+      <section id="result" class="result" hidden aria-live="polite">
+        <div class="result-item">
+          <div class="result-row">
+            <span>Grundumsatz (REE)</span>
+            <strong id="val-ree">–</strong>
+          </div>
+          <div class="bar" id="bar-ree"></div>
+        </div>
+
+        <div class="result-item">
+          <div class="result-row">
+            <span>Gesamtumsatz (TEE)</span>
+            <strong id="val-tee">–</strong>
+          </div>
+          <div class="bar" id="bar-tee"></div>
+        </div>
+
+        <div class="result-item highlight">
+          <div class="result-row">
+            <span id="val-ziel-label">Empfohlene Kalorienzufuhr</span>
+            <strong id="val-ziel">–</strong>
+          </div>
+          <div class="bar" id="bar-ziel"></div>
+          <p id="ziel-warnung" class="signal-text" hidden>Das Ziel würde den Ruheumsatz unterschreiten — aus Sicherheitsgründen wird kein Wert unter dem Grundumsatz ausgegeben. Bitte ärztliche/ernährungstherapeutische Beratung einholen.</p>
+        </div>
+
+        <h3 class="section-heading">Zusätzliche Referenzwerte</h3>
+
+        <div class="result-item">
+          <div class="result-row">
+            <span>Kalorienbedarf für Fettabbau</span>
+            <strong id="val-fettabbau">–</strong>
+          </div>
+          <div class="bar" id="bar-fettabbau"></div>
+        </div>
+
+        <div class="result-item">
+          <div class="result-row">
+            <span>Proteinbedarf Muskelerhalt</span>
+            <strong id="val-protein-erhalt">–</strong>
+          </div>
+          <div class="bar" id="bar-protein-erhalt"></div>
+        </div>
+
+        <div class="result-item">
+          <div class="result-row">
+            <span>Proteinbedarf Muskelaufbau</span>
+            <strong id="val-protein-aufbau">–</strong>
+          </div>
+          <div class="bar" id="bar-protein-aufbau"></div>
+        </div>
+
+        <div class="hint-box">
+          <p><strong>Sporttage:</strong> Die errechneten Werte sind Basiswerte — Sporteinheiten (insb. Cardio/HIIT) steigern den kurzfristigen Kalorienumsatz. An Tagen mit hartem Training sollten daher zusätzliche Kalorien vorgesehen werden, um nicht zu tief in das Kaloriendefizit abzurutschen.</p>
+          <p><strong>Body Recomposition:</strong> Um gleichzeitig Körperfett abzubauen und Muskeln aufzubauen, ist neben ausreichend Protein insbesondere Krafttraining notwendig. Eine mittelfristige Steigerung der Muskelmasse erhöht zudem den Grundumsatz — die Kalkulation sollte daher regelmäßig aktualisiert werden.</p>
+        </div>
+
+        <details class="result-details">
+          <summary>Details zur Berechnung (Bandbreite, Formel, Modifikatoren)</summary>
+          <div id="detail-inhalt"></div>
+        </details>
+
+        <button type="button" id="printBtn" class="secondary-btn">Ergebnis als PDF speichern</button>
+      </section>
+
+      <p class="disclaimer">
+        Diese Berechnung liefert eine grobe Orientierung basierend auf anthropometrischen Schätzformeln (Standardschätzfehler ±10 % / ±200 kcal).
+        Sie ersetzt keine individuelle ärztliche oder ernährungstherapeutische Beratung — insbesondere bei medizinischen Angaben (Medikation, Schilddrüse, Schwangerschaft).
+      </p>
+    </section>
+
+    <section id="tab-methodik" role="tabpanel" hidden>
+      <h2 class="section-heading">Verwendete Formeln</h2>
+      <div id="methodik-formeln"></div>
+
+      <h2 class="section-heading">Wann dieser Rechner nicht ausreicht</h2>
+      <ul class="hinweis-liste">
+        <li>Organgewichte/MRT-Volumetrie oder indirekte Kalorimetrie als Goldstandard sind hier nicht abbildbar.</li>
+        <li>Tumorkachexie und ähnliche klinische Sonderfälle werden von keiner der Formeln erfasst.</li>
+        <li>Bei BMI &lt;16 oder &gt;40, schweren Traumata oder Verbrennungen: bitte klinische Abklärung statt Selbstberechnung.</li>
+      </ul>
+    </section>
+  </main>
+
+  <script src="js/formeln.js"></script>
+  <script src="js/auswahl.js"></script>
+  <script src="js/modifikatoren.js"></script>
+  <script src="js/berechnung.js"></script>
+  <script src="js/speicher.js"></script>
+  <script src="js/ui.js"></script>
+</body>
+</html>

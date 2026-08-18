@@ -1,0 +1,408 @@
+:root {
+  --color-bg: #f9f5ec;
+  --color-card: #ffffff;
+  --color-text: #1b2835;
+  --color-muted: #5a6b78;
+  --color-accent: #23643f;
+  --color-accent-hover: #1a4d30;
+  --color-signal: #a12f2f;
+  --color-border: #e3dcc9;
+  --color-highlight-bg: #eaf2ec;
+  --radius: 14px;
+  --radius-sm: 8px;
+  --font-family: Roboto, -apple-system, "Segoe UI", system-ui, "Helvetica Neue", Arial, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* Ohne diese Regel gewinnt z. B. .field{display:flex} gegen das UA-Standard-
+   [hidden]{display:none} (gleiche Spezifität, später in der Kaskade) —
+   Elemente mit dem hidden-Attribut blieben sonst sichtbar. */
+[hidden] {
+  display: none !important;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 2.5rem 1rem;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-family);
+}
+
+.card {
+  width: 100%;
+  max-width: 640px;
+  background: var(--color-card);
+  border-radius: var(--radius);
+  padding: 2rem;
+  box-shadow: 0 1px 3px rgba(27, 40, 53, 0.06), 0 8px 24px rgba(27, 40, 53, 0.05);
+}
+
+h1 {
+  margin: 0 0 0.25rem;
+  font-size: 1.6rem;
+  letter-spacing: -0.01em;
+}
+
+.subtitle {
+  margin: 0 0 1.5rem;
+  color: var(--color-muted);
+  font-size: 0.92rem;
+  line-height: 1.4;
+}
+
+.section-heading {
+  font-size: 1.05rem;
+  margin: 1.5rem 0 0.75rem;
+  color: var(--color-text);
+}
+
+/* ---- Tabs ------------------------------------------------------------ */
+
+.tabs {
+  display: flex;
+  gap: 0.25rem;
+  border-bottom: 1px solid var(--color-border);
+  margin-bottom: 1.25rem;
+}
+
+.tab-btn {
+  background: none;
+  border: none;
+  padding: 0.65rem 1rem;
+  font-size: 0.95rem;
+  font-family: inherit;
+  color: var(--color-muted);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+}
+
+.tab-btn.is-active {
+  color: var(--color-accent);
+  border-bottom-color: var(--color-accent);
+  font-weight: 600;
+}
+
+/* ---- Formularfelder ---------------------------------------------------- */
+
+.field {
+  margin-bottom: 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.field-row {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.field-row .field {
+  flex: 1;
+  margin-bottom: 0;
+}
+
+.field-label,
+label {
+  font-size: 0.95rem;
+}
+
+.field-hint {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--color-muted);
+  line-height: 1.4;
+}
+
+.disclaimer-inline {
+  color: var(--color-signal);
+}
+
+input[type="number"],
+select {
+  padding: 0.55rem 0.6rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-size: 1rem;
+  font-family: inherit;
+  background: var(--color-card);
+  color: var(--color-text);
+}
+
+input[type="number"]:focus,
+select:focus {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 1px;
+}
+
+.radio-group {
+  display: flex;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.radio-group.vertical {
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.radio-group label,
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.95rem;
+}
+
+.sub-field {
+  margin-left: 1.6rem;
+  padding-left: 0.75rem;
+  border-left: 2px solid var(--color-highlight-bg);
+}
+
+/* ---- Erweiterte Angaben ------------------------------------------------- */
+
+.advanced {
+  margin: 1.25rem 0;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 0.25rem 1rem 0.5rem;
+}
+
+.advanced summary {
+  cursor: pointer;
+  padding: 0.75rem 0;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.field-group {
+  border: none;
+  border-top: 1px solid var(--color-border);
+  padding: 1rem 0;
+  margin: 0;
+}
+
+.field-group legend {
+  font-weight: 600;
+  font-size: 0.95rem;
+  padding: 0 0.1rem;
+}
+
+.hinweis-liste {
+  margin: 0.5rem 0 0;
+  padding-left: 1.2rem;
+  font-size: 0.85rem;
+  color: var(--color-muted);
+  line-height: 1.5;
+}
+
+/* ---- Buttons ------------------------------------------------------------ */
+
+button[type="submit"] {
+  width: 100%;
+  padding: 0.75rem;
+  margin-top: 0.5rem;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: var(--color-accent);
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+button[type="submit"]:hover {
+  background: var(--color-accent-hover);
+}
+
+.secondary-btn {
+  width: 100%;
+  padding: 0.65rem;
+  margin-top: 1rem;
+  border: 1px solid var(--color-accent);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-accent);
+  font-size: 0.95rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.secondary-btn:hover {
+  background: var(--color-highlight-bg);
+}
+
+.link-btn {
+  border: none;
+  background: none;
+  color: var(--color-accent);
+  font-size: 0.85rem;
+  font-family: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 0;
+  align-self: flex-start;
+}
+
+/* ---- Ergebnis ------------------------------------------------------------ */
+
+.result {
+  margin-top: 1.5rem;
+  padding: 1.25rem;
+  border-radius: var(--radius);
+  background: var(--color-highlight-bg);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.result-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.result-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 0.95rem;
+}
+
+.result-item.highlight strong {
+  color: var(--color-accent);
+  font-size: 1.15rem;
+}
+
+.bar {
+  width: 100%;
+  height: 24px;
+}
+
+.bar svg {
+  width: 100%;
+  height: 24px;
+  display: block;
+}
+
+.signal-text {
+  color: var(--color-signal);
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin: 0.25rem 0 0;
+}
+
+.quelle-text {
+  color: var(--color-muted);
+  font-size: 0.82rem;
+  font-style: italic;
+  margin: 0.5rem 0;
+}
+
+.hint-box {
+  background: var(--color-card);
+  border-radius: var(--radius-sm);
+  padding: 0.9rem 1rem;
+  font-size: 0.85rem;
+  color: var(--color-muted);
+  line-height: 1.5;
+}
+
+.hint-box p {
+  margin: 0 0 0.6rem;
+}
+
+.hint-box p:last-child {
+  margin-bottom: 0;
+}
+
+.result-details summary {
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.result-details {
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
+.formel-eintrag {
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.formel-eintrag:last-child {
+  border-bottom: none;
+}
+
+.formel-eintrag h3 {
+  margin: 0 0 0.3rem;
+  font-size: 1rem;
+  color: var(--color-accent);
+}
+
+.formel-eintrag p {
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--color-muted);
+  line-height: 1.5;
+}
+
+.disclaimer {
+  margin: 1.5rem 0 0;
+  font-size: 0.78rem;
+  color: var(--color-muted);
+  line-height: 1.4;
+}
+
+/* ---- Druck / PDF-Export (DIN A4) ------------------------------------------ */
+
+@media print {
+  @page {
+    size: A4;
+    margin: 2cm;
+  }
+
+  body {
+    padding: 0;
+    background: #fff;
+  }
+
+  .card {
+    max-width: none;
+    box-shadow: none;
+    border-radius: 0;
+    padding: 0;
+  }
+
+  .tabs,
+  #calc-form,
+  .secondary-btn,
+  .link-btn,
+  #datenLoeschenBtn,
+  #tab-methodik {
+    display: none !important;
+  }
+
+  .result {
+    background: none;
+    padding: 0;
+  }
+
+  .hint-box {
+    border: 1px solid var(--color-border);
+  }
+}
