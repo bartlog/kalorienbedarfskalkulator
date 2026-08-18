@@ -49,6 +49,21 @@ h1 {
   margin: 0 0 0.25rem;
   font-size: 1.6rem;
   letter-spacing: -0.01em;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.h1-icon {
+  height: 1em;
+  width: 1em;
+}
+
+.beta-tag {
+  font-size: 0.55em;
+  font-weight: 600;
+  color: var(--color-muted);
+  letter-spacing: 0;
 }
 
 .subtitle {
