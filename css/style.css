@@ -229,16 +229,7 @@ label {
 .info-toggle summary {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  gap: 0.3rem;
-  width: 1.15rem;
-  height: 1.15rem;
-  border-radius: 50%;
-  background: var(--color-highlight-bg);
-  color: var(--color-accent);
-  font-size: 0.75rem;
-  font-weight: 700;
-  font-style: italic;
+  gap: 0.35rem;
   cursor: pointer;
   list-style: none;
   user-select: none;
@@ -250,8 +241,28 @@ label {
   content: "";
 }
 
-.info-toggle summary:hover {
-  background: var(--color-border);
+/* Eigenständiges Icon-Element statt des Unicode-Zeichens "ⓘ" -- dessen
+   eigener Kreis-Umriss variiert stark je nach Systemschriftart und wirkte
+   dadurch teils unauffällig. Ein per CSS gezeichneter, ausgefüllter Kreis
+   ist auf jedem System gleich (und laut Nutzer-Feedback auffälliger). */
+.info-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 1.2rem;
+  height: 1.2rem;
+  border-radius: 50%;
+  background: var(--color-accent);
+  color: #fff;
+  font-size: 0.78rem;
+  font-weight: 800;
+  font-family: Georgia, "Times New Roman", serif;
+  line-height: 1;
+}
+
+.info-toggle summary:hover .info-icon {
+  background: var(--color-accent-hover);
 }
 
 .info-toggle-inhalt {
@@ -280,14 +291,16 @@ label {
 }
 
 .info-toggle-standalone summary {
-  width: auto;
-  height: auto;
   padding: 0.4rem 0.7rem;
   border-radius: var(--radius-sm);
-  font-style: normal;
+  background: var(--color-highlight-bg);
   font-size: 0.85rem;
   font-weight: 500;
   color: var(--color-accent);
+}
+
+.info-toggle-standalone summary:hover {
+  background: var(--color-border);
 }
 
 .field-error {
@@ -669,6 +682,18 @@ button[type="submit"]:hover {
   font-size: 1.05rem;
   font-weight: 700;
   color: var(--color-accent);
+}
+
+/* Hebt den Hauptwert unter mehreren Karten hervor -- bewusst per Rahmen statt
+   Farbumkehr (heller Text auf grünem Grund): falls "Hintergrundgrafiken" im
+   Druckdialog deaktiviert ist, würde ein invertierter Text sonst unsichtbar
+   auf Weiß landen (siehe PDF-Verifizierungshinweis in CLAUDE.md). */
+.soft-boundary-wert-primaer {
+  border: 2px solid var(--color-accent);
+}
+
+.soft-boundary-wert-primaer .formel-wert {
+  font-weight: 800;
 }
 
 .result-details summary {

@@ -22,7 +22,11 @@ window.KBR.auswahl = (function (formeln) {
   // Formeln nur wenig, aber der Sprung zwischen ihnen wirkt unmotiviert.
   // In diesen Zonen wird daher zusätzlich zur primären REE (die weiterhin
   // die gesamte Pipeline speist) der Wert der jeweils anderen Formel als
-  // reiner Vergleichswert mitgeliefert — ui.js zeigt beide nebeneinander.
+  // reiner Vergleichswert mitgeliefert — als Array (`alternativen`), da beide
+  // Zonen unabhängig voneinander zutreffen können (z. B. BMI 29,5 UND Alter
+  // 62 gleichzeitig) und dann beide Vergleichswerte gleichzeitig erscheinen
+  // sollen, statt sich exklusiv auszuschließen. ui.js zeigt die primäre REE
+  // plus alle Einträge aus `alternativen` nebeneinander.
   const BMI_SOFT_MIN = 29.0;
   const BMI_SOFT_MAX = 31.0;
   const ALTER_SOFT_MIN = 60;
@@ -36,9 +40,36 @@ window.KBR.auswahl = (function (formeln) {
     return age >= ALTER_SOFT_MIN && age <= ALTER_SOFT_MAX;
   }
 
-  function vergleichswert(entryId, fn, args) {
+  function vergleichswert(entryId, fn, args, softBoundary) {
     const entry = formeln.getById(entryId);
-    return { formelId: entry.id, formelName: entry.name, reeBasis: fn(args) };
+    return { formelId: entry.id, formelName: entry.name, reeBasis: fn(args), softBoundary };
+  }
+
+  // Die beiden Zonen sind voneinander unabhängig (Option 2 "Stacking"): jede
+  // liefert für sich einen Alternativ-Eintrag, sofern sie zutrifft — nie
+  // exklusiv gegeneinander. Statt "primär" nochmal als eigenen Alternativ-
+  // Eintrag zurückzugeben, wird jeweils die *andere* der beiden Formeln
+  // dieser Zone verglichen (z. B. bei Müller primär -> Mifflin als
+  // BMI-Vergleich, sonst -> Müller als BMI-Vergleich).
+  function bmiAlternative(primaerId, bmi, p) {
+    if (!istBmiSoftZone(bmi)) return null;
+    if (primaerId === "mueller") {
+      return vergleichswert("mifflin", formeln.mifflinStJeor, p, "bmi");
+    }
+    return vergleichswert("mueller", formeln.muellerBmiGraduiert, { gender: p.gender, age: p.age, weightKg: p.weightKg }, "bmi");
+  }
+
+  function alterAlternative(primaerId, age, p) {
+    if (!istAlterSoftZone(age)) return null;
+    if (primaerId === "luehrmann") {
+      return vergleichswert("mifflin", formeln.mifflinStJeor, p, "alter");
+    }
+    return vergleichswert("luehrmann", formeln.luehrmann, p, "alter");
+  }
+
+  // Reihenfolge stabil bmi-vor-alter, unabhängig davon welche Formel primär ist.
+  function alternativenFuer(primaerId, bmi, p) {
+    return [bmiAlternative(primaerId, bmi, p), alterAlternative(primaerId, p.age, p)].filter(Boolean);
   }
 
   /**
@@ -51,7 +82,7 @@ window.KBR.auswahl = (function (formeln) {
    * @param {number} [p.ffmKg] - gemessene fettfreie Masse, nur relevant wenn ffmMeasured
    * @param {boolean} [p.istSportler] - Freizeitsportler (für Ten-Haaf-Validierungspopulation)
    * @param {boolean} [p.schwangerschaftStillzeit]
-   * @returns {{ formelId: string, formelName: string, reeBasis: number, begruendungId: string, begruendungParams: object|undefined, hinweise: string[], quelle: string, bmi: number, vergleich: {formelId:string,formelName:string,reeBasis:number}|null, softBoundary: 'bmi'|'alter'|null }}
+   * @returns {{ formelId: string, formelName: string, reeBasis: number, begruendungId: string, begruendungParams: object|undefined, hinweise: string[], quelle: string, bmi: number, alternativen: {formelId:string,formelName:string,reeBasis:number,softBoundary:'bmi'|'alter'}[] }}
    */
   function selectREE(p) {
     const bmi = calculateBmi(p.weightKg, p.heightCm);
@@ -73,8 +104,7 @@ window.KBR.auswahl = (function (formeln) {
           hinweise,
           quelle: entry.quelle,
           bmi,
-          vergleich: null,
-          softBoundary: null,
+          alternativen: [],
         };
       }
 
@@ -87,8 +117,7 @@ window.KBR.auswahl = (function (formeln) {
         hinweise,
         quelle: entry.quelle,
         bmi,
-        vergleich: null,
-        softBoundary: null,
+        alternativen: [],
       };
     }
 
@@ -102,8 +131,7 @@ window.KBR.auswahl = (function (formeln) {
         hinweise: ["pregnancy_not_validated"],
         quelle: entry.quelle,
         bmi,
-        vergleich: null,
-        softBoundary: null,
+        alternativen: [],
       };
     }
 
@@ -121,8 +149,7 @@ window.KBR.auswahl = (function (formeln) {
         hinweise,
         quelle: entry.quelle,
         bmi,
-        vergleich: istBmiSoftZone(bmi) ? vergleichswert("mifflin", formeln.mifflinStJeor, p) : null,
-        softBoundary: istBmiSoftZone(bmi) ? "bmi" : null,
+        alternativen: alternativenFuer(entry.id, bmi, p),
       };
     }
 
@@ -136,25 +163,15 @@ window.KBR.auswahl = (function (formeln) {
         hinweise,
         quelle: entry.quelle,
         bmi,
-        vergleich: istAlterSoftZone(p.age) ? vergleichswert("mifflin", formeln.mifflinStJeor, p) : null,
-        softBoundary: istAlterSoftZone(p.age) ? "alter" : null,
+        alternativen: alternativenFuer(entry.id, bmi, p),
       };
     }
 
     const entry = formeln.getById("mifflin");
-    // Bei Überlappung beider Zonen (z. B. BMI 29,5 UND Alter 62) hat die
-    // BMI-Zone Vorrang — dieselbe Priorisierung wie im Baum oben (Müller vor
-    // Lührmann), da Extremgewicht laut ursprünglichem Konzept stärker auf den
-    // Ruheumsatz wirkt als das Alter allein.
-    let vergleich = null;
-    let softBoundary = null;
-    if (istBmiSoftZone(bmi)) {
-      vergleich = vergleichswert("mueller", formeln.muellerBmiGraduiert, { gender: p.gender, age: p.age, weightKg: p.weightKg });
-      softBoundary = "bmi";
-    } else if (istAlterSoftZone(p.age)) {
-      vergleich = vergleichswert("luehrmann", formeln.luehrmann, p);
-      softBoundary = "alter";
-    }
+    // Beide Übergangszonen (BMI 29-31, Alter 60-69) wirken unabhängig und
+    // werden unabhängig voneinander gestapelt (Option 2 "Stacking") — keine
+    // Vorrangregel mehr zwischen ihnen, beide Alternativen können gleichzeitig
+    // erscheinen, wenn beide Zonen zutreffen (z. B. BMI 29,5 UND Alter 62).
     return {
       formelId: entry.id,
       formelName: entry.name,
@@ -163,8 +180,7 @@ window.KBR.auswahl = (function (formeln) {
       hinweise,
       quelle: entry.quelle,
       bmi,
-      vergleich,
-      softBoundary,
+      alternativen: alternativenFuer(entry.id, bmi, p),
     };
   }
 

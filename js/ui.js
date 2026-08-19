@@ -532,30 +532,41 @@
   }
 
   // Zeigt bei Soft-Boundary-Fällen (BMI 29-31 bzw. Alter 60-69, siehe
-  // auswahl.js) die primäre REE neben dem Vergleichswert der jeweils anderen
-  // Formel — rein informativ, die Pipeline rechnet unverändert mit der
-  // primären Formel weiter (kein Mittelwert o. Ä. im Hintergrund).
+  // auswahl.js) die primäre REE neben den Vergleichswerten der jeweils
+  // anderen Formel(n) — rein informativ, die Pipeline rechnet unverändert mit
+  // der primären Formel weiter (kein Mittelwert o. Ä. im Hintergrund). Beide
+  // Zonen sind unabhängig voneinander und können gleichzeitig zutreffen
+  // (`alternativen` ist ein Array, nicht auf einen Eintrag festgelegt) — das
+  // Markup ist entsprechend generisch für 1 oder 2 Alternativen gebaut.
   function renderSoftBoundaryHinweis(formel, reeBasisPrimaer) {
     const container = el("soft-boundary-hinweis");
-    if (!formel.softBoundary || !formel.vergleich) {
+    const alternativen = formel.alternativen || [];
+    if (!alternativen.length) {
       container.hidden = true;
       return;
     }
-    const titelKey = "soft_boundary_" + formel.softBoundary + "_titel";
-    const textKey = "soft_boundary_" + formel.softBoundary + "_text";
+    const zonen = alternativen
+      .map((a) => a.softBoundary)
+      .filter((z, i, arr) => arr.indexOf(z) === i);
+    const titelKey = zonen.length > 1 ? "soft_boundary_kombiniert_titel" : "soft_boundary_" + zonen[0] + "_titel";
+    const werteHtml = [
+      `<div class="soft-boundary-wert soft-boundary-wert-primaer">
+        <span class="formel-name">${escapeHtml(formel.name)}</span>
+        <span class="formel-wert">${formatKcal(reeBasisPrimaer)}</span>
+      </div>`,
+      ...alternativen.map(
+        (a) => `
+      <div class="soft-boundary-wert">
+        <span class="formel-name">${escapeHtml(a.formelName)}</span>
+        <span class="formel-wert">${formatKcal(a.reeBasis)}</span>
+      </div>`
+      ),
+    ].join("");
+    const textHtml = zonen.map((z) => `<p>${i18n.t("soft_boundary_" + z + "_text")}</p>`).join("");
     container.innerHTML = `
       <p class="soft-boundary-titel">${i18n.t(titelKey)}</p>
-      <div class="soft-boundary-werte">
-        <div class="soft-boundary-wert">
-          <span class="formel-name">${escapeHtml(formel.name)}</span>
-          <span class="formel-wert">${formatKcal(reeBasisPrimaer)}</span>
-        </div>
-        <div class="soft-boundary-wert">
-          <span class="formel-name">${escapeHtml(formel.vergleich.formelName)}</span>
-          <span class="formel-wert">${formatKcal(formel.vergleich.reeBasis)}</span>
-        </div>
-      </div>
-      <p>${i18n.t(textKey)}</p>
+      <div class="soft-boundary-werte">${werteHtml}</div>
+      ${textHtml}
     `;
     container.hidden = false;
   }

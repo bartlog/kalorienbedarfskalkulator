@@ -108,53 +108,86 @@
     );
 
     // ---- Soft Boundaries (BMI 29-31, Alter 60-69) -----------------------
-    group("Soft Boundaries (Formelvergleich)");
+    // Beide Zonen sind unabhängig voneinander gestapelt (Option 2), keine
+    // exklusive Vorrangregel mehr -- r.alternativen ist ein Array mit 0, 1
+    // oder 2 Einträgen ({formelId, formelName, reeBasis, softBoundary}).
+    group("Soft Boundaries (Formelvergleich, gestapelt)");
     (function () {
-      // BMI 30,45 (>=30 -> Müller primär), innerhalb der Zone [29,31]
+      // BMI 30,45 (>=30 -> Müller primär), innerhalb der Zone [29,31], Alter außerhalb
       const r = selectREE({ gender: "male", age: 40, heightCm: 170, weightKg: 88 });
       assert(r.formelId === "mueller", "BMI-Soft-Zone oberhalb 30 -> Müller bleibt primär");
-      assert(r.softBoundary === "bmi", "BMI-Soft-Zone oberhalb 30 -> softBoundary='bmi'");
-      assert(r.vergleich && r.vergleich.formelId === "mifflin", "BMI-Soft-Zone oberhalb 30 -> Vergleichswert ist Mifflin");
+      assert(r.alternativen.length === 1, "BMI-Soft-Zone oberhalb 30 -> genau eine Alternative");
+      assert(r.alternativen[0].formelId === "mifflin" && r.alternativen[0].softBoundary === "bmi", "BMI-Soft-Zone oberhalb 30 -> Alternative ist Mifflin/bmi");
     })();
     (function () {
-      // BMI 29,41 (<30 -> Mifflin primär), innerhalb der Zone [29,31]
+      // BMI 29,41 (<30 -> Mifflin primär), innerhalb der Zone [29,31], Alter außerhalb
       const r = selectREE({ gender: "male", age: 40, heightCm: 170, weightKg: 85 });
       assert(r.formelId === "mifflin", "BMI-Soft-Zone unterhalb 30 -> Mifflin bleibt primär");
-      assert(r.softBoundary === "bmi", "BMI-Soft-Zone unterhalb 30 -> softBoundary='bmi'");
-      assert(r.vergleich && r.vergleich.formelId === "mueller", "BMI-Soft-Zone unterhalb 30 -> Vergleichswert ist Müller");
+      assert(r.alternativen.length === 1, "BMI-Soft-Zone unterhalb 30 -> genau eine Alternative");
+      assert(r.alternativen[0].formelId === "mueller" && r.alternativen[0].softBoundary === "bmi", "BMI-Soft-Zone unterhalb 30 -> Alternative ist Müller/bmi");
     })();
     (function () {
       const rNormal = selectREE({ gender: "male", age: 40, heightCm: 180, weightKg: 75 }); // BMI ~23
-      assert(rNormal.vergleich === null && rNormal.softBoundary === null, "Normalgewicht (BMI~23) -> kein Soft-Boundary-Vergleich");
+      assert(rNormal.alternativen.length === 0, "Normalgewicht (BMI~23) -> keine Soft-Boundary-Alternative");
       const rAdipoes = selectREE({ gender: "male", age: 40, heightCm: 170, weightKg: 105 }); // BMI ~36
-      assert(rAdipoes.vergleich === null && rAdipoes.softBoundary === null, "Deutliche Adipositas (BMI~36, außerhalb Zone) -> kein Vergleich");
+      assert(rAdipoes.alternativen.length === 0, "Deutliche Adipositas (BMI~36, außerhalb Zone) -> keine Alternative");
     })();
     (function () {
       // Alter 62 (<65 -> Mifflin primär), innerhalb der Zone [60,69], Normalgewicht
       const r = selectREE({ gender: "female", age: 62, heightCm: 165, weightKg: 62 });
       assert(r.formelId === "mifflin", "Alters-Soft-Zone unterhalb 65 -> Mifflin bleibt primär");
-      assert(r.softBoundary === "alter", "Alters-Soft-Zone unterhalb 65 -> softBoundary='alter'");
-      assert(r.vergleich && r.vergleich.formelId === "luehrmann", "Alters-Soft-Zone unterhalb 65 -> Vergleichswert ist Lührmann");
+      assert(r.alternativen.length === 1, "Alters-Soft-Zone unterhalb 65 -> genau eine Alternative");
+      assert(r.alternativen[0].formelId === "luehrmann" && r.alternativen[0].softBoundary === "alter", "Alters-Soft-Zone unterhalb 65 -> Alternative ist Lührmann/alter");
     })();
     (function () {
-      // Alter 67 (>=65 -> Lührmann primär), innerhalb der Zone [60,69]
+      // Alter 67 (>=65 -> Lührmann primär), innerhalb der Zone [60,69], Normalgewicht
       const r = selectREE({ gender: "female", age: 67, heightCm: 165, weightKg: 62 });
       assert(r.formelId === "luehrmann", "Alters-Soft-Zone oberhalb 65 -> Lührmann bleibt primär");
-      assert(r.softBoundary === "alter", "Alters-Soft-Zone oberhalb 65 -> softBoundary='alter'");
-      assert(r.vergleich && r.vergleich.formelId === "mifflin", "Alters-Soft-Zone oberhalb 65 -> Vergleichswert ist Mifflin");
+      assert(r.alternativen.length === 1, "Alters-Soft-Zone oberhalb 65 -> genau eine Alternative");
+      assert(r.alternativen[0].formelId === "mifflin" && r.alternativen[0].softBoundary === "alter", "Alters-Soft-Zone oberhalb 65 -> Alternative ist Mifflin/alter");
     })();
     (function () {
       const rJung = selectREE({ gender: "female", age: 50, heightCm: 165, weightKg: 62 });
-      assert(rJung.vergleich === null, "Alter 50 (außerhalb Zone) -> kein Vergleich");
+      assert(rJung.alternativen.length === 0, "Alter 50 (außerhalb Zone) -> keine Alternative");
       const rAlt = selectREE({ gender: "female", age: 75, heightCm: 165, weightKg: 62 });
-      assert(rAlt.formelId === "luehrmann" && rAlt.vergleich === null, "Alter 75 (>65, aber außerhalb Zone 60-69) -> kein Vergleich");
+      assert(rAlt.formelId === "luehrmann" && rAlt.alternativen.length === 0, "Alter 75 (>65, aber außerhalb Zone 60-69) -> keine Alternative");
     })();
     (function () {
-      // Überlappung: BMI 29,41 UND Alter 62 gleichzeitig in der jeweiligen Zone
-      // -> BMI-Zone hat Vorrang (dieselbe Priorisierung wie im Entscheidungsbaum)
+      // Überlappung, beide primär außerhalb ihrer harten Schwelle: BMI 29,41
+      // UND Alter 62 gleichzeitig in der jeweiligen Zone -> Mifflin bleibt
+      // primär (weder bmi>=30 noch age>=65 greift), BEIDE Alternativen
+      // erscheinen gestapelt statt sich exklusiv auszuschließen.
       const r = selectREE({ gender: "male", age: 62, heightCm: 170, weightKg: 85 });
-      assert(r.softBoundary === "bmi", "Überlappende Zonen (BMI+Alter) -> BMI-Zone hat Vorrang");
-      assert(r.vergleich.formelId === "mueller", "Überlappende Zonen -> Vergleichswert ist Müller, nicht Lührmann");
+      assert(r.formelId === "mifflin", "Überlappende Zonen -> Mifflin bleibt primär");
+      assert(r.alternativen.length === 2, "Überlappende Zonen -> beide Alternativen gestapelt (nicht exklusiv)");
+      const zonen = r.alternativen.map((a) => a.softBoundary).sort();
+      assert(zonen[0] === "alter" && zonen[1] === "bmi", "Überlappende Zonen -> je ein bmi- und ein alter-Eintrag");
+      const alt = r.alternativen.find((a) => a.softBoundary === "bmi");
+      assert(alt.formelId === "mueller", "Überlappende Zonen -> BMI-Alternative ist weiterhin Müller");
+      const altAlter = r.alternativen.find((a) => a.softBoundary === "alter");
+      assert(altAlter.formelId === "luehrmann", "Überlappende Zonen -> Alter-Alternative ist Lührmann");
+    })();
+    (function () {
+      // Testfall 6c: Alter genau 65 (harter Cutoff -> Lührmann bleibt primär,
+      // wie bereits vor diesem Stacking-Umbau dokumentiert) UND BMI 29,75
+      // (innerhalb der BMI-Zone [29,31]) gleichzeitig -> beide Zonen greifen
+      // unabhängig voneinander: Alter-Zone vergleicht mit Mifflin (da Lührmann
+      // selbst schon primär ist), BMI-Zone vergleicht mit Müller.
+      const r = selectREE({ gender: "female", age: 65, heightCm: 165, weightKg: 81 });
+      assertApprox(r.bmi, 29.75, 0.05, "Testfall 6c -> BMI wie erwartet ~29,75");
+      assert(r.formelId === "luehrmann", "Testfall 6c -> Lührmann bleibt primär (harter Alters-Cutoff bei 65 unverändert)");
+      assert(r.alternativen.length === 2, "Testfall 6c -> beide Zonen gestapelt");
+      const mifflinAlt = r.alternativen.find((a) => a.softBoundary === "alter");
+      const muellerAlt = r.alternativen.find((a) => a.softBoundary === "bmi");
+      assert(mifflinAlt && mifflinAlt.formelId === "mifflin", "Testfall 6c -> Alter-Alternative ist Mifflin");
+      assert(muellerAlt && muellerAlt.formelId === "mueller", "Testfall 6c -> BMI-Alternative ist Müller");
+      // Exakte Werte gemäß den implementierten Formeln (nicht den zunächst vom
+      // Nutzer überschlagenen Zahlen ~1.350/~1.355/~1.378 -- Gegenprobe von
+      // Hand bestätigte 1480,4/1355,25/1420,4 als die tatsächlich korrekten
+      // Formelergebnisse; die ursprüngliche Schätzung war ungenau, kein Bug).
+      assertApprox(r.reeBasis, 1480.4, 1, "Testfall 6c -> Lührmann-Hauptwert 1.480 kcal");
+      assertApprox(mifflinAlt.reeBasis, 1355.25, 1, "Testfall 6c -> Mifflin-Alternative 1.355 kcal");
+      assertApprox(muellerAlt.reeBasis, 1420.4, 1, "Testfall 6c -> Müller-Alternative 1.420 kcal");
     })();
 
     // ---- Modifikatoren: Guards ------------------------------------------

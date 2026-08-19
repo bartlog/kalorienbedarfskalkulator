@@ -351,6 +351,10 @@ window.KBR.i18n = (function () {
     },
 
     // ---- Soft-Boundary-Formelvergleich (dynamisch) ---------------------------
+    soft_boundary_kombiniert_titel: {
+      de: "Formelvergleich in zwei Übergangszonen (BMI und Alter)",
+      en: "Formula comparison in two transition zones (BMI and age)",
+    },
     soft_boundary_bmi_titel: {
       de: "Formelvergleich in der BMI-Übergangszone",
       en: "Formula comparison in the BMI transition zone",

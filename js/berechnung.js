@@ -316,8 +316,7 @@ window.KBR.berechnung = (function (auswahl, modifikatoren) {
         hinweise: ree.auswahl.hinweise,
         quelle: ree.auswahl.quelle,
         bmi: ree.auswahl.bmi,
-        vergleich: ree.auswahl.vergleich,
-        softBoundary: ree.auswahl.softBoundary,
+        alternativen: ree.auswahl.alternativen,
       },
       ree: { haupt: ree.reeAdjHaupt, min: ree.reeAdjMin, max: ree.reeAdjMax, bandKcal: ree.bandKcal, basis: ree.reeBasis },
       pal: {
