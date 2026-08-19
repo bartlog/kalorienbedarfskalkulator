@@ -98,30 +98,40 @@
 
   // ---- Progressive Disclosure innerhalb Kategorie B ------------------------
 
+  // Zeigt/versteckt eine Doppelzählungs-Statusmeldung an einer von mehreren
+  // Stellen -- ersetzt die frühere Einzellösung (direkter .hidden-Zugriff pro
+  // Aufrufstelle) durch einen gemeinsamen, wiederverwendbaren Aufruf. Die
+  // Texte selbst sind statisch (data-i18n im HTML), hier wird nur die
+  // Sichtbarkeit gesteuert.
+  function aktualisiereStatusHinweis(id, sichtbar) {
+    el(id).hidden = !sichtbar;
+  }
+
   // Bei genauer MET-Berechnung ersetzt das Training die Sport-Häufigkeits-
   // Schätzung oben (statt sie zu ergänzen) — daher wird das Feld auf "Kein
   // Sport" fixiert und deaktiviert, damit nicht doppelt gezählt wird. Die
   // Alltagsaktivität (NEAT) ist davon unabhängig und bleibt unangetastet.
   // Vorheriger Wert wird für den Fall gemerkt, dass der Nutzer wieder auf
-  // "Schätzung oben verwenden" wechselt.
+  // "Schätzung oben verwenden" wechselt. Der Status-Hinweis erscheint zweimal
+  // (direkt am deaktivierten Dropdown UND unten bei MET) -- dort oben entsteht
+  // die eigentliche Verwirrung ("warum ist das grau?"), nicht erst unten.
   function anwendenMetUeberschreibung(istMet) {
     const sportSelect = el("sportHaeufigkeit");
-    const hinweis = el("hinweis-met-override");
     if (istMet) {
       if (sportSelect.dataset.vorherigerWert === undefined) {
         sportSelect.dataset.vorherigerWert = sportSelect.value;
       }
       sportSelect.value = "keinSport";
       sportSelect.disabled = true;
-      hinweis.hidden = false;
     } else {
       sportSelect.disabled = false;
       if (sportSelect.dataset.vorherigerWert !== undefined) {
         sportSelect.value = sportSelect.dataset.vorherigerWert;
         delete sportSelect.dataset.vorherigerWert;
       }
-      hinweis.hidden = true;
     }
+    aktualisiereStatusHinweis("hinweis-met-override", istMet);
+    aktualisiereStatusHinweis("hinweis-met-override-sport", istMet);
   }
 
   function aktualisiereSchwangerschaftSichtbarkeit() {
@@ -172,7 +182,7 @@
 
     function aktualisiereHinweisLaufMet() {
       const aktiv = el("laufAktiv").checked && Number(el("laufKmWoche").value) > 0;
-      el("hinweis-lauf-met").hidden = !aktiv;
+      aktualisiereStatusHinweis("hinweis-lauf-met", aktiv);
     }
     el("laufAktiv").addEventListener("change", (e) => {
       el("feld-lauf-km").hidden = !e.target.checked;
@@ -841,7 +851,7 @@
     el("laufAktiv").checked = !!gespeichert.laufAktiv;
     el("feld-lauf-km").hidden = !gespeichert.laufAktiv;
     el("laufKmWoche").value = gespeichert.laufKmWoche || "";
-    el("hinweis-lauf-met").hidden = !(gespeichert.laufAktiv && Number(gespeichert.laufKmWoche) > 0);
+    aktualisiereStatusHinweis("hinweis-lauf-met", gespeichert.laufAktiv && Number(gespeichert.laufKmWoche) > 0);
     el("traegtTrackerBeimSport").checked = gespeichert.traegtTrackerBeimSport !== false;
 
     aktualisiereSchwangerschaftSichtbarkeit();

@@ -21,6 +21,16 @@ window.KBR.i18n = (function () {
     },
     lang_switch_aria: { de: "Sprache", en: "Language" },
 
+    // ---- Info-Icon aria-labels (spezifisch statt generisch "Mehr Informationen") --
+    info_aria_neat: { de: "Mehr Informationen zu Alltagsaktivität (NEAT)", en: "More information about daily activity (NEAT)" },
+    info_aria_lauf: { de: "Mehr Informationen zu Lauf-Kilometern", en: "More information about running kilometers" },
+    info_aria_sport_haeufigkeit: { de: "Mehr Informationen zu Sport-Häufigkeit", en: "More information about exercise frequency" },
+    info_aria_sport_training: { de: "Mehr Informationen zur genauen MET-Berechnung", en: "More information about precise MET calculation" },
+    info_aria_tracker: { de: "Mehr Informationen zum Schrittzähler-Hinweis", en: "More information about the step tracker note" },
+    info_aria_lauf_met: { de: "Mehr Informationen zur Lauf-km/MET-Erkennung", en: "More information about running km/MET detection" },
+    info_aria_met: { de: "Mehr Informationen zu MET-Aktivitäten", en: "More information about MET activities" },
+    info_aria_fidgeting: { de: "Mehr Informationen zu Spontanbewegung", en: "More information about spontaneous movement" },
+
     // ---- Tabs ---------------------------------------------------------------
     tab_rechner: { de: "Rechner", en: "Calculator" },
     tab_methodik: { de: "Methodik & Quellen", en: "Methodology & Sources" },
@@ -62,14 +72,12 @@ window.KBR.i18n = (function () {
     lauf_label: { de: "Davon gelaufen / gejoggt", en: "Of which running / jogging" },
     lauf_km_label: { de: "Kilometer pro Woche", en: "Kilometers per week" },
     lauf_km_hint: {
-      de: `Zähl deine Gesamtschritte oben weiterhin genau so, wie dein Tracker sie anzeigt. Trage hier deine
-        wöchentlichen Lauf-Kilometer ein. Falls du denselben Lauf unten bei der genauen MET-Berechnung einträgst,
-        erkennt der Rechner das automatisch und übernimmt dafür die MET-Angabe — ohne MET-Eintrag rechnet er
-        stattdessen mit einer einfachen Faustregel.`,
-      en: `Keep counting your total steps above exactly as your tracker shows them. Enter your weekly running
-        kilometers here. If you also log the same run below under the precise MET calculation, the calculator
-        detects this automatically and uses your MET entry instead — without a MET entry it uses a simple rule of
-        thumb instead.`,
+      de: `Trage hier deine wöchentlichen Lauf-Kilometer ein. Trägst du denselben Lauf unten bei der genauen
+        MET-Berechnung ein, erkennt der Rechner das automatisch und rechnet darüber statt mit der einfachen
+        Kilometer-Faustregel.`,
+      en: `Enter your weekly running kilometers here. If you also log the same run below under the precise MET
+        calculation, the calculator detects this automatically and uses that instead of the simple kilometer rule
+        of thumb.`,
     },
     feld_sport_haeufigkeit_label: {
       de: "Sport / Training (Häufigkeit pro Woche)",
@@ -85,12 +93,20 @@ window.KBR.i18n = (function () {
       en: "Frequency of your regular exercise, in addition to the daily activity above.",
     },
     sport_haeufigkeit_doppelzaehlung_warnung: {
-      de: `⚠ Gilt nur für Sport, der nicht wesentlich zu deiner Schrittzahl oben beiträgt (z. B. Radfahren, Schwimmen,
-        Krafttraining, Yoga). Für Lauf- oder Gehsport nutze stattdessen oben bei der Schrittzahl das Feld „Davon
-        gelaufen/gejoggt".`,
-      en: `⚠ Only applies to exercise that doesn't meaningfully add to your step count above (e.g. cycling, swimming,
-        strength training, yoga). For running or walking-based exercise, use the "Of which running/jogging" field
-        above under steps instead.`,
+      de: `Gilt nur für Sport, der nicht wesentlich zu deiner Schrittzahl oben beiträgt (z. B. Radfahren, Schwimmen,
+        Krafttraining, Yoga).`,
+      en: `Only applies to exercise that doesn't meaningfully add to your step count above (e.g. cycling, swimming,
+        strength training, yoga).`,
+    },
+    // Kompakte, immer sichtbare Kurzübersicht direkt vor dem NEAT-Feld (Beginn des
+    // Aktivitäts-Blocks) — nennt die Doppelzählungs-Regel einmal, damit die
+    // einzelnen Tooltips darunter nicht mehr jeweils das Gesamtbild wiederholen
+    // müssen, sondern nur noch ihre eigene, feldspezifische Mechanik erklären.
+    bewegung_kurzuebersicht: {
+      de: `Schrittzahl, Lauf-km, Sport-Häufigkeit und die MET-Tabelle bilden zusammen deine Bewegung ab — dieselbe
+        Aktivität nicht doppelt eintragen. Details an den Info-Symbolen.`,
+      en: `Step count, running km, exercise frequency, and the MET table together cover your movement — don't enter
+        the same activity twice. Details via the info icons.`,
     },
     neat_sport_aequivalenz_text: {
       de: "Der Rechner ermittelt deinen durchschnittlichen Wochen-Tagesbedarf. 10.000 Schritte im Alltag verbrennen oft ähnlich viel Energie wie eine intensive Sporteinheit — solange dein Wochenmittel aus Bewegung und Sport konstant bleibt, passt die Berechnung.",
@@ -127,12 +143,11 @@ window.KBR.i18n = (function () {
       en: "More precise entry instead of the frequency estimate",
     },
     sport_hint: {
-      de: `Die Sport-Häufigkeit oben ist eine grobe Schätzung. Falls du deine Trainingsdaten genau kennst, kannst du
-        sie stattdessen hier präzise angeben — das <strong>ersetzt</strong> die Häufigkeits-Schätzung oben (kein
-        zusätzlicher Aufschlag, sonst Doppelzählung). Deine Alltagsaktivität (NEAT) bleibt davon unberührt.`,
-      en: `The exercise frequency above is a rough estimate. If you know your training data precisely, you can enter
-        it here instead — this <strong>replaces</strong> the frequency estimate above (no additional add-on, to avoid
-        double-counting). Your daily activity (NEAT) is not affected by this.`,
+      de: `Falls du deine Trainingsdaten genau kennst, kannst du sie hier präzise angeben — das
+        <strong>ersetzt</strong> die Häufigkeits-Schätzung oben. Deine Alltagsaktivität (NEAT) bleibt davon
+        unberührt.`,
+      en: `If you know your training data precisely, you can enter it here instead — this <strong>replaces</strong>
+        the frequency estimate above. Your daily activity (NEAT) is not affected by this.`,
     },
     sport_opt_keine: {
       de: "Schätzung oben verwenden",
@@ -156,25 +171,23 @@ window.KBR.i18n = (function () {
     },
     traegt_tracker_hint: {
       de: `Aktiv: Laufen, Gehen/Wandern und Ballsportarten unten werden anteilig von deiner Schrittzahl oben
-        abgezogen, um Doppelzählung zu vermeiden (Krafttraining, Rad, Schwimmen, Yoga bleiben unberührt). Inaktiv:
-        deine Schrittzahl oben gilt als reine Alltagsbewegung, dein Training unten wird voll obendrauf gerechnet.`,
-      en: `On: running, walking/hiking, and ball sports below are proportionally deducted from your step count above
-        to avoid double-counting (strength training, cycling, swimming, yoga are unaffected). Off: your step count
-        above is treated as pure daily activity, your training below is added fully on top.`,
+        abgezogen (Krafttraining, Rad, Schwimmen, Yoga bleiben unberührt). Inaktiv: deine Schrittzahl oben gilt als
+        reine Alltagsbewegung, dein Training unten zählt voll obendrauf.`,
+      en: `On: running, walking/hiking, and ball sports below are proportionally deducted from your step count
+        above (strength training, cycling, swimming, yoga are unaffected). Off: your step count above is treated as
+        pure daily activity, your training below counts fully on top.`,
     },
     hinweis_lauf_met_kurz: {
       de: "Lauf-km oben werden berücksichtigt",
       en: "Running km above are taken into account",
     },
     hinweis_lauf_met: {
-      de: `Wenn du kein Laufen in die MET-Tabelle einträgst, werden deine oben angegebenen Lauf-Kilometer
-        berücksichtigt. Wenn du auch hier dein Lauftraining einträgst, berechnet der Rechner dein Training exakt
-        über MET. Deine gelaufenen Schritte werden im Hintergrund von deinen Alltagsschritten abgezogen, um eine
-        Doppelzählung zu vermeiden. Du musst oben nichts ändern.`,
-      en: `If you don't enter running in the MET table, your running kilometers entered above are taken into
-        account. If you also log the same running below, the calculator uses your MET entry for the precise
-        calculation instead. Your running steps are deducted from your daily steps in the background to avoid
-        double-counting. You don't need to change anything above.`,
+      de: `Wenn du hier kein Laufen einträgst, werden deine oben angegebenen Lauf-Kilometer berücksichtigt. Trägst
+        du dein Lauftraining auch hier ein, berechnet der Rechner es exakt über MET — deine gelaufenen Schritte
+        werden automatisch von deinen Alltagsschritten abgezogen. Du musst oben nichts ändern.`,
+      en: `If you don't log running here, your running kilometers entered above are taken into account. If you
+        also log your running here, the calculator uses your MET entry for the precise calculation — your running
+        steps are automatically deducted from your daily steps. You don't need to change anything above.`,
     },
     hinweis_met_override: {
       de: `Bei genauer MET-Berechnung wird oben automatisch „Kein regelmäßiger Sport" als Sport-Häufigkeit angenommen (Feld ist deaktiviert) — dein Training wird hier separat und präziser dazugerechnet. Deine Alltagsaktivität (NEAT) bleibt davon unberührt.`,
@@ -196,6 +209,10 @@ window.KBR.i18n = (function () {
     schwangerschaft_opt_keine: { de: "Keine Angabe", en: "Not specified" },
     schwangerschaft_opt_schwanger: { de: "Schwangerschaft", en: "Pregnancy" },
     schwangerschaft_opt_stillzeit: { de: "Stillzeit", en: "Breastfeeding" },
+    schwangerschaft_hint: {
+      de: "Erhöht deinen täglichen Gesamtenergieverbrauch spürbar (Schwangerschaft ca. +250 kcal/Tag, Stillzeit ca. +500 kcal/Tag).",
+      en: "Noticeably increases your total daily energy expenditure (pregnancy approx. +250 kcal/day, breastfeeding approx. +500 kcal/day).",
+    },
     diaet_label: {
       de: "Seit längerem in Diät / Kalorienrestriktion",
       en: "In a diet / calorie restriction for a while",
@@ -212,20 +229,33 @@ window.KBR.i18n = (function () {
       de: "Abweichung vom Grundumsatz laut Diagnose (%)",
       en: "Deviation from resting energy expenditure per diagnosis (%)",
     },
-    schilddruese_disclaimer: {
-      de: "Bitte nur nach ärztlicher Angabe ausfüllen — ersetzt keine ärztliche oder ernährungstherapeutische Beratung.",
-      en: "Please fill in only based on medical guidance — this does not replace medical or dietetic advice.",
+    // Kurzmarkierung für Risikostellen (Schilddrüse, Schwangerschaft/Stillzeit,
+    // Fieber) — kurze Variante des disclaimer-Kernsatzes oben, überall identisch
+    // statt vier leicht unterschiedlicher Formulierungen. Bleibt bewusst
+    // sichtbarer Text (kein Tooltip), da eine falsch verstandene Angabe an
+    // diesen Stellen die Ergebniserwartung spürbar verfälschen kann.
+    hinweis_fachpersonal_kurz: {
+      de: "Ersetzt keine individuelle Beratung durch qualifiziertes Fachpersonal.",
+      en: "Does not replace individual advice from qualified professionals.",
     },
     betablocker_label: { de: "Einnahme von Beta-Blockern", en: "Taking beta blockers" },
+    betablocker_hint: {
+      de: "Kann den täglichen Gesamtenergieverbrauch leicht senken (ca. 50–100 kcal/Tag) — dauerhaft wirksam, daher trotz der kleinen Größenordnung eingerechnet.",
+      en: "May slightly lower your total daily energy expenditure (approx. 50–100 kcal/day) — has a chronic effect, so it's factored in despite the small magnitude.",
+    },
     fidgeting_label: {
       de: "Auffällig viel unbewusste Bewegung / Zappeln",
       en: "Noticeably high unconscious movement / fidgeting",
     },
     fidgeting_hint: {
-      de: "Erhöht den Energieverbrauch leicht (PAL +0,05 bis +0,10) — unabhängig von Sport oder Alltagsaktivität.",
-      en: "Slightly increases energy expenditure (PAL +0.05 to +0.10) — independent of exercise or daily activity.",
+      de: "Erhöht deinen täglichen Gesamtenergieverbrauch leicht.",
+      en: "Slightly increases your total daily energy expenditure.",
     },
     fieber_label: { de: "Aktuell Fieber", en: "Currently have a fever" },
+    fieber_hint: {
+      de: "Erhöht den Grundumsatz spürbar (ca. +10–13 % pro °C Körperkerntemperatur über 37 °C).",
+      en: "Noticeably raises your resting energy expenditure (approx. +10–13% per °C of core body temperature above 37°C).",
+    },
     fieber_temp_label: { de: "Körpertemperatur (°C)", en: "Body temperature (°C)" },
 
     speichern_label: { de: "Eingaben auf diesem Gerät speichern", en: "Save inputs on this device" },
@@ -241,6 +271,8 @@ window.KBR.i18n = (function () {
     submit_btn: { de: "Berechnen", en: "Calculate" },
 
     // ---- Ergebnis -----------------------------------------------------------
+    result_haupt_heading: { de: "Ergebnis", en: "Result" },
+    result_ziel_label_default: { de: "Empfohlene Kalorienzufuhr", en: "Recommended calorie intake" },
     result_bmi_label: { de: "Body-Mass-Index (BMI)", en: "Body Mass Index (BMI)" },
     result_ree_label: { de: "Grundumsatz (REE)", en: "Resting energy expenditure (REE)" },
     result_tee_label: { de: "Gesamtumsatz (TEE)", en: "Total energy expenditure (TEE)" },
@@ -328,11 +360,20 @@ window.KBR.i18n = (function () {
     druck_sport_zeile: { de: "{{stunden}} h/Woche, {{met}} MET", en: "{{stunden}} h/week, {{met}} MET" },
     druck_lauf_km_zeile: { de: "{{km}} km/Woche", en: "{{km}} km/week" },
 
+    // Kanonischer Disclaimer-Kernsatz (Konsistenz-Aufräumen, 2026-08-19): dieselbe
+    // Formulierung endet `disclaimer` und `ueber_intro` (die beiden zentralen
+    // Stellen) — hier absichtlich als Text dupliziert statt über eine
+    // Key-Komposition zusammengesetzt, da i18n.js sonst nirgends verschachtelte
+    // Keys kennt und eine neue Compose-Funktion für nur 2 Stellen überdimensioniert
+    // wäre. Beim Ändern beide Stellen synchron halten. `hinweis_fachpersonal_kurz`
+    // (unten) ist die Kurzform davon, für Risikostellen im Formular.
     disclaimer: {
       de: `Diese Berechnung liefert eine grobe Orientierung basierend auf anthropometrischen Schätzformeln (Standardschätzfehler ±10 % / ±200 kcal).
-        Sie ersetzt keine individuelle ärztliche oder ernährungstherapeutische Beratung — insbesondere bei medizinischen Angaben (Medikation, Schilddrüse, Schwangerschaft).`,
+        Sie ersetzt keine individuelle Beratung durch qualifiziertes Fachpersonal — ob Ärztin/Arzt, Ernährungstherapeutin/Ernährungstherapeut
+        oder Gesundheitscoach. Bei medizinischen Angaben (Medikation, Schilddrüse, Schwangerschaft) ist zusätzlich immer ärztlicher Rat einzuholen.`,
       en: `This calculation provides a rough estimate based on anthropometric prediction formulas (standard error of estimate ±10% / ±200 kcal).
-        It does not replace individual medical or dietetic advice — especially for medical factors (medication, thyroid, pregnancy).`,
+        It does not replace individual advice from qualified professionals — whether a physician, a dietitian/nutrition therapist, or a health
+        coach. For medical factors (medication, thyroid, pregnancy), medical advice should always be sought in addition.`,
     },
 
     // ---- Ziel-Labels (dynamisch, GOAL_ADJUSTMENT) ---------------------------
@@ -608,12 +649,16 @@ window.KBR.i18n = (function () {
         <a href="https://github.com/bartlog/kalorienbedarfskalkulator" target="_blank" rel="noopener">GitHub</a>.
         Alle verwendeten Formeln und Modifikatoren beruhen auf wissenschaftlichen Studien (siehe Reiter „Methodik &amp;
         Quellen") und wurden anhand mehrerer Testfälle überprüft. Trotzdem übernimmt dieses Tool keine Gewähr für
-        Richtigkeit oder Vollständigkeit und ersetzt keine medizinische oder ernährungswissenschaftliche Beratung.`,
+        Richtigkeit oder Vollständigkeit. Es ersetzt keine individuelle Beratung durch qualifiziertes Fachpersonal —
+        ob Ärztin/Arzt, Ernährungstherapeutin/Ernährungstherapeut oder Gesundheitscoach. Bei medizinischen Angaben
+        ist zusätzlich immer ärztlicher Rat einzuholen.`,
       en: `The calorie needs calculator is an open-source project — the full source code is freely available on
         <a href="https://github.com/bartlog/kalorienbedarfskalkulator" target="_blank" rel="noopener">GitHub</a>.
         All formulas and modifiers used are based on scientific studies (see the "Methodology &amp; Sources" tab)
         and have been checked against several test cases. Nevertheless, this tool makes no guarantee of accuracy or
-        completeness and does not replace medical or nutritional advice.`,
+        completeness. It does not replace individual advice from qualified professionals — whether a physician, a
+        dietitian/nutrition therapist, or a health coach. For medical factors, medical advice should always be
+        sought in addition.`,
     },
     ueber_autor: {
       de: `<strong>Autor:</strong> Heiko Bartlog —
@@ -628,12 +673,12 @@ window.KBR.i18n = (function () {
     tipps_heading: { de: "Praxis-Tipps für Fettabbau & Recomposition", en: "Practical tips for fat loss & recomposition" },
     tipps_intro: {
       de: `Eine kuratierte Sammlung praktischer Hebel — von Ernährung über Training bis Restaurantbesuche. Diese
-        Empfehlungen ergänzen die Kalorien- und Proteinwerte oben, ersetzen aber keine individuelle medizinische
-        oder ernährungswissenschaftliche Beratung. Jeder Abschnitt lässt sich über die Auswahl unterhalb des Titels
-        nach Einstufung filtern.`,
+        Empfehlungen ergänzen die Kalorien- und Proteinwerte oben, ersetzen aber keine individuelle Beratung durch
+        qualifiziertes Fachpersonal. Jeder Abschnitt lässt sich über die Auswahl unterhalb des Titels nach
+        Einstufung filtern.`,
       en: `A curated collection of practical levers — from nutrition to training to eating out. These
-        recommendations complement the calorie and protein values above but do not replace individual medical
-        or nutritional advice. Each section can be filtered by rating using the dropdown below its title.`,
+        recommendations complement the calorie and protein values above but do not replace individual advice from
+        qualified professionals. Each section can be filtered by rating using the dropdown below its title.`,
     },
     tipps_filtern_nach: { de: "Filtern nach {{spalte}}", en: "Filter by {{spalte}}" },
     tipps_alle: { de: "Alle", en: "All" },

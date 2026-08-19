@@ -55,11 +55,16 @@
           <input type="number" id="weight" name="weight" min="30" max="300" step="0.1" required>
         </div>
 
-        <div class="field field-group-start">
+        <p class="bereichs-hinweis field-group-start" data-i18n="bewegung_kurzuebersicht">
+          Schrittzahl, Lauf-km, Sport-Häufigkeit und die MET-Tabelle bilden zusammen deine Bewegung ab — dieselbe
+          Aktivität nicht doppelt eintragen. Details an den Info-Symbolen.
+        </p>
+
+        <div class="field">
           <div class="field-label-row">
             <label for="neatSchritte" data-i18n="feld_neat_label">Alltagsaktivität (NEAT) — durchschnittliche Schrittzahl/Tag</label>
             <details class="info-toggle">
-              <summary aria-label="Mehr Informationen"><span class="info-icon" aria-hidden="true">i</span></summary>
+              <summary data-i18n-attr-aria-label="info_aria_neat"><span class="info-icon" aria-hidden="true">i</span></summary>
               <div class="info-toggle-inhalt" data-i18n="feld_neat_hint">Zähl deine Gesamt-Schrittzahl an einem typischen Tag, so wie sie dein Tracker anzeigt — inklusive Spaziergänge und Laufrunden. Das deckt deine gesamte Alltagsbewegung ab, auch wenn ein Teil davon aus Sport stammt.</div>
             </details>
           </div>
@@ -74,8 +79,8 @@
         <div class="field">
           <div class="field-label-row">
             <label class="checkbox-label"><input type="checkbox" id="laufAktiv"> <span data-i18n="lauf_label">Davon gelaufen / gejoggt</span></label>
-            <details class="info-toggle">
-              <summary aria-label="Mehr Informationen"><span class="info-icon" aria-hidden="true">i</span></summary>
+            <details class="info-toggle info-toggle-wichtig">
+              <summary data-i18n-attr-aria-label="info_aria_lauf"><span class="info-icon" aria-hidden="true">i</span></summary>
               <div class="info-toggle-inhalt" data-i18n="lauf_km_hint">
                 Zähl deine Gesamtschritte oben weiterhin genau so, wie dein Tracker sie anzeigt. Trage hier deine
                 wöchentlichen Lauf-Kilometer ein. Falls du denselben Lauf unten bei der genauen MET-Berechnung
@@ -93,11 +98,11 @@
         <div class="field">
           <div class="field-label-row">
             <label for="sportHaeufigkeit" data-i18n="feld_sport_haeufigkeit_label">Sport / Training (Häufigkeit pro Woche)</label>
-            <details class="info-toggle">
-              <summary aria-label="Mehr Informationen"><span class="info-icon" aria-hidden="true">i</span></summary>
+            <details class="info-toggle info-toggle-wichtig">
+              <summary data-i18n-attr-aria-label="info_aria_sport_haeufigkeit"><span class="info-icon" aria-hidden="true">i</span></summary>
               <div class="info-toggle-inhalt">
                 <p data-i18n="feld_sport_haeufigkeit_hint">Häufigkeit deines regelmäßigen Sports, zusätzlich zur Alltagsaktivität oben.</p>
-                <p data-i18n="sport_haeufigkeit_doppelzaehlung_warnung">Gilt nur für Sport, der nicht wesentlich zu deiner Schrittzahl oben beiträgt (z. B. Radfahren, Schwimmen, Krafttraining, Yoga). Für Lauf- oder Gehsport nutze stattdessen oben bei der Schrittzahl das Feld „Davon gelaufen/gejoggt".</p>
+                <p data-i18n="sport_haeufigkeit_doppelzaehlung_warnung">Gilt nur für Sport, der nicht wesentlich zu deiner Schrittzahl oben beiträgt (z. B. Radfahren, Schwimmen, Krafttraining, Yoga).</p>
               </div>
             </details>
           </div>
@@ -108,6 +113,7 @@
             <option value="6bis7" data-i18n="sport_haeufigkeit_opt_6bis7">6–7× pro Woche</option>
             <option value="leistungssport" data-i18n="sport_haeufigkeit_opt_leistungssport">Leistungssport / sehr intensiv</option>
           </select>
+          <p class="field-hint sub-field" id="hinweis-met-override-sport" hidden data-i18n="hinweis_met_override">Bei genauer MET-Berechnung wird oben automatisch „Kein regelmäßiger Sport" als Sport-Häufigkeit angenommen (Feld ist deaktiviert) — dein Training wird hier separat und präziser dazugerechnet. Deine Alltagsaktivität (NEAT) bleibt davon unberührt.</p>
         </div>
 
         <div class="hint-box" data-i18n="neat_sport_aequivalenz_text">
@@ -138,12 +144,12 @@
             </div>
             <div class="field sub-field" id="feld-ffm-direkt" hidden>
               <label for="ffmDirekt" data-i18n="ffm_direkt_label">Fettfreie Masse (kg)</label>
-              <input type="number" id="ffmDirekt" min="10" max="150" step="0.1">
+              <input type="number" id="ffmDirekt" min="10" max="150" step="0.1" aria-describedby="error-ffm-direkt">
               <p class="field-error" id="error-ffm-direkt" hidden data-i18n="error_ffm_zu_hoch">Die fettfreie Masse muss kleiner als dein Gesamtgewicht sein.</p>
             </div>
             <div class="field sub-field" id="feld-ffm-kfa" hidden>
               <label for="kfaProzent" data-i18n="ffm_kfa_label">Körperfettanteil (%)</label>
-              <input type="number" id="kfaProzent" min="3" max="60" step="0.1">
+              <input type="number" id="kfaProzent" min="3" max="60" step="0.1" aria-describedby="error-kfa">
               <p class="field-error" id="error-kfa" hidden data-i18n="error_kfa_bereich">Bitte einen Wert zwischen 3 % und 60 % eingeben.</p>
             </div>
             <div class="field sub-field" id="feld-ist-sportler" hidden>
@@ -153,13 +159,12 @@
 
           <fieldset class="field-group">
             <legend data-i18n="sport_legend">Sport / Training</legend>
-            <details class="info-toggle info-toggle-standalone">
-              <summary aria-label="Mehr Informationen"><span class="info-icon" aria-hidden="true">i</span><span data-i18n="sport_hint_kurz"> Genauere Eingabe statt Häufigkeits-Schätzung</span></summary>
+            <details class="info-toggle info-toggle-standalone info-toggle-wichtig">
+              <summary data-i18n-attr-aria-label="info_aria_sport_training"><span class="info-icon" aria-hidden="true">i</span><span data-i18n="sport_hint_kurz"> Genauere Eingabe statt Häufigkeits-Schätzung</span></summary>
               <div class="info-toggle-inhalt" data-i18n="sport_hint">
-                Die Sport-Häufigkeit oben ist eine grobe Schätzung. Falls du deine Trainingsdaten genau kennst,
-                kannst du sie stattdessen hier präzise angeben — das <strong>ersetzt</strong> die
-                Häufigkeits-Schätzung oben (kein zusätzlicher Aufschlag, sonst Doppelzählung). Deine
-                Alltagsaktivität (NEAT) bleibt davon unberührt.
+                Falls du deine Trainingsdaten genau kennst, kannst du sie hier präzise angeben — das
+                <strong>ersetzt</strong> die Häufigkeits-Schätzung oben. Deine Alltagsaktivität (NEAT) bleibt davon
+                unberührt.
               </div>
             </details>
             <div class="radio-group vertical">
@@ -170,30 +175,29 @@
               <div class="field">
                 <div class="field-label-row">
                   <label class="checkbox-label"><input type="checkbox" id="traegtTrackerBeimSport" checked> <span data-i18n="traegt_tracker_label">Ich trage meinen Schrittzähler auch beim hier eingetragenen Sport</span></label>
-                  <details class="info-toggle">
-                    <summary aria-label="Mehr Informationen"><span class="info-icon" aria-hidden="true">i</span></summary>
+                  <details class="info-toggle info-toggle-wichtig">
+                    <summary data-i18n-attr-aria-label="info_aria_tracker"><span class="info-icon" aria-hidden="true">i</span></summary>
                     <div class="info-toggle-inhalt" data-i18n="traegt_tracker_hint">
                       Aktiv: Laufen, Gehen/Wandern und Ballsportarten unten werden anteilig von deiner Schrittzahl
-                      oben abgezogen, um Doppelzählung zu vermeiden (Krafttraining, Rad, Schwimmen, Yoga bleiben
-                      unberührt). Inaktiv: deine Schrittzahl oben gilt als reine Alltagsbewegung, dein Training
-                      unten wird voll obendrauf gerechnet.
+                      oben abgezogen (Krafttraining, Rad, Schwimmen, Yoga bleiben unberührt). Inaktiv: deine
+                      Schrittzahl oben gilt als reine Alltagsbewegung, dein Training unten zählt voll obendrauf.
                     </div>
                   </details>
                 </div>
               </div>
-              <details class="info-toggle info-toggle-standalone" id="hinweis-lauf-met" hidden>
-                <summary aria-label="Mehr Informationen"><span class="info-icon" aria-hidden="true">i</span><span data-i18n="hinweis_lauf_met_kurz"> Lauf-km oben werden berücksichtigt</span></summary>
+              <details class="info-toggle info-toggle-standalone info-toggle-wichtig" id="hinweis-lauf-met" hidden>
+                <summary data-i18n-attr-aria-label="info_aria_lauf_met"><span class="info-icon" aria-hidden="true">i</span><span data-i18n="hinweis_lauf_met_kurz"> Lauf-km oben werden berücksichtigt</span></summary>
                 <div class="info-toggle-inhalt" data-i18n="hinweis_lauf_met">
-                  Wenn du kein Laufen in die MET-Tabelle einträgst, werden deine oben angegebenen Lauf-Kilometer
-                  berücksichtigt. Wenn du auch hier dein Lauftraining einträgst, berechnet der Rechner dein Training
-                  exakt über MET. Deine gelaufenen Schritte werden im Hintergrund von deinen Alltagsschritten
-                  abgezogen, um eine Doppelzählung zu vermeiden. Du musst oben nichts ändern.
+                  Wenn du hier kein Laufen einträgst, werden deine oben angegebenen Lauf-Kilometer berücksichtigt.
+                  Trägst du dein Lauftraining auch hier ein, berechnet der Rechner es exakt über MET — deine
+                  gelaufenen Schritte werden automatisch von deinen Alltagsschritten abgezogen. Du musst oben nichts
+                  ändern.
                 </div>
               </details>
               <div class="field-label-row">
                 <span class="field-label" data-i18n="met_legend">MET-Aktivitäten</span>
                 <details class="info-toggle">
-                  <summary aria-label="Mehr Informationen"><span class="info-icon" aria-hidden="true">i</span></summary>
+                  <summary data-i18n-attr-aria-label="info_aria_met"><span class="info-icon" aria-hidden="true">i</span></summary>
                   <div class="info-toggle-inhalt" data-i18n="met_hint">
                     <abbr title="Metabolic Equivalent of Task">MET</abbr>: Vielfaches des Grundumsatzes während einer Aktivität. Werte
                     aus dem <em>Compendium of Physical Activities</em> (Standardreferenz der Sportwissenschaft, Details im Tab
@@ -219,6 +223,8 @@
                 <option value="schwanger" data-i18n="schwangerschaft_opt_schwanger">Schwangerschaft</option>
                 <option value="stillzeit" data-i18n="schwangerschaft_opt_stillzeit">Stillzeit</option>
               </select>
+              <p class="field-hint" data-i18n="schwangerschaft_hint">Erhöht deinen täglichen Gesamtenergieverbrauch spürbar (Schwangerschaft ca. +250 kcal/Tag, Stillzeit ca. +500 kcal/Tag).</p>
+              <p class="field-hint disclaimer-inline" data-i18n="hinweis_fachpersonal_kurz">Ersetzt keine individuelle Beratung durch qualifiziertes Fachpersonal.</p>
             </div>
 
             <div class="field">
@@ -231,29 +237,32 @@
               <div class="field sub-field" id="feld-schilddruse" hidden>
                 <label for="schilddruseProzent" data-i18n="schilddruese_prozent_label">Abweichung vom Grundumsatz laut Diagnose (%)</label>
                 <input type="number" id="schilddruseProzent" min="-10" max="30" step="1">
-                <p class="field-hint disclaimer-inline" data-i18n="schilddruese_disclaimer">Bitte nur nach ärztlicher Angabe ausfüllen — ersetzt keine ärztliche oder ernährungstherapeutische Beratung.</p>
+                <p class="field-hint disclaimer-inline" data-i18n="hinweis_fachpersonal_kurz">Ersetzt keine individuelle Beratung durch qualifiziertes Fachpersonal.</p>
               </div>
             </div>
 
             <div class="field">
               <label class="checkbox-label"><input type="checkbox" id="betaBlockerAktiv"> <span data-i18n="betablocker_label">Einnahme von Beta-Blockern</span></label>
+              <p class="field-hint" data-i18n="betablocker_hint">Kann den täglichen Gesamtenergieverbrauch leicht senken (ca. 50–100 kcal/Tag) — dauerhaft wirksam, daher trotz der kleinen Größenordnung eingerechnet.</p>
             </div>
 
             <div class="field">
               <div class="field-label-row">
                 <label class="checkbox-label"><input type="checkbox" id="fidgetingAktiv"> <span data-i18n="fidgeting_label">Auffällig viel unbewusste Bewegung / Zappeln</span></label>
                 <details class="info-toggle">
-                  <summary aria-label="Mehr Informationen"><span class="info-icon" aria-hidden="true">i</span></summary>
-                  <div class="info-toggle-inhalt" data-i18n="fidgeting_hint">Erhöht den Energieverbrauch leicht (PAL +0,05 bis +0,10) — unabhängig von Sport oder Alltagsaktivität.</div>
+                  <summary data-i18n-attr-aria-label="info_aria_fidgeting"><span class="info-icon" aria-hidden="true">i</span></summary>
+                  <div class="info-toggle-inhalt" data-i18n="fidgeting_hint">Erhöht deinen täglichen Gesamtenergieverbrauch leicht.</div>
                 </details>
               </div>
             </div>
 
             <div class="field">
               <label class="checkbox-label"><input type="checkbox" id="fieberAktiv"> <span data-i18n="fieber_label">Aktuell Fieber</span></label>
+              <p class="field-hint" data-i18n="fieber_hint">Erhöht den Grundumsatz spürbar (ca. +10–13 % pro °C Körperkerntemperatur über 37 °C).</p>
+              <p class="field-hint disclaimer-inline" data-i18n="hinweis_fachpersonal_kurz">Ersetzt keine individuelle Beratung durch qualifiziertes Fachpersonal.</p>
               <div class="field sub-field" id="feld-fieber" hidden>
                 <label for="fieberTemperatur" data-i18n="fieber_temp_label">Körpertemperatur (°C)</label>
-                <input type="number" id="fieberTemperatur" min="35" max="45" step="0.1">
+                <input type="number" id="fieberTemperatur" min="35" max="45" step="0.1" aria-describedby="error-fieber">
                 <p class="field-error" id="error-fieber" hidden></p>
               </div>
             </div>
@@ -274,6 +283,8 @@
       </form>
 
       <section id="result" class="result" hidden aria-live="polite">
+        <h3 class="section-heading" data-i18n="result_haupt_heading">Ergebnis</h3>
+
         <div class="result-item">
           <div class="result-row">
             <span data-i18n="result_bmi_label">Body-Mass-Index (BMI)</span>
@@ -301,7 +312,7 @@
 
         <div class="result-item highlight">
           <div class="result-row">
-            <span id="val-ziel-label">Empfohlene Kalorienzufuhr</span>
+            <span id="val-ziel-label" data-i18n="result_ziel_label_default">Empfohlene Kalorienzufuhr</span>
             <strong id="val-ziel">–</strong>
           </div>
           <div class="bar" id="bar-ziel"></div>
@@ -381,16 +392,18 @@
           <div id="detail-inhalt"></div>
         </details>
 
-        <div class="field print-footer-feld">
-          <label for="druckFussnote" data-i18n="druck_footer_label">Fußzeile für den PDF-Export (optional)</label>
-          <input type="text" id="druckFussnote" maxlength="20">
-          <p class="field-hint" data-i18n="druck_footer_hint">
-            Wird zentriert am unteren Rand jeder gedruckten Seite angezeigt, z. B. dein Name. Bleibt das Feld leer, ändert
-            sich am PDF-Export nichts.
-          </p>
-        </div>
+        <div class="result-aktionen">
+          <div class="field print-footer-feld">
+            <label for="druckFussnote" data-i18n="druck_footer_label">Fußzeile für den PDF-Export (optional)</label>
+            <input type="text" id="druckFussnote" maxlength="20">
+            <p class="field-hint" data-i18n="druck_footer_hint">
+              Wird zentriert am unteren Rand jeder gedruckten Seite angezeigt, z. B. dein Name. Bleibt das Feld leer, ändert
+              sich am PDF-Export nichts.
+            </p>
+          </div>
 
-        <button type="button" id="printBtn" class="secondary-btn" data-i18n="print_btn">Ergebnis als PDF speichern</button>
+          <button type="button" id="printBtn" class="secondary-btn" data-i18n="print_btn">Ergebnis als PDF speichern</button>
+        </div>
       </section>
 
       <p class="disclaimer" data-i18n="disclaimer">
