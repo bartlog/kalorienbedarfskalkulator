@@ -56,19 +56,33 @@
         </div>
 
         <div class="field">
-          <label for="activity" data-i18n="feld_aktivitaet_label">Aktivitätslevel (Alltag inkl. gewohntem Training)</label>
-          <select id="activity" name="activity" required>
-            <option value="1.2" data-i18n="aktivitaet_opt_sitzend">Sitzend (kaum Bewegung, kein regelmäßiger Sport)</option>
-            <option value="1.375" data-i18n="aktivitaet_opt_leicht">Leicht aktiv (Alltag + ca. 1–3× Sport/Woche)</option>
-            <option value="1.55" selected data-i18n="aktivitaet_opt_maessig">Mäßig aktiv (Alltag + ca. 3–5× Sport/Woche)</option>
-            <option value="1.725" data-i18n="aktivitaet_opt_sehr">Sehr aktiv (Alltag + ca. 6–7× Sport/Woche)</option>
-            <option value="1.9" data-i18n="aktivitaet_opt_extrem">Extrem aktiv (körperlich fordernde Arbeit + intensiver Sport)</option>
+          <label for="neatSchritte" data-i18n="feld_neat_label">Alltagsaktivität (NEAT) — durchschnittliche Schrittzahl/Tag</label>
+          <select id="neatSchritte" name="neatSchritte" required>
+            <option value="unter5000" selected data-i18n="neat_opt_unter5000">Unter 5.000 Schritte/Tag (Sitzender Alltag, z. B. Bürojob/Homeoffice)</option>
+            <option value="5000bis10000" data-i18n="neat_opt_5000bis10000">5.000–10.000 Schritte/Tag (Moderat aktiv, z. B. Verkäufer, viele Alltagswege)</option>
+            <option value="10000bis15000" data-i18n="neat_opt_10000bis15000">10.000–15.000 Schritte/Tag (Sehr aktiv, z. B. Kellner, Pflegekraft)</option>
+            <option value="ab15000" data-i18n="neat_opt_ab15000">Über 15.000 Schritte/Tag (Extrem aktiv, z. B. Handwerker, Bauarbeiter)</option>
           </select>
-          <p class="field-hint" data-i18n="feld_aktivitaet_hint">
-            Ganzheitliche Einschätzung nach dem <abbr title="Physical Activity Level">PAL</abbr>-Konzept: ein Vielfaches deines Grundumsatzes, das
-            deinen gesamten Tagesdurchschnitt beschreibt — Alltag <strong>und</strong> dein gewohntes Trainingspensum zusammen. Wenn du unten bei
-            „Sport/Training" eine genaue MET-Berechnung angibst, ersetzt diese die Trainings-Schätzung hier (siehe dort).
-          </p>
+          <p class="field-hint" data-i18n="feld_neat_hint">Zähl deine Gesamt-Schrittzahl an einem typischen Tag, so wie sie dein Tracker anzeigt — inklusive Spaziergänge und Laufrunden. Das deckt deine gesamte Alltagsbewegung ab, auch wenn ein Teil davon aus Sport stammt.</p>
+        </div>
+
+        <div class="field">
+          <label for="sportHaeufigkeit" data-i18n="feld_sport_haeufigkeit_label">Sport / Training (Häufigkeit pro Woche)</label>
+          <select id="sportHaeufigkeit" name="sportHaeufigkeit" required>
+            <option value="keinSport" selected data-i18n="sport_haeufigkeit_opt_keinSport">Kein regelmäßiger Sport</option>
+            <option value="1bis3" data-i18n="sport_haeufigkeit_opt_1bis3">1–3× pro Woche</option>
+            <option value="3bis5" data-i18n="sport_haeufigkeit_opt_3bis5">3–5× pro Woche</option>
+            <option value="6bis7" data-i18n="sport_haeufigkeit_opt_6bis7">6–7× pro Woche</option>
+            <option value="leistungssport" data-i18n="sport_haeufigkeit_opt_leistungssport">Leistungssport / sehr intensiv</option>
+          </select>
+          <p class="field-hint" data-i18n="feld_sport_haeufigkeit_hint">Häufigkeit deines regelmäßigen Sports, zusätzlich zur Alltagsaktivität oben.</p>
+          <p class="disclaimer-inline" data-i18n="sport_haeufigkeit_doppelzaehlung_warnung">⚠ Gilt nur für Sport, der nicht wesentlich zu deiner Schrittzahl oben beiträgt (z. B. Radfahren, Schwimmen, Krafttraining, Yoga). Lauf- oder Gehsport ist über deine Schrittzahl bereits abgedeckt — wähle dafür hier nicht zusätzlich eine Häufigkeit, sonst zählt er doppelt.</p>
+        </div>
+
+        <div class="hint-box" data-i18n="neat_sport_aequivalenz_text">
+          Der Rechner ermittelt deinen durchschnittlichen Wochen-Tagesbedarf. 10.000 Schritte im Alltag verbrennen oft
+          ähnlich viel Energie wie eine intensive Sporteinheit — solange dein Wochenmittel aus Bewegung und Sport
+          konstant bleibt, passt die Berechnung.
         </div>
 
         <div class="field">
@@ -109,12 +123,12 @@
           <fieldset class="field-group">
             <legend data-i18n="sport_legend">Sport / Training</legend>
             <p class="field-hint" data-i18n="sport_hint">
-              Die Aktivitätslevel-Auswahl oben ist eine grobe, ganzheitliche Schätzung inkl. Training. Falls du deine
-              Trainingsdaten genau kennst, kannst du sie stattdessen hier präzise angeben — das <strong>ersetzt</strong> die
-              Trainings-Schätzung oben (kein zusätzlicher Aufschlag, sonst Doppelzählung).
+              Die Sport-Häufigkeit oben ist eine grobe Schätzung. Falls du deine Trainingsdaten genau kennst, kannst du
+              sie stattdessen hier präzise angeben — das <strong>ersetzt</strong> die Häufigkeits-Schätzung oben (kein
+              zusätzlicher Aufschlag, sonst Doppelzählung). Deine Alltagsaktivität (NEAT) bleibt davon unberührt.
             </p>
             <div class="radio-group vertical">
-              <label><input type="radio" name="sportModus" value="keine" checked> <span data-i18n="sport_opt_keine">Keine genaueren Angaben (Schätzung oben verwenden)</span></label>
+              <label><input type="radio" name="sportModus" value="keine" checked> <span data-i18n="sport_opt_keine">Schätzung oben verwenden</span></label>
               <label><input type="radio" name="sportModus" value="met"> <span data-i18n="sport_opt_met">Genaue MET-Berechnung</span></label>
             </div>
             <div class="sub-field" id="feld-met" hidden>
@@ -124,10 +138,11 @@
                 „Methodik &amp; Quellen"). Wähle je Aktivität einen Eintrag und die Stunden pro Woche — bei mehreren
                 Sportarten erscheint automatisch eine neue Zeile.
               </p>
+              <p class="disclaimer-inline" data-i18n="met_doppelzaehlung_warnung">⚠ Trage hier vor allem Sport ein, der nicht wesentlich zu deiner Schrittzahl oben beiträgt (Rad, Schwimmen, Kraft, Ballsport …). Lauf- oder Gehsport ist über deine Schrittzahl bereits erfasst.</p>
               <div id="met-liste"></div>
             </div>
             <p class="field-hint sub-field" id="hinweis-met-override" hidden data-i18n="hinweis_met_override">
-              Bei genauer MET-Berechnung wird oben automatisch „Sitzend" als Alltags-Basis angenommen (Aktivitätslevel-Feld ist deaktiviert) — dein Training wird hier separat und präziser dazugerechnet.
+              Bei genauer MET-Berechnung wird oben automatisch „Kein regelmäßiger Sport" als Sport-Häufigkeit angenommen (Feld ist deaktiviert) — dein Training wird hier separat und präziser dazugerechnet. Deine Alltagsaktivität (NEAT) bleibt davon unberührt.
             </p>
           </fieldset>
 
@@ -159,6 +174,11 @@
 
             <div class="field">
               <label class="checkbox-label"><input type="checkbox" id="betaBlockerAktiv"> <span data-i18n="betablocker_label">Einnahme von Beta-Blockern</span></label>
+            </div>
+
+            <div class="field">
+              <label class="checkbox-label"><input type="checkbox" id="fidgetingAktiv"> <span data-i18n="fidgeting_label">Auffällig viel unbewusste Bewegung / Zappeln</span></label>
+              <p class="field-hint" data-i18n="fidgeting_hint">Erhöht den Energieverbrauch leicht (PAL +0,05 bis +0,10) — unabhängig von Sport oder Alltagsaktivität.</p>
             </div>
 
             <div class="field">
@@ -220,6 +240,12 @@
           <div id="ziel-warnung" class="signal-text" hidden></div>
         </div>
 
+        <div class="hint-box" id="pal-hoch-hinweis" hidden data-i18n="pal_hoch_hinweis">
+          Dein berechnetes Aktivitätslevel (PAL) liegt bei oder über 2,4 — das entspricht einer außergewöhnlich hohen
+          dauerhaften Belastung nahe der physiologischen Obergrenze. Achte auf ausreichend Regeneration, Schlaf und bei
+          Bedarf Erholungstage, besonders wenn du dieses Niveau über längere Zeit hältst.
+        </div>
+
         <h3 class="section-heading" data-i18n="result_zusatz_heading">Zusätzliche Referenzwerte</h3>
 
         <div class="result-item">
@@ -252,10 +278,49 @@
           <p data-i18n="hint_recomposition"><strong>Body Recomposition:</strong> Um gleichzeitig Körperfett abzubauen und Muskeln aufzubauen, ist neben ausreichend Protein insbesondere Krafttraining notwendig. Eine mittelfristige Steigerung der Muskelmasse erhöht zudem den Grundumsatz — die Kalkulation sollte daher regelmäßig aktualisiert werden.</p>
         </div>
 
+        <details class="result-details stillstand-panel">
+          <summary data-i18n="stillstand_panel_titel">Gewichtsstillstand oder Abnehmblockade? Woran es liegen kann</summary>
+          <div class="hint-box">
+            <p data-i18n="stillstand_thermogenese">
+              Ein zu extremes Defizit kann zu vermehrtem Hunger, weniger unbewusster Alltagsbewegung (NEAT) und einem leicht
+              sinkenden Grundumsatz führen (adaptive Thermogenese, ca. 5–10 %) — genau deshalb empfiehlt dieser Rechner ein
+              moderates Defizit von 15–20 % statt eines radikalen.
+            </p>
+            <p data-i18n="stillstand_hormonell">
+              Auch hormonelle Faktoren spielen eine Rolle: Eine Schilddrüsenunterfunktion kann den Grundumsatz messbar senken
+              (im Formular oben unter „Weitere Faktoren" berücksichtigbar, falls ärztlich diagnostiziert), und erhöhte
+              Stresshormone (Cortisol) können durch Wassereinlagerungen den tatsächlichen Fettabbau auf der Waage verschleiern.
+            </p>
+            <p data-i18n="stillstand_checkliste_intro">
+              Bevor du von einem echten Plateau ausgehst: Gewichtsschwankungen durch Wasser sind normal — erst ab 4–6 Wochen
+              wirklichem Stillstand lohnt sich eine genauere Abklärung. Für ein Arztgespräch können folgende Blutwerte
+              hilfreich sein:
+            </p>
+            <ul class="hinweis-liste">
+              <li data-i18n="stillstand_checkliste_schilddruese">Schilddrüse (TSH, fT3, fT4)</li>
+              <li data-i18n="stillstand_checkliste_naehrstoffe">Nährstoffstatus (Eisen/Ferritin, Vitamin D)</li>
+              <li data-i18n="stillstand_checkliste_hormone">ggf. Hormonstatus</li>
+            </ul>
+            <p class="disclaimer-inline" data-i18n="stillstand_disclaimer">
+              Dieser Rechner ersetzt keine medizinische Diagnostik. Bei chronischem Abnehmstillstand oder Verdacht auf
+              Stoffwechselerkrankungen wende dich bitte an qualifiziertes Fachpersonal.
+            </p>
+          </div>
+        </details>
+
         <details class="result-details">
           <summary data-i18n="result_details_summary">Details zur Berechnung (Bandbreite, Formel, Modifikatoren)</summary>
           <div id="detail-inhalt"></div>
         </details>
+
+        <div class="field print-footer-feld">
+          <label for="druckFussnote" data-i18n="druck_footer_label">Fußzeile für den PDF-Export (optional)</label>
+          <input type="text" id="druckFussnote" maxlength="20">
+          <p class="field-hint" data-i18n="druck_footer_hint">
+            Wird zentriert am unteren Rand jeder gedruckten Seite angezeigt, z. B. dein Name. Bleibt das Feld leer, ändert
+            sich am PDF-Export nichts.
+          </p>
+        </div>
 
         <button type="button" id="printBtn" class="secondary-btn" data-i18n="print_btn">Ergebnis als PDF speichern</button>
       </section>
@@ -269,6 +334,11 @@
         <h2 class="section-heading" data-i18n="druck_eingaben_heading">Eingegebene Werte</h2>
         <dl id="druck-eingaben-liste"></dl>
       </div>
+
+      <div class="druck-footer" id="druck-footer" hidden>
+        <span id="druck-footer-datum"></span>
+        <span id="druck-footer-text"></span>
+      </div>
     </section>
 
     <section id="tab-methodik" role="tabpanel" hidden>
@@ -278,12 +348,12 @@
       <h2 class="section-heading" data-i18n="methodik_pal_heading">Das PAL-Konzept</h2>
       <p class="field-hint" data-i18n="methodik_pal_text">
         <abbr title="Physical Activity Level">PAL</abbr> steht für „Physical Activity Level" und beschreibt, wievielmal höher
-        dein tatsächlicher Tagesverbrauch im Vergleich zum Grundumsatz liegt — als ein einziger Durchschnittswert über
-        den ganzen Tag, Alltag und Training zusammen. Ein PAL von 1,2 bedeutet z. B. kaum Bewegung, ein PAL von 1,9 sehr
-        viel körperliche Aktivität. Die Werte in der Aktivitätslevel-Auswahl (1,2 bis 1,9) stammen aus der etablierten
-        FAO/WHO/UNU-Klassifikation und sind bewusst ganzheitlich gedacht — sie schließen ein durchschnittliches
-        Trainingspensum bereits mit ein, statt Alltag und Sport getrennt zu addieren. Wer seine Trainingsdaten genau
-        kennt, kann stattdessen die MET-Berechnung nutzen (siehe unten).
+        dein tatsächlicher Tagesverbrauch im Vergleich zum Grundumsatz liegt. Dieser Rechner setzt sich aus drei
+        unabhängigen, addierten Bausteinen zusammen: der Alltagsaktivität (NEAT, geschätzt über deine durchschnittliche
+        Schrittzahl/Tag, PAL 1,2–2,0), einem Sport-Zuschlag nach Trainingshäufigkeit oder wahlweise einer genauen
+        MET-Berechnung (+0,00 bis +0,40) und optional einem kleinen Zuschlag für auffällig viel unbewusste Spontanbewegung
+        (Fidgeting, +0,05 bis +0,10). Die getrennte Erfassung von Alltag und Sport vermeidet, dass beides in einer
+        einzigen groben Schätzung vermischt wird — die Gesamtsumme wird auf 1,2 bis 2,6 begrenzt.
       </p>
 
       <h2 class="section-heading" data-i18n="methodik_met_heading">MET-Werte (Trainingsintensität)</h2>

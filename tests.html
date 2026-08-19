@@ -175,9 +175,14 @@
     // ---- Pipeline: Guards & Plausibilitätsgrenzen -----------------------
     group("Pipeline-Guards");
     (function () {
+      // Adaptive Thermogenese zusätzlich aktiv, da die NEAT-Mindeststufe (unter5000)
+      // im Mittel PAL 1.25 liefert (statt eines fixen 1.2 wie im alten Einzel-Dropdown)
+      // -- ohne einen zusätzlichen REE-senkenden Faktor unterschreitet das 20%-Defizit
+      // den Grundumsatz bei dieser PAL-Untergrenze nicht mehr zuverlässig.
       const r = berechne({
         gender: "female", age: 65, heightCm: 150, weightKg: 45,
-        basisPAL: 1.2, ziel: "lose", sport: { modus: "keine" },
+        neatSchritteId: "unter5000", ziel: "lose", sport: { modus: "keine" },
+        adaptiveThermogeneseAktiv: true,
       });
       assert(r.ziel.unterReeBasis === true, "Sehr niedriger TDEE + Abnehmen loest Warnhinweis 'unter REE_basis' aus");
       assertApprox(r.ziel.haupt, r.ree.basis, 0.01, "Ziel wird bei Unterschreitung auf den Grundumsatz gedeckelt (nicht blockiert)");
@@ -188,7 +193,7 @@
       // Untergewicht + Ziel Abnehmen -> eigenständige BMI-Warnung, unabhängig vom Grundumsatz-Clamp
       const r = berechne({
         gender: "female", age: 25, heightCm: 170, weightKg: 48,
-        basisPAL: 1.55, ziel: "lose", sport: { modus: "keine" },
+        neatSchritteId: "5000bis10000", ziel: "lose", sport: { modus: "keine" },
       });
       assert(r.formel.bmi < 18.5, "Testfall hat tatsächlich Untergewicht (BMI < 18.5)");
       assert(r.ziel.bmiWarnung === true, "Untergewicht + Ziel Abnehmen loest BMI-Warnung aus");
@@ -196,7 +201,7 @@
     (function () {
       const r = berechne({
         gender: "male", age: 25, heightCm: 190, weightKg: 100,
-        basisPAL: 1.9, ziel: "gain",
+        neatSchritteId: "ab15000", ziel: "gain",
         sport: { modus: "met", aktivitaeten: [{ metWert: 10, stundenProWoche: 7.5, label: "Laufen" }] },
       });
       assert(r.tee.haupt <= r.ree.basis * 2.5 + 0.01, "TEE bleibt innerhalb der globalen Plausibilitätsgrenze (<= 2.5x REE_basis)");
@@ -205,7 +210,7 @@
     (function () {
       // MET-Berechnung ersetzt die Aktivitätslevel-Schätzung, statt sie additiv zu ergänzen
       // (kein separater "PAL-Zuschlag" mehr -> kein Doppelzählungsrisiko mit dem ganzheitlichen PAL)
-      const basis = { gender: "male", age: 30, heightCm: 178, weightKg: 75, basisPAL: 1.375, ziel: "maintain" };
+      const basis = { gender: "male", age: 30, heightCm: 178, weightKg: 75, neatSchritteId: "unter5000", ziel: "maintain" };
       const rKeine = berechne({ ...basis, sport: { modus: "keine" } });
       const rMet = berechne({ ...basis, sport: { modus: "met", aktivitaeten: [{ metWert: 9, stundenProWoche: 3, label: "Laufen" }] } });
       assert(rMet.tee.haupt > rKeine.tee.haupt, "MET-Berechnung erhöht TEE gegenüber 'keine'");
@@ -230,7 +235,7 @@
     (function () {
       const r = berechne({
         gender: "male", age: 30, heightCm: 180, weightKg: 80,
-        basisPAL: 1.55, ziel: "maintain", sport: { modus: "keine" },
+        neatSchritteId: "5000bis10000", ziel: "maintain", sport: { modus: "keine" },
       });
       assert(r.fettabbau.haupt < r.tee.haupt, "Fettabbau-Kalorien liegen unter TEE");
       assert(r.fettabbau.haupt >= r.ree.basis, "Fettabbau-Kalorien nie unter REE_basis (Guard)");
@@ -240,7 +245,7 @@
     (function () {
       const r = berechne({
         gender: "male", age: 30, heightCm: 180, weightKg: 80,
-        basisPAL: 1.55, ziel: "maintain", sport: { modus: "keine" },
+        neatSchritteId: "5000bis10000", ziel: "maintain", sport: { modus: "keine" },
       });
       assertApprox(r.proteinErhalt.min, 80 * 1.2, 0.01, "Proteinbedarf Erhalt Untergrenze = Gewicht × 1.2");
       assertApprox(r.proteinAufbau.max, 80 * 2.0, 0.01, "Proteinbedarf Aufbau Obergrenze = Gewicht × 2.0");
@@ -249,7 +254,7 @@
       // BMI >=30 ohne FFM-Angabe -> weiterhin Gesamtgewicht als Referenz
       const rOhneFfm = berechne({
         gender: "male", age: 40, heightCm: 175, weightKg: 105,
-        basisPAL: 1.2, ziel: "maintain", sport: { modus: "keine" },
+        neatSchritteId: "unter5000", ziel: "maintain", sport: { modus: "keine" },
       });
       assert(rOhneFfm.proteinBasis === "gewicht", "BMI>=30 ohne FFM-Angabe: Proteinbasis bleibt Gesamtgewicht");
       assertApprox(rOhneFfm.proteinAufbau.max, 105 * 2.0, 0.01, "Proteinbedarf ohne FFM: Gesamtgewicht × 2.0");
@@ -258,11 +263,112 @@
       const ffmKg = formeln.ffmAusKfa({ weightKg: 105, kfaProzent: 35 }); // FFM = 68.25 kg
       const rMitFfm = berechne({
         gender: "male", age: 40, heightCm: 175, weightKg: 105, ffmKg,
-        basisPAL: 1.2, ziel: "maintain", sport: { modus: "keine" },
+        neatSchritteId: "unter5000", ziel: "maintain", sport: { modus: "keine" },
       });
       assert(rMitFfm.proteinBasis === "ffm", "BMI>=30 mit bekannter FFM: Proteinbasis wechselt auf FFM");
       assertApprox(rMitFfm.proteinAufbau.max, ffmKg * 2.0, 0.01, "Proteinbedarf mit FFM: FFM × 2.0 statt Gesamtgewicht × 2.0");
       assert(rMitFfm.proteinAufbau.max < rOhneFfm.proteinAufbau.max, "FFM-basierter Proteinbedarf liegt unter dem gesamtgewichtsbasierten Wert (verhindert Überschätzung)");
+    })();
+
+    // ---- NEAT/Sport-PAL-Trennung ----------------------------------------
+    group("NEAT/Sport-PAL-Trennung");
+    (function () {
+      const m = window.KBR.modifikatoren;
+      assertApprox(m.neatPalBereich({ neatSchritteId: "unter5000" }).palMin, 1.2, 0.001, "NEAT unter5000: palMin 1.2");
+      assertApprox(m.neatPalBereich({ neatSchritteId: "unter5000" }).palMax, 1.3, 0.001, "NEAT unter5000: palMax 1.3");
+      assertApprox(m.neatPalBereich({ neatSchritteId: "5000bis10000" }).palMin, 1.4, 0.001, "NEAT 5000bis10000: palMin 1.4");
+      assertApprox(m.neatPalBereich({ neatSchritteId: "5000bis10000" }).palMax, 1.5, 0.001, "NEAT 5000bis10000: palMax 1.5");
+      assertApprox(m.neatPalBereich({ neatSchritteId: "10000bis15000" }).palMin, 1.6, 0.001, "NEAT 10000bis15000: palMin 1.6");
+      assertApprox(m.neatPalBereich({ neatSchritteId: "10000bis15000" }).palMax, 1.7, 0.001, "NEAT 10000bis15000: palMax 1.7");
+      assertApprox(m.neatPalBereich({ neatSchritteId: "ab15000" }).palMin, 1.8, 0.001, "NEAT ab15000: palMin 1.8");
+      assertApprox(m.neatPalBereich({ neatSchritteId: "ab15000" }).palMax, 2.0, 0.001, "NEAT ab15000: palMax 2.0");
+      assert(m.neatPalBereich({ neatSchritteId: "unbekannt" }) === null, "NEAT unbekannte id liefert null");
+    })();
+    (function () {
+      const m = window.KBR.modifikatoren;
+      assertApprox(m.sportHaeufigkeitZuschlag({ haeufigkeitId: "keinSport" }).min, 0.0, 0.001, "Sport keinSport: +0.00");
+      assertApprox(m.sportHaeufigkeitZuschlag({ haeufigkeitId: "1bis3" }).min, 0.1, 0.001, "Sport 1bis3: +0.10");
+      assertApprox(m.sportHaeufigkeitZuschlag({ haeufigkeitId: "3bis5" }).min, 0.2, 0.001, "Sport 3bis5: +0.20");
+      assertApprox(m.sportHaeufigkeitZuschlag({ haeufigkeitId: "6bis7" }).min, 0.3, 0.001, "Sport 6bis7: +0.30");
+      assertApprox(m.sportHaeufigkeitZuschlag({ haeufigkeitId: "leistungssport" }).min, 0.4, 0.001, "Sport leistungssport: +0.40");
+      assert(m.sportHaeufigkeitZuschlag({ haeufigkeitId: "unbekannt" }) === null, "Sport unbekannte id liefert null");
+    })();
+    (function () {
+      const m = window.KBR.modifikatoren;
+      assert(m.fidgetingPalZuschlag({ aktiv: false }) === null, "Fidgeting inaktiv liefert null");
+      const f = m.fidgetingPalZuschlag({ aktiv: true });
+      assertApprox(f.min, 0.05, 0.001, "Fidgeting aktiv: min +0.05");
+      assertApprox(f.max, 0.1, 0.001, "Fidgeting aktiv: max +0.10");
+    })();
+    (function () {
+      // Höhere NEAT-Stufe erhöht TEE bei sonst gleichem Input
+      const basis = { gender: "male", age: 30, heightCm: 178, weightKg: 75, ziel: "maintain", sport: { modus: "keine", haeufigkeitId: "keinSport" } };
+      const rNiedrig = berechne({ ...basis, neatSchritteId: "unter5000" });
+      const rHoch = berechne({ ...basis, neatSchritteId: "ab15000" });
+      assert(rHoch.tee.haupt > rNiedrig.tee.haupt, "Höhere NEAT-Stufe erhöht TEE");
+    })();
+    (function () {
+      // MET-Modus ersetzt den Sport-Häufigkeits-Zuschlag, ignoriert haeufigkeitId
+      const basis = { gender: "male", age: 30, heightCm: 178, weightKg: 75, neatSchritteId: "5000bis10000", ziel: "maintain" };
+      const aktivitaeten = [{ metWert: 9, stundenProWoche: 3, label: "Laufen" }];
+      const rLeistung = berechne({ ...basis, sport: { modus: "met", haeufigkeitId: "leistungssport", aktivitaeten } });
+      const rKein = berechne({ ...basis, sport: { modus: "met", haeufigkeitId: "keinSport", aktivitaeten } });
+      assertApprox(rLeistung.tee.haupt, rKein.tee.haupt, 0.01, "MET-Modus ignoriert sport.haeufigkeitId (Ersetzung, keine Ergänzung)");
+    })();
+    (function () {
+      // Fidgeting addiert sich unabhängig vom Sport-Modus
+      const basis = { gender: "male", age: 30, heightCm: 178, weightKg: 75, neatSchritteId: "5000bis10000", ziel: "maintain" };
+      const rKeineOhne = berechne({ ...basis, sport: { modus: "keine", haeufigkeitId: "keinSport" }, fidgetingAktiv: false });
+      const rKeineMit = berechne({ ...basis, sport: { modus: "keine", haeufigkeitId: "keinSport" }, fidgetingAktiv: true });
+      assert(rKeineMit.tee.haupt > rKeineOhne.tee.haupt, "Fidgeting erhöht TEE im Sport-Modus 'keine'");
+      const aktivitaeten = [{ metWert: 9, stundenProWoche: 3, label: "Laufen" }];
+      const rMetOhne = berechne({ ...basis, sport: { modus: "met", aktivitaeten }, fidgetingAktiv: false });
+      const rMetMit = berechne({ ...basis, sport: { modus: "met", aktivitaeten }, fidgetingAktiv: true });
+      assert(rMetMit.tee.haupt > rMetOhne.tee.haupt, "Fidgeting erhöht TEE auch im Sport-Modus 'met'");
+    })();
+    (function () {
+      // Extremfall über die Dropdowns: NEAT-Max 2.0 + Sport-Max 0.4 + Fidgeting-Max 0.1 = 2.5,
+      // bleibt unter der neuen Klammer 2.6 (kein Abschneiden mehr, anders als bei der alten Grenze 2.4).
+      const r = berechne({
+        gender: "male", age: 25, heightCm: 180, weightKg: 80, neatSchritteId: "ab15000", ziel: "maintain",
+        sport: { modus: "keine", haeufigkeitId: "leistungssport" }, fidgetingAktiv: true,
+      });
+      assertApprox(r.pal.max, 2.5, 0.01, "Extremfall über Dropdowns (NEAT max + Sport max + Fidgeting max) erreicht 2.5, ohne bei 2.4 gekappt zu werden");
+    })();
+    (function () {
+      // Extremfall über MET: sehr hohes Trainingspensum kann den PAL-Hauptwert über 2.4 (Warnung)
+      // und sogar über die neue Klammer 2.6 treiben -> Klammer greift korrekt.
+      const r = berechne({
+        gender: "male", age: 25, heightCm: 180, weightKg: 80, neatSchritteId: "ab15000", ziel: "maintain",
+        sport: { modus: "met", aktivitaeten: [{ metWert: 20, stundenProWoche: 20, label: "Extrem" }] }, fidgetingAktiv: true,
+      });
+      assert(r.pal.hochWarnung === true, "Sehr hohes MET-Trainingspensum löst PAL-Hoch-Warnung aus (PAL >= 2.4)");
+      assert(r.pal.max <= 2.6 + 0.001, "PAL-Hauptwert wird trotz extremem MET-Pensum auf 2.6 gekappt");
+    })();
+    (function () {
+      const r = berechne({
+        gender: "male", age: 30, heightCm: 178, weightKg: 75, neatSchritteId: "5000bis10000", ziel: "maintain",
+        sport: { modus: "keine", haeufigkeitId: "keinSport" }, fidgetingAktiv: false,
+      });
+      assert(r.pal.hochWarnung === false, "Normalfall löst keine PAL-Hoch-Warnung aus");
+    })();
+    (function () {
+      const basis = { gender: "male", age: 30, heightCm: 178, weightKg: 75, neatSchritteId: "5000bis10000", ziel: "maintain" };
+      const rMitSport = berechne({ ...basis, sport: { modus: "keine", haeufigkeitId: "3bis5" }, fidgetingAktiv: true });
+      const hatSportHaeufigkeit = rMitSport.aktiveModifikatoren.some((mod) => mod.id === "sport_haeufigkeit");
+      const hatFidgeting = rMitSport.aktiveModifikatoren.some((mod) => mod.id === "fidgeting");
+      assert(hatSportHaeufigkeit, "aktiveModifikatoren enthält 'sport_haeufigkeit' wenn Häufigkeit != keinSport");
+      assert(hatFidgeting, "aktiveModifikatoren enthält 'fidgeting' wenn aktiv");
+
+      const rOhne = berechne({ ...basis, sport: { modus: "keine", haeufigkeitId: "keinSport" }, fidgetingAktiv: false });
+      const hatSportHaeufigkeitOhne = rOhne.aktiveModifikatoren.some((mod) => mod.id === "sport_haeufigkeit");
+      const hatFidgetingOhne = rOhne.aktiveModifikatoren.some((mod) => mod.id === "fidgeting");
+      assert(!hatSportHaeufigkeitOhne, "aktiveModifikatoren enthält 'sport_haeufigkeit' NICHT bei keinSport");
+      assert(!hatFidgetingOhne, "aktiveModifikatoren enthält 'fidgeting' NICHT wenn inaktiv");
+
+      const rMet = berechne({ ...basis, sport: { modus: "met", haeufigkeitId: "leistungssport", aktivitaeten: [{ metWert: 9, stundenProWoche: 3, label: "Laufen" }] } });
+      const hatSportHaeufigkeitMet = rMet.aktiveModifikatoren.some((mod) => mod.id === "sport_haeufigkeit");
+      assert(!hatSportHaeufigkeitMet, "aktiveModifikatoren enthält 'sport_haeufigkeit' NICHT im MET-Modus (auch bei gesetztem haeufigkeitId)");
     })();
 
     // ---- Rendering ----

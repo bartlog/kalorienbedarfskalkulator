@@ -35,37 +35,50 @@ window.KBR.i18n = (function () {
     feld_alter_label: { de: "Alter (Jahre)", en: "Age (years)" },
     feld_groesse_label: { de: "Größe (cm)", en: "Height (cm)" },
     feld_gewicht_label: { de: "Gewicht (kg)", en: "Weight (kg)" },
-    feld_aktivitaet_label: {
-      de: "Aktivitätslevel (Alltag inkl. gewohntem Training)",
-      en: "Activity level (daily life incl. usual training)",
+    feld_neat_label: {
+      de: "Alltagsaktivität (NEAT) — durchschnittliche Schrittzahl/Tag",
+      en: "Daily activity (NEAT) — average steps/day",
     },
-    aktivitaet_opt_sitzend: {
-      de: "Sitzend (kaum Bewegung, kein regelmäßiger Sport)",
-      en: "Sedentary (little movement, no regular exercise)",
+    neat_opt_unter5000: {
+      de: "Unter 5.000 Schritte/Tag (Sitzender Alltag, z. B. Bürojob/Homeoffice)",
+      en: "Under 5,000 steps/day (sedentary daily life, e.g. office job/home office)",
     },
-    aktivitaet_opt_leicht: {
-      de: "Leicht aktiv (Alltag + ca. 1–3× Sport/Woche)",
-      en: "Lightly active (daily life + approx. 1–3× exercise/week)",
+    neat_opt_5000bis10000: {
+      de: "5.000–10.000 Schritte/Tag (Moderat aktiv, z. B. Verkäufer, viele Alltagswege)",
+      en: "5,000–10,000 steps/day (moderately active, e.g. retail work, lots of daily errands)",
     },
-    aktivitaet_opt_maessig: {
-      de: "Mäßig aktiv (Alltag + ca. 3–5× Sport/Woche)",
-      en: "Moderately active (daily life + approx. 3–5× exercise/week)",
+    neat_opt_10000bis15000: {
+      de: "10.000–15.000 Schritte/Tag (Sehr aktiv, z. B. Kellner, Pflegekraft)",
+      en: "10,000–15,000 steps/day (very active, e.g. waiting staff, care worker)",
     },
-    aktivitaet_opt_sehr: {
-      de: "Sehr aktiv (Alltag + ca. 6–7× Sport/Woche)",
-      en: "Very active (daily life + approx. 6–7× exercise/week)",
+    neat_opt_ab15000: {
+      de: "Über 15.000 Schritte/Tag (Extrem aktiv, z. B. Handwerker, Bauarbeiter)",
+      en: "Over 15,000 steps/day (extremely active, e.g. tradesperson, construction worker)",
     },
-    aktivitaet_opt_extrem: {
-      de: "Extrem aktiv (körperlich fordernde Arbeit + intensiver Sport)",
-      en: "Extremely active (physically demanding job + intense exercise)",
+    feld_neat_hint: {
+      de: "Zähl deine Gesamt-Schrittzahl an einem typischen Tag, so wie sie dein Tracker anzeigt — inklusive Spaziergänge und Laufrunden. Das deckt deine gesamte Alltagsbewegung ab, auch wenn ein Teil davon aus Sport stammt.",
+      en: "Count your total steps on a typical day, as shown by your tracker — including walks and jogs. This covers your entire daily movement, even if part of it comes from exercise.",
     },
-    feld_aktivitaet_hint: {
-      de: `Ganzheitliche Einschätzung nach dem <abbr title="Physical Activity Level">PAL</abbr>-Konzept: ein Vielfaches deines Grundumsatzes, das
-        deinen gesamten Tagesdurchschnitt beschreibt — Alltag <strong>und</strong> dein gewohntes Trainingspensum zusammen. Wenn du unten bei
-        „Sport/Training" eine genaue MET-Berechnung angibst, ersetzt diese die Trainings-Schätzung hier (siehe dort).`,
-      en: `Holistic estimate based on the <abbr title="Physical Activity Level">PAL</abbr> concept: a multiple of your resting energy
-        expenditure describing your entire daily average — daily life <strong>and</strong> your usual training load together. If you enter a
-        precise MET calculation below under "Exercise/Training", it replaces the training estimate here (see below).`,
+    feld_sport_haeufigkeit_label: {
+      de: "Sport / Training (Häufigkeit pro Woche)",
+      en: "Exercise / training (frequency per week)",
+    },
+    sport_haeufigkeit_opt_keinSport: { de: "Kein regelmäßiger Sport", en: "No regular exercise" },
+    sport_haeufigkeit_opt_1bis3: { de: "1–3× pro Woche", en: "1–3× per week" },
+    sport_haeufigkeit_opt_3bis5: { de: "3–5× pro Woche", en: "3–5× per week" },
+    sport_haeufigkeit_opt_6bis7: { de: "6–7× pro Woche", en: "6–7× per week" },
+    sport_haeufigkeit_opt_leistungssport: { de: "Leistungssport / sehr intensiv", en: "Competitive sport / very intense" },
+    feld_sport_haeufigkeit_hint: {
+      de: "Häufigkeit deines regelmäßigen Sports, zusätzlich zur Alltagsaktivität oben.",
+      en: "Frequency of your regular exercise, in addition to the daily activity above.",
+    },
+    sport_haeufigkeit_doppelzaehlung_warnung: {
+      de: "⚠ Gilt nur für Sport, der nicht wesentlich zu deiner Schrittzahl oben beiträgt (z. B. Radfahren, Schwimmen, Krafttraining, Yoga). Lauf- oder Gehsport ist über deine Schrittzahl bereits abgedeckt — wähle dafür hier nicht zusätzlich eine Häufigkeit, sonst zählt er doppelt.",
+      en: "⚠ Only applies to exercise that doesn't meaningfully add to your step count above (e.g. cycling, swimming, strength training, yoga). Running or walking-based exercise is already covered by your step count — don't also select a frequency here for it, or it will be counted twice.",
+    },
+    neat_sport_aequivalenz_text: {
+      de: "Der Rechner ermittelt deinen durchschnittlichen Wochen-Tagesbedarf. 10.000 Schritte im Alltag verbrennen oft ähnlich viel Energie wie eine intensive Sporteinheit — solange dein Wochenmittel aus Bewegung und Sport konstant bleibt, passt die Berechnung.",
+      en: "This calculator determines your average daily needs over the week. 10,000 daily steps often burn a similar amount of energy to an intense workout — as long as your weekly average of movement and exercise stays consistent, the calculation holds.",
     },
     feld_ziel_label: { de: "Ziel", en: "Goal" },
     ziel_opt_lose: { de: "Gewicht verlieren", en: "Lose weight" },
@@ -94,16 +107,16 @@ window.KBR.i18n = (function () {
 
     sport_legend: { de: "Sport / Training", en: "Exercise / Training" },
     sport_hint: {
-      de: `Die Aktivitätslevel-Auswahl oben ist eine grobe, ganzheitliche Schätzung inkl. Training. Falls du deine
-        Trainingsdaten genau kennst, kannst du sie stattdessen hier präzise angeben — das <strong>ersetzt</strong> die
-        Trainings-Schätzung oben (kein zusätzlicher Aufschlag, sonst Doppelzählung).`,
-      en: `The activity level selection above is a rough, holistic estimate including training. If you know your
-        training data precisely, you can enter it here instead — this <strong>replaces</strong> the training estimate
-        above (no additional add-on, to avoid double-counting).`,
+      de: `Die Sport-Häufigkeit oben ist eine grobe Schätzung. Falls du deine Trainingsdaten genau kennst, kannst du
+        sie stattdessen hier präzise angeben — das <strong>ersetzt</strong> die Häufigkeits-Schätzung oben (kein
+        zusätzlicher Aufschlag, sonst Doppelzählung). Deine Alltagsaktivität (NEAT) bleibt davon unberührt.`,
+      en: `The exercise frequency above is a rough estimate. If you know your training data precisely, you can enter
+        it here instead — this <strong>replaces</strong> the frequency estimate above (no additional add-on, to avoid
+        double-counting). Your daily activity (NEAT) is not affected by this.`,
     },
     sport_opt_keine: {
-      de: "Keine genaueren Angaben (Schätzung oben verwenden)",
-      en: "No more precise data (use estimate above)",
+      de: "Schätzung oben verwenden",
+      en: "Use estimate above",
     },
     sport_opt_met: { de: "Genaue MET-Berechnung", en: "Precise MET calculation" },
     met_hint: {
@@ -116,9 +129,13 @@ window.KBR.i18n = (function () {
         "Methodology &amp; Sources" tab). Choose an entry per activity and the hours per week — a new row appears
         automatically for multiple activities.`,
     },
+    met_doppelzaehlung_warnung: {
+      de: "⚠ Trage hier vor allem Sport ein, der nicht wesentlich zu deiner Schrittzahl oben beiträgt (Rad, Schwimmen, Kraft, Ballsport …). Lauf- oder Gehsport ist über deine Schrittzahl bereits erfasst.",
+      en: "⚠ Enter exercise here that doesn't meaningfully add to your step count above (cycling, swimming, strength, ball sports …). Running or walking-based exercise is already captured by your step count.",
+    },
     hinweis_met_override: {
-      de: `Bei genauer MET-Berechnung wird oben automatisch „Sitzend" als Alltags-Basis angenommen (Aktivitätslevel-Feld ist deaktiviert) — dein Training wird hier separat und präziser dazugerechnet.`,
-      en: `With precise MET calculation, "Sedentary" is automatically assumed above as the daily-life baseline (the activity level field is disabled) — your training is added here separately and more precisely.`,
+      de: `Bei genauer MET-Berechnung wird oben automatisch „Kein regelmäßiger Sport" als Sport-Häufigkeit angenommen (Feld ist deaktiviert) — dein Training wird hier separat und präziser dazugerechnet. Deine Alltagsaktivität (NEAT) bleibt davon unberührt.`,
+      en: `With precise MET calculation, "No regular exercise" is automatically assumed above as the sport frequency (the field is disabled) — your training is added here separately and more precisely. Your daily activity (NEAT) is not affected by this.`,
     },
 
     met_option_placeholder: { de: "– Aktivität wählen –", en: "– Choose an activity –" },
@@ -157,6 +174,14 @@ window.KBR.i18n = (function () {
       en: "Please fill in only based on medical guidance — this does not replace medical or dietetic advice.",
     },
     betablocker_label: { de: "Einnahme von Beta-Blockern", en: "Taking beta blockers" },
+    fidgeting_label: {
+      de: "Auffällig viel unbewusste Bewegung / Zappeln",
+      en: "Noticeably high unconscious movement / fidgeting",
+    },
+    fidgeting_hint: {
+      de: "Erhöht den Energieverbrauch leicht (PAL +0,05 bis +0,10) — unabhängig von Sport oder Alltagsaktivität.",
+      en: "Slightly increases energy expenditure (PAL +0.05 to +0.10) — independent of exercise or daily activity.",
+    },
     fieber_label: { de: "Aktuell Fieber", en: "Currently have a fever" },
     fieber_temp_label: { de: "Körpertemperatur (°C)", en: "Body temperature (°C)" },
 
@@ -176,6 +201,10 @@ window.KBR.i18n = (function () {
     result_bmi_label: { de: "Body-Mass-Index (BMI)", en: "Body Mass Index (BMI)" },
     result_ree_label: { de: "Grundumsatz (REE)", en: "Resting energy expenditure (REE)" },
     result_tee_label: { de: "Gesamtumsatz (TEE)", en: "Total energy expenditure (TEE)" },
+    pal_hoch_hinweis: {
+      de: "Dein berechnetes Aktivitätslevel (PAL) liegt bei oder über 2,4 — das entspricht einer außergewöhnlich hohen dauerhaften Belastung nahe der physiologischen Obergrenze. Achte auf ausreichend Regeneration, Schlaf und bei Bedarf Erholungstage, besonders wenn du dieses Niveau über längere Zeit hältst.",
+      en: "Your calculated activity level (PAL) is at or above 2.4 — this corresponds to an exceptionally high sustained load, close to the physiological upper limit. Make sure to get enough recovery, sleep, and rest days if needed, especially if you maintain this level over a longer period.",
+    },
     result_zusatz_heading: { de: "Zusätzliche Referenzwerte", en: "Additional reference values" },
     result_fettabbau_label: { de: "Kalorienbedarf für Fettabbau", en: "Calorie target for fat loss" },
     result_fettabbau_hinweis: {
@@ -196,6 +225,54 @@ window.KBR.i18n = (function () {
       de: "Details zur Berechnung (Bandbreite, Formel, Modifikatoren)",
       en: "Calculation details (range, formula, modifiers)",
     },
+
+    stillstand_panel_titel: {
+      de: "Gewichtsstillstand oder Abnehmblockade? Woran es liegen kann",
+      en: "Weight plateau or stalled fat loss? What could be behind it",
+    },
+    stillstand_thermogenese: {
+      de: `Ein zu extremes Defizit kann zu vermehrtem Hunger, weniger unbewusster Alltagsbewegung (NEAT) und einem leicht
+        sinkenden Grundumsatz führen (adaptive Thermogenese, ca. 5–10 %) — genau deshalb empfiehlt dieser Rechner ein
+        moderates Defizit von 15–20 % statt eines radikalen.`,
+      en: `Too extreme a deficit can lead to increased hunger, less unconscious daily movement (NEAT), and a slightly
+        declining resting energy expenditure (adaptive thermogenesis, approx. 5–10%) — which is exactly why this
+        calculator recommends a moderate deficit of 15–20% instead of a radical one.`,
+    },
+    stillstand_hormonell: {
+      de: `Auch hormonelle Faktoren spielen eine Rolle: Eine Schilddrüsenunterfunktion kann den Grundumsatz messbar senken
+        (im Formular oben unter „Weitere Faktoren" berücksichtigbar, falls ärztlich diagnostiziert), und erhöhte
+        Stresshormone (Cortisol) können durch Wassereinlagerungen den tatsächlichen Fettabbau auf der Waage verschleiern.`,
+      en: `Hormonal factors also play a role: an underactive thyroid can measurably lower resting energy expenditure
+        (can be accounted for above under "Additional factors" if medically diagnosed), and elevated stress hormones
+        (cortisol) can mask actual fat loss on the scale through water retention.`,
+    },
+    stillstand_checkliste_intro: {
+      de: `Bevor du von einem echten Plateau ausgehst: Gewichtsschwankungen durch Wasser sind normal — erst ab 4–6 Wochen
+        wirklichem Stillstand lohnt sich eine genauere Abklärung. Für ein Arztgespräch können folgende Blutwerte
+        hilfreich sein:`,
+      en: `Before assuming a real plateau: weight fluctuations from water are normal — only after 4–6 weeks of genuine
+        stagnation is a closer medical look worthwhile. The following blood values can be helpful for a doctor's
+        appointment:`,
+    },
+    stillstand_checkliste_schilddruese: { de: "Schilddrüse (TSH, fT3, fT4)", en: "Thyroid (TSH, fT3, fT4)" },
+    stillstand_checkliste_naehrstoffe: {
+      de: "Nährstoffstatus (Eisen/Ferritin, Vitamin D)",
+      en: "Nutrient status (iron/ferritin, vitamin D)",
+    },
+    stillstand_checkliste_hormone: { de: "ggf. Hormonstatus", en: "hormone status, if relevant" },
+    stillstand_disclaimer: {
+      de: `Dieser Rechner ersetzt keine medizinische Diagnostik. Bei chronischem Abnehmstillstand oder Verdacht auf
+        Stoffwechselerkrankungen wende dich bitte an qualifiziertes Fachpersonal.`,
+      en: `This calculator does not replace medical diagnostics. If you experience chronic weight-loss stalls or
+        suspect a metabolic condition, please consult qualified medical professionals.`,
+    },
+
+    druck_footer_label: { de: "Fußzeile für den PDF-Export (optional)", en: "Footer text for the PDF export (optional)" },
+    druck_footer_hint: {
+      de: "Wird zentriert am unteren Rand jeder gedruckten Seite angezeigt, z. B. dein Name. Bleibt das Feld leer, ändert sich am PDF-Export nichts.",
+      en: "Shown centered at the bottom of every printed page, e.g. your name. If left empty, nothing changes in the PDF export.",
+    },
+
     print_btn: { de: "Ergebnis als PDF speichern", en: "Save result as PDF" },
     print_dateiname_praefix: { de: "Kalorienbedarfsrechner", en: "CalorieNeedsCalculator" },
 
@@ -293,8 +370,16 @@ window.KBR.i18n = (function () {
       en: "Fever ({{temp}} °C, Δ{{delta}} °C above 37 °C): REE +10–13% per °C",
     },
     mod_sport_met: {
-      de: "Sport (MET-Berechnung, ersetzt Aktivitätslevel-Schätzung): {{details}} — PAL-Äquivalent +{{zuschlag}}",
-      en: "Exercise (MET calculation, replaces activity-level estimate): {{details}} — PAL equivalent +{{zuschlag}}",
+      de: "Sport (MET-Berechnung, ersetzt Sport-Häufigkeits-Schätzung): {{details}} — PAL-Äquivalent +{{zuschlag}}",
+      en: "Exercise (MET calculation, replaces sport-frequency estimate): {{details}} — PAL equivalent +{{zuschlag}}",
+    },
+    mod_sport_haeufigkeit: {
+      de: "Sport ({{stufe}}): PAL-Äquivalent +{{zuschlag}}",
+      en: "Exercise ({{stufe}}): PAL equivalent +{{zuschlag}}",
+    },
+    mod_fidgeting: {
+      de: "Auffällig viel Spontanbewegung: PAL-Äquivalent +{{zuschlagMin}}…+{{zuschlagMax}}",
+      en: "Noticeably high spontaneous movement: PAL equivalent +{{zuschlagMin}}…+{{zuschlagMax}}",
     },
     mod_sport_aktivitaet_eintrag: {
       de: "{{label}} ({{stunden}} h/Woche, {{met}} MET)",
@@ -373,19 +458,19 @@ window.KBR.i18n = (function () {
     methodik_pal_heading: { de: "Das PAL-Konzept", en: "The PAL concept" },
     methodik_pal_text: {
       de: `<abbr title="Physical Activity Level">PAL</abbr> steht für „Physical Activity Level" und beschreibt, wievielmal höher
-        dein tatsächlicher Tagesverbrauch im Vergleich zum Grundumsatz liegt — als ein einziger Durchschnittswert über
-        den ganzen Tag, Alltag und Training zusammen. Ein PAL von 1,2 bedeutet z. B. kaum Bewegung, ein PAL von 1,9 sehr
-        viel körperliche Aktivität. Die Werte in der Aktivitätslevel-Auswahl (1,2 bis 1,9) stammen aus der etablierten
-        FAO/WHO/UNU-Klassifikation und sind bewusst ganzheitlich gedacht — sie schließen ein durchschnittliches
-        Trainingspensum bereits mit ein, statt Alltag und Sport getrennt zu addieren. Wer seine Trainingsdaten genau
-        kennt, kann stattdessen die MET-Berechnung nutzen (siehe unten).`,
+        dein tatsächlicher Tagesverbrauch im Vergleich zum Grundumsatz liegt. Dieser Rechner setzt sich aus drei
+        unabhängigen, addierten Bausteinen zusammen: der Alltagsaktivität (NEAT, geschätzt über deine durchschnittliche
+        Schrittzahl/Tag, PAL 1,2–2,0), einem Sport-Zuschlag nach Trainingshäufigkeit oder wahlweise einer genauen
+        MET-Berechnung (+0,00 bis +0,40) und optional einem kleinen Zuschlag für auffällig viel unbewusste Spontanbewegung
+        (Fidgeting, +0,05 bis +0,10). Die getrennte Erfassung von Alltag und Sport vermeidet, dass beides in einer
+        einzigen groben Schätzung vermischt wird — die Gesamtsumme wird auf 1,2 bis 2,6 begrenzt.`,
       en: `<abbr title="Physical Activity Level">PAL</abbr> stands for "Physical Activity Level" and describes how many
-        times higher your actual daily energy expenditure is compared to your resting energy expenditure — as a
-        single daily average covering both everyday life and training together. A PAL of 1.2 means, for example,
-        very little movement, while a PAL of 1.9 means a very high level of physical activity. The values in the
-        activity level selection (1.2 to 1.9) come from the established FAO/WHO/UNU classification and are
-        deliberately holistic — they already include an average training load instead of adding daily life and
-        exercise separately. If you know your training data precisely, you can use the MET calculation instead (see below).`,
+        times higher your actual daily energy expenditure is compared to your resting energy expenditure. This
+        calculator combines three independent, added components: daily activity (NEAT, estimated from your average
+        daily step count, PAL 1.2–2.0), a sport add-on based on training frequency or, alternatively, a precise MET
+        calculation (+0.00 to +0.40), and optionally a small add-on for noticeably high unconscious spontaneous
+        movement (fidgeting, +0.05 to +0.10). Tracking daily life and exercise separately avoids blending both into
+        a single rough estimate — the total is capped between 1.2 and 2.6.`,
     },
     methodik_met_heading: { de: "MET-Werte (Trainingsintensität)", en: "MET values (training intensity)" },
     methodik_nicht_heading: { de: "Nicht eingerechnete Faktoren", en: "Factors not included" },

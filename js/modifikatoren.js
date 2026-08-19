@@ -75,6 +75,48 @@ window.KBR.modifikatoren = (function () {
 
   // ---- PAL-wirksame Faktoren --------------------------------------------
 
+  // NEAT-Schätzung über die durchschnittliche Schrittzahl/Tag als PAL-Bereich
+  // (nicht als Zuschlag) — ersetzt das alte, Sport-vermischte Aktivitätslevel-
+  // Dropdown vollständig. Berufliche Beispiele in den i18n-Labels dienen nur als
+  // Orientierung für Nutzer:innen ohne Schrittzähler, sind aber nicht Teil der
+  // Berechnung.
+  const NEAT_STUFEN = [
+    { id: "unter5000", palMin: 1.2, palMax: 1.3 },
+    { id: "5000bis10000", palMin: 1.4, palMax: 1.5 },
+    { id: "10000bis15000", palMin: 1.6, palMax: 1.7 },
+    { id: "ab15000", palMin: 1.8, palMax: 2.0 },
+  ];
+
+  function neatPalBereich({ neatSchritteId }) {
+    const stufe = NEAT_STUFEN.find((s) => s.id === neatSchritteId);
+    return stufe ? { palMin: stufe.palMin, palMax: stufe.palMax } : null;
+  }
+
+  // Sport-Häufigkeit als eigenständiger, additiver PAL-Zuschlag — unabhängig von
+  // NEAT. Wird durch die genaue MET-Berechnung ersetzt, nicht ergänzt (siehe
+  // sportMet-Kommentar unten), da beide dieselbe Achse (Trainingsintensität)
+  // beschreiben.
+  const SPORT_HAEUFIGKEIT_STUFEN = [
+    { id: "keinSport", zuschlag: 0.0 },
+    { id: "1bis3", zuschlag: 0.1 },
+    { id: "3bis5", zuschlag: 0.2 },
+    { id: "6bis7", zuschlag: 0.3 },
+    { id: "leistungssport", zuschlag: 0.4 },
+  ];
+
+  function sportHaeufigkeitZuschlag({ haeufigkeitId }) {
+    const stufe = SPORT_HAEUFIGKEIT_STUFEN.find((s) => s.id === haeufigkeitId);
+    return stufe ? { min: stufe.zuschlag, max: stufe.zuschlag } : null;
+  }
+
+  // Spontanbewegung (Wippen, Gestikulieren, häufiges Aufstehen) — unabhängig von
+  // NEAT-Schrittzahl (wird von Trackern oft nicht erfasst) und von Sport, daher
+  // immer additiv, nie ersetzend.
+  function fidgetingPalZuschlag({ aktiv }) {
+    if (!aktiv) return null;
+    return { min: 0.05, max: 0.1 };
+  }
+
   // MET-Referenztabelle für die Sport-Auswahl im UI. Werte aus dem Compendium
   // of Physical Activities (Ainsworth et al., 2024 Adult Compendium,
   // pacompendium.com) — die Standardquelle für MET-Werte in der Sportwissenschaft.
@@ -121,11 +163,11 @@ window.KBR.modifikatoren = (function () {
   ];
 
   /**
-   * MET-basierte Sportberechnung als PAL-Äquivalent. Ersetzt die ganzheitliche
-   * Aktivitätslevel-Schätzung (siehe berechnung.js/ui.js), statt sie additiv zu
-   * ergänzen — ein separater "PAL-Zuschlag" auf Basis einer Schätzung ohne
-   * echte Trainingsdaten wäre nicht literaturgestützt und würde bei ohnehin
-   * sport-inklusiven PAL-Werten (FAO/WHO/UNU) Doppelzählung riskieren.
+   * MET-basierte Sportberechnung als PAL-Äquivalent. Ersetzt den Sport-
+   * Häufigkeits-Zuschlag (siehe berechnung.js/ui.js), statt ihn additiv zu
+   * ergänzen — beide beschreiben dieselbe Achse (Trainingsintensität), eine
+   * zusätzliche Addition würde Doppelzählung riskieren. Die Alltagsaktivität
+   * (NEAT) ist davon unabhängig und bleibt in jedem Fall unberührt.
    *
    * Nettoeffekt (MET-1, da MET=1 dem Ruheumsatz entspricht) je Aktivität über
    * die Trainingsstunden pro Woche, über alle angegebenen Aktivitäten summiert,
@@ -169,6 +211,11 @@ window.KBR.modifikatoren = (function () {
     adaptiveThermogenese,
     schilddruese,
     fieber,
+    NEAT_STUFEN,
+    neatPalBereich,
+    SPORT_HAEUFIGKEIT_STUFEN,
+    sportHaeufigkeitZuschlag,
+    fidgetingPalZuschlag,
     sportMet,
     MET_AKTIVITAETEN,
     schwangerschaftStillzeit,

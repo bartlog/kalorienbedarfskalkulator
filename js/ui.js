@@ -14,16 +14,6 @@
   let letztesErgebnis = null;
   let letzteEingabe = null;
 
-  // Aktivitätslevel-Werte (siehe #activity-Options in index.html) auf ihre
-  // i18n-Labels abgebildet, für die Druckseite "Eingegebene Werte".
-  const PAL_LABEL_KEYS = {
-    1.2: "aktivitaet_opt_sitzend",
-    1.375: "aktivitaet_opt_leicht",
-    1.55: "aktivitaet_opt_maessig",
-    1.725: "aktivitaet_opt_sehr",
-    1.9: "aktivitaet_opt_extrem",
-  };
-
   function formatKcal(value) {
     return `${i18n.zahl(Math.round(value), 0)} kcal`;
   }
@@ -108,25 +98,27 @@
 
   // ---- Progressive Disclosure innerhalb Kategorie B ------------------------
 
-  // Bei genauer MET-Berechnung ersetzt das Training die Aktivitätslevel-Schätzung
-  // oben (statt sie zu ergänzen) — daher wird das Feld auf "Sitzend" fixiert und
-  // deaktiviert, damit nicht doppelt gezählt wird. Vorheriger Wert wird für den
-  // Fall gemerkt, dass der Nutzer wieder auf "Keine genaueren Angaben" wechselt.
+  // Bei genauer MET-Berechnung ersetzt das Training die Sport-Häufigkeits-
+  // Schätzung oben (statt sie zu ergänzen) — daher wird das Feld auf "Kein
+  // Sport" fixiert und deaktiviert, damit nicht doppelt gezählt wird. Die
+  // Alltagsaktivität (NEAT) ist davon unabhängig und bleibt unangetastet.
+  // Vorheriger Wert wird für den Fall gemerkt, dass der Nutzer wieder auf
+  // "Schätzung oben verwenden" wechselt.
   function anwendenMetUeberschreibung(istMet) {
-    const activitySelect = el("activity");
+    const sportSelect = el("sportHaeufigkeit");
     const hinweis = el("hinweis-met-override");
     if (istMet) {
-      if (activitySelect.dataset.vorherigerWert === undefined) {
-        activitySelect.dataset.vorherigerWert = activitySelect.value;
+      if (sportSelect.dataset.vorherigerWert === undefined) {
+        sportSelect.dataset.vorherigerWert = sportSelect.value;
       }
-      activitySelect.value = "1.2";
-      activitySelect.disabled = true;
+      sportSelect.value = "keinSport";
+      sportSelect.disabled = true;
       hinweis.hidden = false;
     } else {
-      activitySelect.disabled = false;
-      if (activitySelect.dataset.vorherigerWert !== undefined) {
-        activitySelect.value = activitySelect.dataset.vorherigerWert;
-        delete activitySelect.dataset.vorherigerWert;
+      sportSelect.disabled = false;
+      if (sportSelect.dataset.vorherigerWert !== undefined) {
+        sportSelect.value = sportSelect.dataset.vorherigerWert;
+        delete sportSelect.dataset.vorherigerWert;
       }
       hinweis.hidden = true;
     }
@@ -357,7 +349,7 @@
     const age = Number(el("age").value);
     const heightCm = Number(el("height").value);
     const weightKg = Number(el("weight").value);
-    const basisPAL = Number(el("activity").value);
+    const neatSchritteId = el("neatSchritte").value;
     const ziel = el("goal").value;
 
     const ffmModus = document.querySelector('input[name="ffmModus"]:checked').value;
@@ -374,7 +366,12 @@
     const istSportler = ffmModus !== "keine" && el("istSportler").checked;
 
     const sportModus = document.querySelector('input[name="sportModus"]:checked').value;
-    const sport = sportModus === "met" ? { modus: "met", aktivitaeten: leseMetZeilen() } : { modus: sportModus };
+    const sportHaeufigkeitId = el("sportHaeufigkeit").value;
+    const sport =
+      sportModus === "met"
+        ? { modus: "met", haeufigkeitId: sportHaeufigkeitId, aktivitaeten: leseMetZeilen() }
+        : { modus: "keine", haeufigkeitId: sportHaeufigkeitId, aktivitaeten: [] };
+    const fidgetingAktiv = el("fidgetingAktiv").checked;
 
     const schwangerschaftStillzeit = el("schwangerschaftStillzeit").value || null;
     const adaptiveThermogeneseAktiv = el("adaptiveThermogenese").checked;
@@ -393,12 +390,13 @@
       age,
       heightCm,
       weightKg,
-      basisPAL,
+      neatSchritteId,
       ziel,
       ffmMeasured,
       ffmKg,
       istSportler,
       sport,
+      fidgetingAktiv,
       schwangerschaftStillzeit,
       adaptiveThermogeneseAktiv,
       schilddruese,
@@ -410,14 +408,16 @@
         age: el("age").value,
         height: el("height").value,
         weight: el("weight").value,
-        activity: el("activity").value,
+        neatSchritteId,
         goal: el("goal").value,
         ffmModus,
         ffmDirekt: el("ffmDirekt").value,
         kfaProzent: el("kfaProzent").value,
         istSportler: el("istSportler").checked,
         sportModus,
+        sportHaeufigkeitId,
         metZeilen: leseMetZeilenRoh(),
+        fidgetingAktiv,
         schwangerschaftStillzeit,
         adaptiveThermogeneseAktiv,
         schilddruseAktiv: el("schilddruseAktiv").checked,
@@ -425,6 +425,7 @@
         betaBlockerAktiv,
         fieberAktiv: fieberAktivCheckbox,
         fieberTemperatur: el("fieberTemperatur").value,
+        druckFussnote: el("druckFussnote").value,
       },
     };
   }
@@ -566,6 +567,16 @@
           .join(", ");
         return i18n.t("mod_sport_met", { details, zuschlag: i18n.zahl(eintrag.zuschlag, 2) });
       }
+      case "sport_haeufigkeit":
+        return i18n.t("mod_sport_haeufigkeit", {
+          stufe: i18n.t("sport_haeufigkeit_opt_" + eintrag.haeufigkeitId),
+          zuschlag: i18n.zahl(eintrag.zuschlag, 2),
+        });
+      case "fidgeting":
+        return i18n.t("mod_fidgeting", {
+          zuschlagMin: i18n.zahl(eintrag.zuschlagMin, 2),
+          zuschlagMax: i18n.zahl(eintrag.zuschlagMax, 2),
+        });
       case "schwangerschaft":
         return i18n.t("mod_schwangerschaft");
       case "stillzeit":
@@ -610,6 +621,8 @@
     const zielWarnung = el("ziel-warnung");
     zielWarnung.innerHTML = zielWarnungTexte.map((t) => `<p>${t}</p>`).join("");
     zielWarnung.hidden = zielWarnungTexte.length === 0;
+
+    el("pal-hoch-hinweis").hidden = !r.pal.hochWarnung;
 
     el("val-fettabbau").textContent = formatKcal(r.fettabbau.haupt);
     renderBar("bar-fettabbau", { min: r.fettabbau.min, max: r.fettabbau.max, haupt: r.fettabbau.haupt, axisMin: 0, axisMax: axisMaxKcal, warn: r.fettabbau.unterReeBasis });
@@ -685,11 +698,12 @@
     zeilen.push(druckZeile(i18n.t("feld_alter_label"), i18n.zahlNatuerlich(eingabe.age)));
     zeilen.push(druckZeile(i18n.t("feld_groesse_label"), `${i18n.zahlNatuerlich(eingabe.heightCm)} cm`));
     zeilen.push(druckZeile(i18n.t("feld_gewicht_label"), `${i18n.zahlNatuerlich(eingabe.weightKg)} kg`));
-    // Bei MET-Berechnung wird "Sitzend" nur als technische Basis erzwungen
-    // (siehe anwendenMetUeberschreibung) — kein echter Nutzer-Input, daher
-    // hier ausgelassen; die MET-Liste unten ist der eigentliche Eintrag.
+    zeilen.push(druckZeile(i18n.t("feld_neat_label"), i18n.t("neat_opt_" + eingabe.neatSchritteId)));
+    // Bei MET-Berechnung wird "Kein regelmäßiger Sport" nur als technische Basis
+    // erzwungen (siehe anwendenMetUeberschreibung) — kein echter Nutzer-Input,
+    // daher hier ausgelassen; die MET-Liste unten ist der eigentliche Eintrag.
     if (!eingabe.sport || eingabe.sport.modus !== "met") {
-      zeilen.push(druckZeile(i18n.t("feld_aktivitaet_label"), i18n.t(PAL_LABEL_KEYS[eingabe.basisPAL] || "aktivitaet_opt_sitzend")));
+      zeilen.push(druckZeile(i18n.t("feld_sport_haeufigkeit_label"), i18n.t("sport_haeufigkeit_opt_" + eingabe.sport.haeufigkeitId)));
     }
     zeilen.push(druckZeile(i18n.t("feld_ziel_label"), i18n.t("ziel_opt_" + eingabe.ziel)));
 
@@ -730,6 +744,9 @@
     if (eingabe.betaBlockerAktiv) {
       zeilen.push(druckZeile(i18n.t("betablocker_label"), i18n.t("druck_ja")));
     }
+    if (eingabe.fidgetingAktiv) {
+      zeilen.push(druckZeile(i18n.t("fidgeting_label"), i18n.t("druck_ja")));
+    }
     if (eingabe.fieber && eingabe.fieber.aktiv) {
       zeilen.push(druckZeile(i18n.t("fieber_label"), i18n.t("druck_ja")));
       zeilen.push(druckZeile(i18n.t("fieber_temp_label"), `${i18n.zahlNatuerlich(eingabe.fieber.temperaturC)} °C`));
@@ -753,7 +770,7 @@
     el("age").value = gespeichert.age || "";
     el("height").value = gespeichert.height || "";
     el("weight").value = gespeichert.weight || "";
-    el("activity").value = gespeichert.activity || "1.55";
+    el("neatSchritte").value = gespeichert.neatSchritteId || "unter5000";
     el("goal").value = gespeichert.goal || "maintain";
 
     if (gespeichert.ffmModus) {
@@ -766,13 +783,13 @@
     el("kfaProzent").value = gespeichert.kfaProzent || "";
     el("istSportler").checked = !!gespeichert.istSportler;
 
-    // "pal" gab es in einer früheren Version — fällt hier stillschweigend auf
-    // "keine" zurück, falls noch in alten gespeicherten Daten vorhanden.
     const sportModus = gespeichert.sportModus === "met" ? "met" : "keine";
     setzeRadioFallsVorhanden("sportModus", sportModus);
     el("feld-met").hidden = sportModus !== "met";
+    el("sportHaeufigkeit").value = gespeichert.sportHaeufigkeitId || "keinSport";
     anwendenMetUeberschreibung(sportModus === "met");
     stelleMetZeilenWieder(gespeichert.metZeilen);
+    el("fidgetingAktiv").checked = !!gespeichert.fidgetingAktiv;
 
     aktualisiereSchwangerschaftSichtbarkeit();
     if (!el("feld-schwangerschaft").hidden) {
@@ -789,6 +806,8 @@
     el("fieberAktiv").checked = !!gespeichert.fieberAktiv;
     el("feld-fieber").hidden = !gespeichert.fieberAktiv;
     el("fieberTemperatur").value = gespeichert.fieberTemperatur || "";
+
+    el("druckFussnote").value = gespeichert.druckFussnote || "";
 
     el("speichernAktiv").checked = true;
   }
@@ -842,6 +861,11 @@
       const datum = `${heute.getFullYear()}-${pad(heute.getMonth() + 1)}-${pad(heute.getDate())}`;
       // Browser schlagen im "Als PDF speichern"-Dialog meist document.title als Dateinamen vor.
       document.title = `${i18n.t("print_dateiname_praefix")}_${datum}`;
+
+      el("druck-footer-datum").textContent = datum;
+      el("druck-footer-text").textContent = el("druckFussnote").value.trim();
+      el("druck-footer").hidden = false;
+
       window.print();
       window.addEventListener(
         "afterprint",

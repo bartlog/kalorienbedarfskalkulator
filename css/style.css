@@ -655,6 +655,7 @@ button[type="submit"]:hover {
   .secondary-btn,
   .link-btn,
   #datenLoeschenBtn,
+  .print-footer-feld,
   #tab-methodik,
   #tab-ueber,
   #tab-tipps {
@@ -757,5 +758,21 @@ button[type="submit"]:hover {
     margin: 1.1rem 0 0.4rem;
     font-weight: 600;
     font-size: 0.95rem;
+  }
+
+  /* Wiederholt sich auf jeder gedruckten Seite (Chromium-Druck-Engine
+     verhält sich hier verlässlich, obwohl CSS-@page-Randboxen/counter(page)
+     nicht unterstützt werden — siehe CLAUDE.md). Bleibt per [hidden] auf dem
+     Bildschirm unsichtbar; das Attribut wird nur beim Klick auf "Ergebnis als
+     PDF speichern" per JS entfernt (siehe ui.js printBtn-Handler). */
+  .druck-footer:not([hidden]) {
+    display: flex;
+    position: fixed;
+    bottom: 0.6cm;
+    left: 2cm;
+    right: 2cm;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    color: var(--color-muted);
   }
 }

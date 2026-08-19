@@ -70,31 +70,51 @@ window.KBR.berechnung = (function (auswahl, modifikatoren) {
   }
 
   function berechnePalMitBand(eingabe, reeAdjHaupt) {
-    const basisPAL = eingabe.basisPAL;
-    // Die MET-Berechnung ersetzt die Aktivitätslevel-Schätzung (basisPAL wird
-    // dafür im UI auf "Sitzend" fixiert) — kein separater additiver "PAL-Zuschlag"
-    // mehr, um Doppelzählung mit dem ganzheitlichen Aktivitätslevel auszuschließen.
+    // NEAT (Alltag, Schrittzahl-basiert) und Sport sind unabhängige, addierte
+    // PAL-Bausteine — siehe modifikatoren.js. Die MET-Berechnung ersetzt nur
+    // den Sport-Zuschlag (dafür wird die Sport-Häufigkeit im UI auf "Kein
+    // Sport" fixiert), NEAT bleibt davon in jedem Fall unberührt.
+    const neat = modifikatoren.neatPalBereich({ neatSchritteId: eingabe.neatSchritteId }) || { palMin: 1.2, palMax: 1.3 };
+
+    const sportModus = eingabe.sport ? eingabe.sport.modus : "keine";
     let sportZuschlag = null;
-    if (eingabe.sport && eingabe.sport.modus === "met") {
+    if (sportModus === "met") {
       sportZuschlag = modifikatoren.sportMet({
         aktivitaeten: eingabe.sport.aktivitaeten,
         weightKg: eingabe.weightKg,
         reeAdj: reeAdjHaupt,
       });
+    } else {
+      sportZuschlag = modifikatoren.sportHaeufigkeitZuschlag({
+        haeufigkeitId: eingabe.sport ? eingabe.sport.haeufigkeitId : null,
+      });
     }
+    const fidgeting = modifikatoren.fidgetingPalZuschlag({ aktiv: !!eingabe.fidgetingAktiv });
 
-    const zuschlagMin = sportZuschlag ? sportZuschlag.min : 0;
-    const zuschlagMax = sportZuschlag ? sportZuschlag.max : 0;
-    const zuschlagHaupt = (zuschlagMin + zuschlagMax) / 2;
+    const sportMin = sportZuschlag ? sportZuschlag.min : 0;
+    const sportMax = sportZuschlag ? sportZuschlag.max : 0;
+    const fidgetMin = fidgeting ? fidgeting.min : 0;
+    const fidgetMax = fidgeting ? fidgeting.max : 0;
 
+    const palMinRoh = neat.palMin + sportMin + fidgetMin;
+    const palMaxRoh = neat.palMax + sportMax + fidgetMax;
+    const palHauptRoh = (neat.palMin + neat.palMax) / 2 + (sportMin + sportMax) / 2 + (fidgetMin + fidgetMax) / 2;
+
+    // Obergrenze 2,6 statt der früheren 2,4: NEAT-Max 2,0 + Sport-Max 0,4 +
+    // Fidgeting-Max 0,1 = 2,5 würde sonst abgeschnitten. Die alte Grenze war
+    // auf das frühere Einzel-Dropdown-Maximum (1,9) plus kleinem MET-Zuschlag
+    // kalibriert, jetzt strukturell höher durch drei addierte Quellen.
     return {
-      palAdjHaupt: clamp(basisPAL + zuschlagHaupt, 1.2, 2.4),
-      palAdjMin: clamp(basisPAL + zuschlagMin, 1.2, 2.4),
-      palAdjMax: clamp(basisPAL + zuschlagMax, 1.2, 2.4),
-      sportModus: eingabe.sport ? eingabe.sport.modus : "keine",
-      sportZuschlagMin: zuschlagMin,
-      sportZuschlagMax: zuschlagMax,
-      sportAktivitaeten: eingabe.sport && eingabe.sport.modus === "met" ? eingabe.sport.aktivitaeten : [],
+      palAdjHaupt: clamp(palHauptRoh, 1.2, 2.6),
+      palAdjMin: clamp(palMinRoh, 1.2, 2.6),
+      palAdjMax: clamp(palMaxRoh, 1.2, 2.6),
+      sportModus,
+      sportZuschlagMin: sportMin,
+      sportZuschlagMax: sportMax,
+      sportAktivitaeten: sportModus === "met" ? eingabe.sport.aktivitaeten : [],
+      sportHaeufigkeitId: sportModus !== "met" && eingabe.sport ? eingabe.sport.haeufigkeitId : null,
+      neatSchritteId: eingabe.neatSchritteId,
+      fidgetingZuschlag: fidgeting,
     };
   }
 
@@ -145,6 +165,12 @@ window.KBR.berechnung = (function (auswahl, modifikatoren) {
     if (pal.sportModus === "met" && pal.sportAktivitaeten && pal.sportAktivitaeten.length) {
       liste.push({ id: "sport_met", aktivitaeten: pal.sportAktivitaeten, zuschlag: pal.sportZuschlagMin });
     }
+    if (pal.sportModus !== "met" && pal.sportHaeufigkeitId && pal.sportHaeufigkeitId !== "keinSport") {
+      liste.push({ id: "sport_haeufigkeit", haeufigkeitId: pal.sportHaeufigkeitId, zuschlag: pal.sportZuschlagMin });
+    }
+    if (pal.fidgetingZuschlag) {
+      liste.push({ id: "fidgeting", zuschlagMin: pal.fidgetingZuschlag.min, zuschlagMax: pal.fidgetingZuschlag.max });
+    }
     if (teeAdditiv.schwangerschaft) {
       liste.push({ id: eingabe.schwangerschaftStillzeit === "schwanger" ? "schwangerschaft" : "stillzeit" });
     }
@@ -165,7 +191,8 @@ window.KBR.berechnung = (function (auswahl, modifikatoren) {
   /**
    * Führt die komplette Pipeline aus und liefert alle Anzeige-relevanten Werte.
    * @param {object} eingabe - siehe auswahl.js/modifikatoren.js für erwartete Felder,
-   *   zusätzlich: basisPAL, ziel ('lose'|'maintain'|'gain'), sport, schilddruese, fieber,
+   *   zusätzlich: neatSchritteId, sport ({modus, haeufigkeitId, aktivitaeten}), fidgetingAktiv,
+   *   ziel ('lose'|'maintain'|'gain'), schilddruese, fieber,
    *   adaptiveThermogeneseAktiv, betaBlockerAktiv, schwangerschaftStillzeit
    */
   function berechne(eingabe) {
@@ -227,6 +254,12 @@ window.KBR.berechnung = (function (auswahl, modifikatoren) {
         softBoundary: ree.auswahl.softBoundary,
       },
       ree: { haupt: ree.reeAdjHaupt, min: ree.reeAdjMin, max: ree.reeAdjMax, bandKcal: ree.bandKcal, basis: ree.reeBasis },
+      pal: {
+        haupt: pal.palAdjHaupt,
+        min: pal.palAdjMin,
+        max: pal.palAdjMax,
+        hochWarnung: pal.palAdjHaupt >= 2.4,
+      },
       tee: { haupt: teeHaupt, min: teeMin, max: teeMax, bandKcal: teeBandKcal },
       ziel: {
         haupt: zielHaupt,
