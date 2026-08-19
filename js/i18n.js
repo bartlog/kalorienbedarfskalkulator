@@ -173,6 +173,7 @@ window.KBR.i18n = (function () {
     submit_btn: { de: "Berechnen", en: "Calculate" },
 
     // ---- Ergebnis -----------------------------------------------------------
+    result_bmi_label: { de: "Body-Mass-Index (BMI)", en: "Body Mass Index (BMI)" },
     result_ree_label: { de: "Grundumsatz (REE)", en: "Resting energy expenditure (REE)" },
     result_tee_label: { de: "Gesamtumsatz (TEE)", en: "Total energy expenditure (TEE)" },
     result_zusatz_heading: { de: "Zusätzliche Referenzwerte", en: "Additional reference values" },
@@ -225,6 +226,42 @@ window.KBR.i18n = (function () {
     ziel_warnung_bmi: {
       de: "Dein BMI liegt im Untergewichtsbereich — eine weitere Gewichtsreduktion wird hier nicht empfohlen. Bitte sprich vorher mit einer Ärztin/einem Arzt oder einer Ernährungsfachkraft.",
       en: "Your BMI is in the underweight range — further weight loss is not recommended here. Please speak with a doctor or a nutrition professional first.",
+    },
+
+    // ---- Soft-Boundary-Formelvergleich (dynamisch) ---------------------------
+    soft_boundary_bmi_titel: {
+      de: "Formelvergleich in der BMI-Übergangszone",
+      en: "Formula comparison in the BMI transition zone",
+    },
+    soft_boundary_bmi_text: {
+      de: "Hinweis zur BMI-Übergangszone: Dein BMI liegt im Schwellenbereich zur Adipositas (29,0–31,0 kg/m²). Da sich das Verhältnis von stoffwechselaktivem Organgewebe zu Muskel- und Fettgewebe an dieser Schwelle verschiebt, weichen unterschiedliche Formelmodelle leicht voneinander ab. Anwendung: Orientiere dich für deinen Tagesbedarf am Mittelwert beider Zahlen und passe deine Kalorienzufuhr nach 2–3 Wochen basierend auf deiner realen Gewichtsveränderung an.",
+      en: "Note on the BMI transition zone: Your BMI is in the threshold range for obesity (29.0–31.0 kg/m²). Because the ratio of metabolically active organ tissue to muscle and fat tissue shifts around this threshold, different formula models diverge slightly. How to use this: use the average of both numbers as your daily target, and adjust your calorie intake after 2–3 weeks based on your actual weight change.",
+    },
+    soft_boundary_alter_titel: {
+      de: "Formelvergleich in der Alters-Übergangszone",
+      en: "Formula comparison in the age transition zone",
+    },
+    soft_boundary_alter_text: {
+      de: "Hinweis zur metabolischen Alters-Übergangszone: Im Alter zwischen 60 und 70 Jahren verändert sich die Körperzusammensetzung (mögliche altersbedingte Sarkopenie) individuell sehr unterschiedlich schnell. Standard-Formeln für jüngere Erwachsene (Mifflin) und spezifische Geriatrie-Formeln (Lührmann) bilden diese Spanne unterschiedlich ab. Anwendung: Wenn du sehr aktiv bist und viel Muskelmasse besitzt, orientiere dich eher am höheren Wert (Mifflin). Wenn du eher inaktiv bist, nutze den Lührmann-Wert oder wähle die goldene Mitte als Startpunkt.",
+      en: "Note on the metabolic age transition zone: between ages 60 and 70, body composition (potential age-related sarcopenia) changes at very different rates from person to person. Standard formulas for younger adults (Mifflin) and specific geriatric formulas (Lührmann) capture this range differently. How to use this: if you're very active and have substantial muscle mass, lean toward the higher value (Mifflin). If you're more sedentary, use the Lührmann value, or start with the midpoint between the two.",
+    },
+
+    // ---- Eingabevalidierung (Fehlermeldungen unter Feldern) -------------------
+    error_kfa_bereich: {
+      de: "Bitte einen Wert zwischen 3 % und 60 % eingeben.",
+      en: "Please enter a value between 3% and 60%.",
+    },
+    error_ffm_zu_hoch: {
+      de: "Die fettfreie Masse muss kleiner als dein Gesamtgewicht sein.",
+      en: "Fat-free mass must be less than your total body weight.",
+    },
+    error_fieber_fahrenheit: {
+      de: "Dieser Wert wirkt wie eine Angabe in Fahrenheit — bitte die Körpertemperatur in Celsius (°C) eingeben.",
+      en: "This value looks like it's in Fahrenheit — please enter body temperature in Celsius (°C).",
+    },
+    error_fieber_bereich: {
+      de: "Bitte einen Wert zwischen 35,0 °C und 42,0 °C eingeben.",
+      en: "Please enter a value between 35.0 °C and 42.0 °C.",
     },
 
     // ---- Detail-Block (dynamisch) --------------------------------------------

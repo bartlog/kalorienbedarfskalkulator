@@ -429,6 +429,62 @@
     };
   }
 
+  // Plausibilitäts-Guards für Körperzusammensetzung/Fieber — blockiert die
+  // Berechnung bei physiologisch unmöglichen Eingaben (statt sie stillschweigend
+  // zu übernehmen) und zeigt eine Fehlermeldung unter dem jeweiligen Feld.
+  // Läuft vor berechne(), nicht in berechnung.js selbst: die Pipeline bleibt
+  // eine reine Funktion ohne Validierungs-/Fehlerzustand, siehe CLAUDE.md.
+  function validiereEingabe(eingabe) {
+    let gueltig = true;
+
+    const fehlerKfa = el("error-kfa");
+    const ffmModus = document.querySelector('input[name="ffmModus"]:checked').value;
+    if (ffmModus === "kfa") {
+      const kfa = Number(el("kfaProzent").value);
+      const kfaGueltig = kfa >= 3 && kfa <= 60;
+      fehlerKfa.hidden = kfaGueltig;
+      if (!kfaGueltig) gueltig = false;
+    } else {
+      fehlerKfa.hidden = true;
+    }
+
+    const fehlerFfm = el("error-ffm-direkt");
+    if (ffmModus === "direkt") {
+      const ffm = Number(el("ffmDirekt").value);
+      const ffmGueltig = ffm > 0 && ffm < eingabe.weightKg;
+      fehlerFfm.hidden = ffmGueltig;
+      if (!ffmGueltig) gueltig = false;
+    } else {
+      fehlerFfm.hidden = true;
+    }
+
+    // Nicht über eingabe.fieber geprüft: leseFormular liefert dort null, sobald
+    // temperaturC <= 37 ist (kein "aktives" Fieber für den Modifikator) — das
+    // ist aber unabhängig davon, ob der rohe Feldwert selbst plausibel ist.
+    const fehlerFieber = el("error-fieber");
+    if (el("fieberAktiv").checked) {
+      const rohWert = el("fieberTemperatur").value;
+      const temp = Number(rohWert);
+      if (rohWert === "" || Number.isNaN(temp)) {
+        fehlerFieber.hidden = true;
+      } else if (temp > 45) {
+        fehlerFieber.textContent = i18n.t("error_fieber_fahrenheit");
+        fehlerFieber.hidden = false;
+        gueltig = false;
+      } else if (!(temp >= 35 && temp <= 42)) {
+        fehlerFieber.textContent = i18n.t("error_fieber_bereich");
+        fehlerFieber.hidden = false;
+        gueltig = false;
+      } else {
+        fehlerFieber.hidden = true;
+      }
+    } else {
+      fehlerFieber.hidden = true;
+    }
+
+    return gueltig;
+  }
+
   // ---- Bar-Rendering (Inline-SVG, keine Bibliothek) ------------------------
 
   function renderBar(containerId, { min, max, haupt, axisMin, axisMax, warn }) {
@@ -453,6 +509,35 @@
         ? { bmi: i18n.zahl(formel.begruendungParams.bmi, 1) }
         : undefined;
     return i18n.t("begruendung_" + formel.begruendungId, params);
+  }
+
+  // Zeigt bei Soft-Boundary-Fällen (BMI 29-31 bzw. Alter 60-69, siehe
+  // auswahl.js) die primäre REE neben dem Vergleichswert der jeweils anderen
+  // Formel — rein informativ, die Pipeline rechnet unverändert mit der
+  // primären Formel weiter (kein Mittelwert o. Ä. im Hintergrund).
+  function renderSoftBoundaryHinweis(formel, reeBasisPrimaer) {
+    const container = el("soft-boundary-hinweis");
+    if (!formel.softBoundary || !formel.vergleich) {
+      container.hidden = true;
+      return;
+    }
+    const titelKey = "soft_boundary_" + formel.softBoundary + "_titel";
+    const textKey = "soft_boundary_" + formel.softBoundary + "_text";
+    container.innerHTML = `
+      <p class="soft-boundary-titel">${i18n.t(titelKey)}</p>
+      <div class="soft-boundary-werte">
+        <div class="soft-boundary-wert">
+          <span class="formel-name">${escapeHtml(formel.name)}</span>
+          <span class="formel-wert">${formatKcal(reeBasisPrimaer)}</span>
+        </div>
+        <div class="soft-boundary-wert">
+          <span class="formel-name">${escapeHtml(formel.vergleich.formelName)}</span>
+          <span class="formel-wert">${formatKcal(formel.vergleich.reeBasis)}</span>
+        </div>
+      </div>
+      <p>${i18n.t(textKey)}</p>
+    `;
+    container.hidden = false;
   }
 
   function formatiereModifikator(eintrag) {
@@ -500,6 +585,10 @@
 
     const axisMaxKcal = Math.max(r.ree.max, r.tee.max, r.ziel.max, r.fettabbau.max) * 1.1;
     const axisMaxProtein = r.proteinAufbau.max * 1.15;
+
+    el("val-bmi").textContent = i18n.zahl(r.formel.bmi, 1);
+
+    renderSoftBoundaryHinweis(r.formel, r.ree.basis);
 
     el("val-ree").textContent = formatKcal(r.ree.haupt);
     renderBar("bar-ree", { min: r.ree.min, max: r.ree.max, haupt: r.ree.haupt, axisMin: 0, axisMax: axisMaxKcal });
@@ -724,6 +813,9 @@
       event.preventDefault();
       const eingabe = leseFormular(event.target);
       if (!eingabe.age || !eingabe.heightCm || !eingabe.weightKg) {
+        return;
+      }
+      if (!validiereEingabe(eingabe)) {
         return;
       }
 

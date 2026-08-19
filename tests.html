@@ -107,6 +107,56 @@
       "Schwangerschaft erzeugt Validierungs-Hinweis"
     );
 
+    // ---- Soft Boundaries (BMI 29-31, Alter 60-69) -----------------------
+    group("Soft Boundaries (Formelvergleich)");
+    (function () {
+      // BMI 30,45 (>=30 -> Müller primär), innerhalb der Zone [29,31]
+      const r = selectREE({ gender: "male", age: 40, heightCm: 170, weightKg: 88 });
+      assert(r.formelId === "mueller", "BMI-Soft-Zone oberhalb 30 -> Müller bleibt primär");
+      assert(r.softBoundary === "bmi", "BMI-Soft-Zone oberhalb 30 -> softBoundary='bmi'");
+      assert(r.vergleich && r.vergleich.formelId === "mifflin", "BMI-Soft-Zone oberhalb 30 -> Vergleichswert ist Mifflin");
+    })();
+    (function () {
+      // BMI 29,41 (<30 -> Mifflin primär), innerhalb der Zone [29,31]
+      const r = selectREE({ gender: "male", age: 40, heightCm: 170, weightKg: 85 });
+      assert(r.formelId === "mifflin", "BMI-Soft-Zone unterhalb 30 -> Mifflin bleibt primär");
+      assert(r.softBoundary === "bmi", "BMI-Soft-Zone unterhalb 30 -> softBoundary='bmi'");
+      assert(r.vergleich && r.vergleich.formelId === "mueller", "BMI-Soft-Zone unterhalb 30 -> Vergleichswert ist Müller");
+    })();
+    (function () {
+      const rNormal = selectREE({ gender: "male", age: 40, heightCm: 180, weightKg: 75 }); // BMI ~23
+      assert(rNormal.vergleich === null && rNormal.softBoundary === null, "Normalgewicht (BMI~23) -> kein Soft-Boundary-Vergleich");
+      const rAdipoes = selectREE({ gender: "male", age: 40, heightCm: 170, weightKg: 105 }); // BMI ~36
+      assert(rAdipoes.vergleich === null && rAdipoes.softBoundary === null, "Deutliche Adipositas (BMI~36, außerhalb Zone) -> kein Vergleich");
+    })();
+    (function () {
+      // Alter 62 (<65 -> Mifflin primär), innerhalb der Zone [60,69], Normalgewicht
+      const r = selectREE({ gender: "female", age: 62, heightCm: 165, weightKg: 62 });
+      assert(r.formelId === "mifflin", "Alters-Soft-Zone unterhalb 65 -> Mifflin bleibt primär");
+      assert(r.softBoundary === "alter", "Alters-Soft-Zone unterhalb 65 -> softBoundary='alter'");
+      assert(r.vergleich && r.vergleich.formelId === "luehrmann", "Alters-Soft-Zone unterhalb 65 -> Vergleichswert ist Lührmann");
+    })();
+    (function () {
+      // Alter 67 (>=65 -> Lührmann primär), innerhalb der Zone [60,69]
+      const r = selectREE({ gender: "female", age: 67, heightCm: 165, weightKg: 62 });
+      assert(r.formelId === "luehrmann", "Alters-Soft-Zone oberhalb 65 -> Lührmann bleibt primär");
+      assert(r.softBoundary === "alter", "Alters-Soft-Zone oberhalb 65 -> softBoundary='alter'");
+      assert(r.vergleich && r.vergleich.formelId === "mifflin", "Alters-Soft-Zone oberhalb 65 -> Vergleichswert ist Mifflin");
+    })();
+    (function () {
+      const rJung = selectREE({ gender: "female", age: 50, heightCm: 165, weightKg: 62 });
+      assert(rJung.vergleich === null, "Alter 50 (außerhalb Zone) -> kein Vergleich");
+      const rAlt = selectREE({ gender: "female", age: 75, heightCm: 165, weightKg: 62 });
+      assert(rAlt.formelId === "luehrmann" && rAlt.vergleich === null, "Alter 75 (>65, aber außerhalb Zone 60-69) -> kein Vergleich");
+    })();
+    (function () {
+      // Überlappung: BMI 29,41 UND Alter 62 gleichzeitig in der jeweiligen Zone
+      // -> BMI-Zone hat Vorrang (dieselbe Priorisierung wie im Entscheidungsbaum)
+      const r = selectREE({ gender: "male", age: 62, heightCm: 170, weightKg: 85 });
+      assert(r.softBoundary === "bmi", "Überlappende Zonen (BMI+Alter) -> BMI-Zone hat Vorrang");
+      assert(r.vergleich.formelId === "mueller", "Überlappende Zonen -> Vergleichswert ist Müller, nicht Lührmann");
+    })();
+
     // ---- Modifikatoren: Guards ------------------------------------------
     group("Modifikatoren-Guards");
     (function () {

@@ -15,6 +15,32 @@ window.KBR.auswahl = (function (formeln) {
     return weightKg / (heightM * heightM);
   }
 
+  // ---- Soft Boundaries -----------------------------------------------------
+  // An den beiden Formel-Übergängen (Übergewicht/Adipositas bei BMI 30,
+  // Erwachsene/Senioren bei Alter 65) ist der harte Formelwechsel eine
+  // Vereinfachung — kurz vor/nach der Schwelle unterscheiden sich beide
+  // Formeln nur wenig, aber der Sprung zwischen ihnen wirkt unmotiviert.
+  // In diesen Zonen wird daher zusätzlich zur primären REE (die weiterhin
+  // die gesamte Pipeline speist) der Wert der jeweils anderen Formel als
+  // reiner Vergleichswert mitgeliefert — ui.js zeigt beide nebeneinander.
+  const BMI_SOFT_MIN = 29.0;
+  const BMI_SOFT_MAX = 31.0;
+  const ALTER_SOFT_MIN = 60;
+  const ALTER_SOFT_MAX = 69;
+
+  function istBmiSoftZone(bmi) {
+    return bmi >= BMI_SOFT_MIN && bmi <= BMI_SOFT_MAX;
+  }
+
+  function istAlterSoftZone(age) {
+    return age >= ALTER_SOFT_MIN && age <= ALTER_SOFT_MAX;
+  }
+
+  function vergleichswert(entryId, fn, args) {
+    const entry = formeln.getById(entryId);
+    return { formelId: entry.id, formelName: entry.name, reeBasis: fn(args) };
+  }
+
   /**
    * @param {object} p
    * @param {'male'|'female'} p.gender
@@ -25,7 +51,7 @@ window.KBR.auswahl = (function (formeln) {
    * @param {number} [p.ffmKg] - gemessene fettfreie Masse, nur relevant wenn ffmMeasured
    * @param {boolean} [p.istSportler] - Freizeitsportler (für Ten-Haaf-Validierungspopulation)
    * @param {boolean} [p.schwangerschaftStillzeit]
-   * @returns {{ formelId: string, formelName: string, reeBasis: number, begruendungId: string, begruendungParams: object|undefined, hinweise: string[], quelle: string, bmi: number }}
+   * @returns {{ formelId: string, formelName: string, reeBasis: number, begruendungId: string, begruendungParams: object|undefined, hinweise: string[], quelle: string, bmi: number, vergleich: {formelId:string,formelName:string,reeBasis:number}|null, softBoundary: 'bmi'|'alter'|null }}
    */
   function selectREE(p) {
     const bmi = calculateBmi(p.weightKg, p.heightCm);
@@ -47,6 +73,8 @@ window.KBR.auswahl = (function (formeln) {
           hinweise,
           quelle: entry.quelle,
           bmi,
+          vergleich: null,
+          softBoundary: null,
         };
       }
 
@@ -59,6 +87,8 @@ window.KBR.auswahl = (function (formeln) {
         hinweise,
         quelle: entry.quelle,
         bmi,
+        vergleich: null,
+        softBoundary: null,
       };
     }
 
@@ -72,6 +102,8 @@ window.KBR.auswahl = (function (formeln) {
         hinweise: ["pregnancy_not_validated"],
         quelle: entry.quelle,
         bmi,
+        vergleich: null,
+        softBoundary: null,
       };
     }
 
@@ -89,6 +121,8 @@ window.KBR.auswahl = (function (formeln) {
         hinweise,
         quelle: entry.quelle,
         bmi,
+        vergleich: istBmiSoftZone(bmi) ? vergleichswert("mifflin", formeln.mifflinStJeor, p) : null,
+        softBoundary: istBmiSoftZone(bmi) ? "bmi" : null,
       };
     }
 
@@ -102,10 +136,25 @@ window.KBR.auswahl = (function (formeln) {
         hinweise,
         quelle: entry.quelle,
         bmi,
+        vergleich: istAlterSoftZone(p.age) ? vergleichswert("mifflin", formeln.mifflinStJeor, p) : null,
+        softBoundary: istAlterSoftZone(p.age) ? "alter" : null,
       };
     }
 
     const entry = formeln.getById("mifflin");
+    // Bei Überlappung beider Zonen (z. B. BMI 29,5 UND Alter 62) hat die
+    // BMI-Zone Vorrang — dieselbe Priorisierung wie im Baum oben (Müller vor
+    // Lührmann), da Extremgewicht laut ursprünglichem Konzept stärker auf den
+    // Ruheumsatz wirkt als das Alter allein.
+    let vergleich = null;
+    let softBoundary = null;
+    if (istBmiSoftZone(bmi)) {
+      vergleich = vergleichswert("mueller", formeln.muellerBmiGraduiert, { gender: p.gender, age: p.age, weightKg: p.weightKg });
+      softBoundary = "bmi";
+    } else if (istAlterSoftZone(p.age)) {
+      vergleich = vergleichswert("luehrmann", formeln.luehrmann, p);
+      softBoundary = "alter";
+    }
     return {
       formelId: entry.id,
       formelName: entry.name,
@@ -114,6 +163,8 @@ window.KBR.auswahl = (function (formeln) {
       hinweise,
       quelle: entry.quelle,
       bmi,
+      vergleich,
+      softBoundary,
     };
   }
 

@@ -94,10 +94,12 @@
             <div class="field sub-field" id="feld-ffm-direkt" hidden>
               <label for="ffmDirekt" data-i18n="ffm_direkt_label">Fettfreie Masse (kg)</label>
               <input type="number" id="ffmDirekt" min="10" max="150" step="0.1">
+              <p class="field-error" id="error-ffm-direkt" hidden data-i18n="error_ffm_zu_hoch">Die fettfreie Masse muss kleiner als dein Gesamtgewicht sein.</p>
             </div>
             <div class="field sub-field" id="feld-ffm-kfa" hidden>
               <label for="kfaProzent" data-i18n="ffm_kfa_label">Körperfettanteil (%)</label>
               <input type="number" id="kfaProzent" min="3" max="60" step="0.1">
+              <p class="field-error" id="error-kfa" hidden data-i18n="error_kfa_bereich">Bitte einen Wert zwischen 3 % und 60 % eingeben.</p>
             </div>
             <div class="field sub-field" id="feld-ist-sportler" hidden>
               <label class="checkbox-label"><input type="checkbox" id="istSportler"> <span data-i18n="ffm_sportler_label">Freizeitsportler:in (regelmäßiges Training)</span></label>
@@ -163,7 +165,8 @@
               <label class="checkbox-label"><input type="checkbox" id="fieberAktiv"> <span data-i18n="fieber_label">Aktuell Fieber</span></label>
               <div class="field sub-field" id="feld-fieber" hidden>
                 <label for="fieberTemperatur" data-i18n="fieber_temp_label">Körpertemperatur (°C)</label>
-                <input type="number" id="fieberTemperatur" min="37" max="42" step="0.1">
+                <input type="number" id="fieberTemperatur" min="35" max="45" step="0.1">
+                <p class="field-error" id="error-fieber" hidden></p>
               </div>
             </div>
           </fieldset>
@@ -185,11 +188,20 @@
       <section id="result" class="result" hidden aria-live="polite">
         <div class="result-item">
           <div class="result-row">
+            <span data-i18n="result_bmi_label">Body-Mass-Index (BMI)</span>
+            <strong id="val-bmi">–</strong>
+          </div>
+        </div>
+
+        <div class="result-item">
+          <div class="result-row">
             <span data-i18n="result_ree_label">Grundumsatz (REE)</span>
             <strong id="val-ree">–</strong>
           </div>
           <div class="bar" id="bar-ree"></div>
         </div>
+
+        <div class="hint-box soft-boundary-hinweis" id="soft-boundary-hinweis" hidden></div>
 
         <div class="result-item">
           <div class="result-row">

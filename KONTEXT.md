@@ -49,6 +49,17 @@ CSS-Bug dabei gefunden und gefixt: `<h1>` ist selbst ein Flex-Container ohne `mi
 
 **2026-08-19 — PDF-Export: leere zweite Seite gefixt + Eingaben-Seite ergänzt.** Ursache des Bugs: Disclaimer-Absatz überlief bei aktiven Modifikatoren knapp (~35-40px) auf eine fast leere zweite Seite — Print-Spacing verkleinert, damit Ergebnis+Disclaimer zuverlässig auf eine Seite passen. Neu: zweite (ggf. dritte bei vielen MET-Zeilen) Druckseite mit allen eingegebenen Werten als Klartext, nur im PDF sichtbar. Verifiziert per Playwright+pdfjs-dist über 5 Szenarien (Details siehe Commit `3afd9d0`).
 
+**2026-08-19 (Fortsetzung) — Soft Boundaries, Validierungs-Guards, BMI-Anzeige.** 5-Punkte-Auftrag erhalten (Formelauswahl/Validierung/UI überarbeiten):
+- **Punkt 1** (Müller-Untergewicht entfernen) war bereits erledigt (siehe oben) — neu ergänzt: BMI-Übergangszone (29,0–31,0) zeigt jetzt Mifflin- und Müller-Wert nebeneinander mit Erklärtext.
+- **Punkt 2** (Ten-Haaf cm→m-Konvertierung) **nicht umgesetzt** — Codeprüfung zeigt, dass `tenHaaf()` nie eine Körpergröße entgegennimmt (reine FFM-Formel). Die im Auftrag beschriebene "gewichtsbasierte Ten-Haaf-Formel mit Körpergröße in Metern" existiert in dieser Codebase nicht; vermutlich Verwechslung mit einer anderen Formelvariante. Details in CLAUDE.md.
+- **Punkt 3** (Alters-Übergangszone 60–69): analog zu Punkt 1, Mifflin vs. Lührmann nebeneinander.
+- **Punkt 4** (FFM/KFA-Plausibilität) und **Punkt 5** (Fieber-Clamp + Fahrenheit-Erkennung): neue `validiereEingabe()` in ui.js, blockiert die Berechnung bei KFA außerhalb 3–60 %, FFM ≥ Gesamtgewicht, oder Fieber-Temperatur außerhalb 35–42 °C (mit gesonderter Meldung bei >45 °C als vermutlicher Fahrenheit-Fehleingabe).
+- **Nachtrag:** BMI wird jetzt immer im Ergebnisbereich (Web + PDF) angezeigt.
+
+Architektur: `auswahl.js` liefert bei Soft-Boundary-Fällen zusätzlich `vergleich`/`softBoundary` (rein informativ, beeinflusst nicht die Pipeline — bei Überlappung beider Zonen hat BMI Vorrang, dieselbe Priorisierung wie im Baum). Neue Tests in tests.html (59/59 grün).
+
+**PDF-Pagination erneut geprüft und nachgebessert:** Der neue Soft-Boundary-Block ließ den Disclaimer wieder auf eine fast leere Seite überlaufen — Print-Spacing weiter verkleinert (`.result`-Gap 0.65rem→0.5rem, `.soft-boundary-hinweis` eigene Print-Regeln), bis alle Testfälle (Basis, Alters-/BMI-Soft-Boundary, Extremfall mit beiden Zonen + allen Modifikatoren) sauber bei 2 Seiten liegen. Wichtige Lektion dabei (siehe CLAUDE.md): `scrollHeight` unter `emulateMedia('print')` sagt die tatsächliche `page.pdf()`-Paginierung nicht zuverlässig voraus — musste zweimal per echtem PDF+pdfjs-dist nachgemessen werden, bevor der Fix wirklich saß.
+
 ## 2. notebooklm MCP-Server
 
 **Status: wieder entfernt (`claude mcp remove notebooklm`) — Login funktionierte nicht zuverlässig.**
