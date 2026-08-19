@@ -122,6 +122,10 @@ window.KBR.i18n = (function () {
     },
 
     sport_legend: { de: "Sport / Training", en: "Exercise / Training" },
+    sport_hint_kurz: {
+      de: "Genauere Eingabe statt Häufigkeits-Schätzung",
+      en: "More precise entry instead of the frequency estimate",
+    },
     sport_hint: {
       de: `Die Sport-Häufigkeit oben ist eine grobe Schätzung. Falls du deine Trainingsdaten genau kennst, kannst du
         sie stattdessen hier präzise angeben — das <strong>ersetzt</strong> die Häufigkeits-Schätzung oben (kein

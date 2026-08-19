@@ -55,7 +55,7 @@
           <input type="number" id="weight" name="weight" min="30" max="300" step="0.1" required>
         </div>
 
-        <div class="field">
+        <div class="field field-group-start">
           <div class="field-label-row">
             <label for="neatSchritte" data-i18n="feld_neat_label">Alltagsaktivität (NEAT) — durchschnittliche Schrittzahl/Tag</label>
             <details class="info-toggle">
@@ -116,7 +116,7 @@
           konstant bleibt, passt die Berechnung.
         </div>
 
-        <div class="field">
+        <div class="field field-group-start">
           <label for="goal" data-i18n="feld_ziel_label">Ziel</label>
           <select id="goal" name="goal">
             <option value="lose" data-i18n="ziel_opt_lose">Gewicht verlieren</option>
@@ -153,8 +153,8 @@
 
           <fieldset class="field-group">
             <legend data-i18n="sport_legend">Sport / Training</legend>
-            <details class="info-toggle">
-              <summary aria-label="Mehr Informationen">ⓘ</summary>
+            <details class="info-toggle info-toggle-standalone">
+              <summary aria-label="Mehr Informationen">ⓘ<span data-i18n="sport_hint_kurz"> Genauere Eingabe statt Häufigkeits-Schätzung</span></summary>
               <div class="info-toggle-inhalt" data-i18n="sport_hint">
                 Die Sport-Häufigkeit oben ist eine grobe Schätzung. Falls du deine Trainingsdaten genau kennst,
                 kannst du sie stattdessen hier präzise angeben — das <strong>ersetzt</strong> die
