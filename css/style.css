@@ -574,6 +574,12 @@ button[type="submit"]:hover {
   line-height: 1.4;
 }
 
+/* Nur für den Druck/PDF-Export gedacht (zweite Seite mit den eingegebenen
+   Werten) — auf dem Bildschirm nie sichtbar, siehe @media print unten. */
+.druck-eingaben {
+  display: none;
+}
+
 /* ---- Druck / PDF-Export (DIN A4) ------------------------------------------ */
 
 @media print {
@@ -614,9 +620,75 @@ button[type="submit"]:hover {
   .result {
     background: none;
     padding: 0;
+    /* Verkleinert gegenüber der Bildschirm-Regel (1rem) — reklamiert genug
+       Höhe, damit das Ergebnis inkl. Disclaimer zuverlässig auf eine Seite
+       passt. Ohne das rutschte der Disclaimer allein auf eine fast leere
+       zweite Seite, sobald mehrere Modifikatoren/Warnhinweise aktiv waren. */
+    gap: 0.65rem;
+  }
+
+  .result-item {
+    gap: 0.25rem;
+  }
+
+  .section-heading {
+    margin: 0.9rem 0 0.5rem;
   }
 
   .hint-box {
     border: 1px solid var(--color-border);
+    padding: 0.6rem 0.8rem;
+  }
+
+  .hint-box p {
+    margin: 0 0 0.4rem;
+  }
+
+  .disclaimer {
+    margin-top: 0.75rem;
+  }
+
+  /* Zweite Druckseite: die eingegebenen Werte als Referenz (z. B. für den
+     Arztbesuch). Auf dem Bildschirm nie sichtbar, nur beim Drucken/PDF-Export
+     — erzwungener Seitenumbruch, damit sie unabhängig davon, wie viel Platz
+     Seite 1 übrig lässt, immer sauber auf einer eigenen Seite beginnt. Bei
+     vielen MET-Zeilen darf der Inhalt natürlich auf eine dritte Seite fließen. */
+  /* :not([hidden]) — falls per Strg+P statt über den PDF-Button gedruckt wird,
+     bevor überhaupt eine Berechnung lief, bleibt die Seite (hidden per
+     Default, siehe HTML) über die globale [hidden]{display:none!important}
+     Regel ausgeblendet, statt eine leere Seite mit nur der Überschrift zu zeigen. */
+  .druck-eingaben:not([hidden]) {
+    display: block;
+    break-before: page;
+    page-break-before: always;
+  }
+
+  .druck-eingaben h2 {
+    margin: 0 0 1rem;
+  }
+
+  .druck-zeile {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.35rem 0;
+    border-bottom: 1px solid var(--color-border);
+    font-size: 0.9rem;
+  }
+
+  .druck-zeile dt {
+    color: var(--color-muted);
+  }
+
+  .druck-zeile dd {
+    margin: 0;
+    text-align: right;
+    font-weight: 600;
+  }
+
+  .druck-untergruppe {
+    margin: 1.1rem 0 0.4rem;
+    font-weight: 600;
+    font-size: 0.95rem;
   }
 }

@@ -14,6 +14,16 @@
   let letztesErgebnis = null;
   let letzteEingabe = null;
 
+  // Aktivitätslevel-Werte (siehe #activity-Options in index.html) auf ihre
+  // i18n-Labels abgebildet, für die Druckseite "Eingegebene Werte".
+  const PAL_LABEL_KEYS = {
+    1.2: "aktivitaet_opt_sitzend",
+    1.375: "aktivitaet_opt_leicht",
+    1.55: "aktivitaet_opt_maessig",
+    1.725: "aktivitaet_opt_sehr",
+    1.9: "aktivitaet_opt_extrem",
+  };
+
   function formatKcal(value) {
     return `${i18n.zahl(Math.round(value), 0)} kcal`;
   }
@@ -564,6 +574,80 @@
     el("detail-inhalt").innerHTML = detailTeile.join("");
 
     el("result").hidden = false;
+
+    renderDruckEingaben(eingabe);
+  }
+
+  // ---- Druckseite "Eingegebene Werte" ---------------------------------------
+
+  function druckZeile(labelText, wertText) {
+    return `<div class="druck-zeile"><dt>${escapeHtml(labelText)}</dt><dd>${escapeHtml(wertText)}</dd></div>`;
+  }
+
+  // Zweite (ggf. dritte) PDF-Seite: Klartext-Zusammenfassung der Eingaben, z. B.
+  // als Beleg für einen Arztbesuch. Nur relevant für den Druck (siehe CSS
+  // .druck-eingaben), auf dem Bildschirm nie sichtbar.
+  function renderDruckEingaben(eingabe) {
+    const liste = el("druck-eingaben-liste");
+    if (!liste) return;
+
+    const zeilen = [];
+    zeilen.push(druckZeile(i18n.t("feld_geschlecht_label"), i18n.t(eingabe.gender === "male" ? "geschlecht_maennlich" : "geschlecht_weiblich")));
+    zeilen.push(druckZeile(i18n.t("feld_alter_label"), i18n.zahlNatuerlich(eingabe.age)));
+    zeilen.push(druckZeile(i18n.t("feld_groesse_label"), `${i18n.zahlNatuerlich(eingabe.heightCm)} cm`));
+    zeilen.push(druckZeile(i18n.t("feld_gewicht_label"), `${i18n.zahlNatuerlich(eingabe.weightKg)} kg`));
+    // Bei MET-Berechnung wird "Sitzend" nur als technische Basis erzwungen
+    // (siehe anwendenMetUeberschreibung) — kein echter Nutzer-Input, daher
+    // hier ausgelassen; die MET-Liste unten ist der eigentliche Eintrag.
+    if (!eingabe.sport || eingabe.sport.modus !== "met") {
+      zeilen.push(druckZeile(i18n.t("feld_aktivitaet_label"), i18n.t(PAL_LABEL_KEYS[eingabe.basisPAL] || "aktivitaet_opt_sitzend")));
+    }
+    zeilen.push(druckZeile(i18n.t("feld_ziel_label"), i18n.t("ziel_opt_" + eingabe.ziel)));
+
+    if (eingabe.ffmMeasured && eingabe.ffmKg) {
+      zeilen.push(druckZeile(i18n.t("druck_ffm_direkt_label"), `${i18n.zahl(eingabe.ffmKg, 1)} kg`));
+    } else if (eingabe.ffmKg) {
+      zeilen.push(druckZeile(i18n.t("druck_ffm_kfa_label"), `${i18n.zahl(eingabe.ffmKg, 1)} kg`));
+    }
+    if (eingabe.istSportler) {
+      zeilen.push(druckZeile(i18n.t("ffm_sportler_label"), i18n.t("druck_ja")));
+    }
+
+    if (eingabe.sport && eingabe.sport.modus === "met" && eingabe.sport.aktivitaeten.length) {
+      zeilen.push(`<div class="druck-untergruppe">${escapeHtml(i18n.t("sport_legend"))}</div>`);
+      eingabe.sport.aktivitaeten.forEach((a) => {
+        zeilen.push(
+          druckZeile(
+            metAktivitaetLabel(a.aktivitaetId),
+            i18n.t("druck_sport_zeile", { stunden: i18n.zahlNatuerlich(a.stundenProWoche), met: i18n.zahlNatuerlich(a.metWert) })
+          )
+        );
+      });
+    }
+
+    if (eingabe.schwangerschaftStillzeit === "schwanger") {
+      zeilen.push(druckZeile(i18n.t("schwangerschaft_label"), i18n.t("schwangerschaft_opt_schwanger")));
+    } else if (eingabe.schwangerschaftStillzeit === "stillzeit") {
+      zeilen.push(druckZeile(i18n.t("schwangerschaft_label"), i18n.t("schwangerschaft_opt_stillzeit")));
+    }
+    if (eingabe.adaptiveThermogeneseAktiv) {
+      zeilen.push(druckZeile(i18n.t("diaet_label"), i18n.t("druck_ja")));
+    }
+    if (eingabe.schilddruese && eingabe.schilddruese.aktiv) {
+      zeilen.push(druckZeile(i18n.t("schilddruese_label"), i18n.t("druck_ja")));
+      const p = eingabe.schilddruese.faktorProzent;
+      zeilen.push(druckZeile(i18n.t("schilddruese_prozent_label"), `${p >= 0 ? "+" : ""}${i18n.zahlNatuerlich(p)} %`));
+    }
+    if (eingabe.betaBlockerAktiv) {
+      zeilen.push(druckZeile(i18n.t("betablocker_label"), i18n.t("druck_ja")));
+    }
+    if (eingabe.fieber && eingabe.fieber.aktiv) {
+      zeilen.push(druckZeile(i18n.t("fieber_label"), i18n.t("druck_ja")));
+      zeilen.push(druckZeile(i18n.t("fieber_temp_label"), `${i18n.zahlNatuerlich(eingabe.fieber.temperaturC)} °C`));
+    }
+
+    liste.innerHTML = zeilen.join("");
+    el("druck-eingaben").hidden = false;
   }
 
   // ---- Speichern / Laden -----------------------------------------------------

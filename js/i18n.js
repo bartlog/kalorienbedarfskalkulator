@@ -198,6 +198,13 @@ window.KBR.i18n = (function () {
     print_btn: { de: "Ergebnis als PDF speichern", en: "Save result as PDF" },
     print_dateiname_praefix: { de: "Kalorienbedarfsrechner", en: "CalorieNeedsCalculator" },
 
+    // ---- Druckseite "Eingegebene Werte" (nur PDF-Export, siehe ui.js) --------
+    druck_eingaben_heading: { de: "Eingegebene Werte", en: "Values Entered" },
+    druck_ja: { de: "Ja", en: "Yes" },
+    druck_ffm_direkt_label: { de: "Fettfreie Masse (direkt gemessen)", en: "Fat-free mass (measured directly)" },
+    druck_ffm_kfa_label: { de: "Fettfreie Masse (aus Körperfettanteil)", en: "Fat-free mass (from body fat %)" },
+    druck_sport_zeile: { de: "{{stunden}} h/Woche, {{met}} MET", en: "{{stunden}} h/week, {{met}} MET" },
+
     disclaimer: {
       de: `Diese Berechnung liefert eine grobe Orientierung basierend auf anthropometrischen Schätzformeln (Standardschätzfehler ±10 % / ±200 kcal).
         Sie ersetzt keine individuelle ärztliche oder ernährungstherapeutische Beratung — insbesondere bei medizinischen Angaben (Medikation, Schilddrüse, Schwangerschaft).`,
