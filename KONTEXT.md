@@ -47,6 +47,8 @@ CSS-Bug dabei gefunden und gefixt: `<h1>` ist selbst ein Flex-Container ohne `mi
 
 **2026-08-19 — fachliche Korrektur: Müller-Untergewicht-Stufe entfernt.** Nutzer-Testfall (40J/165cm/50kg weiblich, BMI 18,37) lieferte 820 kcal Grundumsatz (Mifflin zum Vergleich: 1170 kcal) — von Gemini als unplausibel gemeldet und von mir unabhängig nachgerechnet, bestätigt. Eigene Zusatzprüfung ging über Geminis Diagnose hinaus: Müllers Adipositas-Stufe (BMI≥30) weicht an ihrer Grenze nur ~2 % von Mifflin ab, die Untergewicht-Stufe aber über die gesamte Spanne 35–70 % — Hinweis auf einen Transkriptionsfehler in den Untergewicht-Koeffizienten, nicht auf eine erwartbare Formeleigenschaft. Nutzerentscheidung (statt Geminis Vorschlag, nur die Schwelle auf BMI<16 zu verengen): Untergewicht-Stufe komplett entfernt, BMI<18,5 fällt jetzt durch auf Lührmann (Senior) bzw. Mifflin (Standard); Müller wird nur noch für Adipositas verwendet. Details/Zahlen in PLAN.md und CLAUDE.md. `formeln.js`/`auswahl.js`/`tests.html` angepasst, 41/41 Tests grün (ein Test umbenannt, einer neu für „untergewichtiger Senior → Lührmann").
 
+**2026-08-19 — PDF-Export: leere zweite Seite gefixt + Eingaben-Seite ergänzt.** Ursache des Bugs: Disclaimer-Absatz überlief bei aktiven Modifikatoren knapp (~35-40px) auf eine fast leere zweite Seite — Print-Spacing verkleinert, damit Ergebnis+Disclaimer zuverlässig auf eine Seite passen. Neu: zweite (ggf. dritte bei vielen MET-Zeilen) Druckseite mit allen eingegebenen Werten als Klartext, nur im PDF sichtbar. Verifiziert per Playwright+pdfjs-dist über 5 Szenarien (Details siehe Commit `3afd9d0`).
+
 ## 2. notebooklm MCP-Server
 
 **Status: wieder entfernt (`claude mcp remove notebooklm`) — Login funktionierte nicht zuverlässig.**
