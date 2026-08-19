@@ -169,6 +169,10 @@
     el("fieberAktiv").addEventListener("change", (e) => {
       el("feld-fieber").hidden = !e.target.checked;
     });
+
+    el("laufAktiv").addEventListener("change", (e) => {
+      el("feld-lauf-km").hidden = !e.target.checked;
+    });
   }
 
   // ---- MET-Aktivitätsliste (dynamisch, Kategorie B) ------------------------
@@ -372,6 +376,8 @@
         ? { modus: "met", haeufigkeitId: sportHaeufigkeitId, aktivitaeten: leseMetZeilen() }
         : { modus: "keine", haeufigkeitId: sportHaeufigkeitId, aktivitaeten: [] };
     const fidgetingAktiv = el("fidgetingAktiv").checked;
+    const laufAktiv = el("laufAktiv").checked;
+    const laufKmWoche = Number(el("laufKmWoche").value) || 0;
 
     const schwangerschaftStillzeit = el("schwangerschaftStillzeit").value || null;
     const adaptiveThermogeneseAktiv = el("adaptiveThermogenese").checked;
@@ -397,6 +403,8 @@
       istSportler,
       sport,
       fidgetingAktiv,
+      laufAktiv,
+      laufKmWoche,
       schwangerschaftStillzeit,
       adaptiveThermogeneseAktiv,
       schilddruese,
@@ -418,6 +426,8 @@
         sportHaeufigkeitId,
         metZeilen: leseMetZeilenRoh(),
         fidgetingAktiv,
+        laufAktiv,
+        laufKmWoche: el("laufKmWoche").value,
         schwangerschaftStillzeit,
         adaptiveThermogeneseAktiv,
         schilddruseAktiv: el("schilddruseAktiv").checked,
@@ -577,6 +587,11 @@
           zuschlagMin: i18n.zahl(eintrag.zuschlagMin, 2),
           zuschlagMax: i18n.zahl(eintrag.zuschlagMax, 2),
         });
+      case "lauf_intensitaet":
+        return i18n.t("mod_lauf_intensitaet", {
+          km: i18n.zahlNatuerlich(eintrag.kmWoche),
+          zuschlag: i18n.zahl(eintrag.zuschlag, 2),
+        });
       case "schwangerschaft":
         return i18n.t("mod_schwangerschaft");
       case "stillzeit":
@@ -699,6 +714,9 @@
     zeilen.push(druckZeile(i18n.t("feld_groesse_label"), `${i18n.zahlNatuerlich(eingabe.heightCm)} cm`));
     zeilen.push(druckZeile(i18n.t("feld_gewicht_label"), `${i18n.zahlNatuerlich(eingabe.weightKg)} kg`));
     zeilen.push(druckZeile(i18n.t("feld_neat_label"), i18n.t("neat_opt_" + eingabe.neatSchritteId)));
+    if (eingabe.laufAktiv && eingabe.laufKmWoche > 0) {
+      zeilen.push(druckZeile(i18n.t("lauf_label"), i18n.t("druck_lauf_km_zeile", { km: i18n.zahlNatuerlich(eingabe.laufKmWoche) })));
+    }
     // Bei MET-Berechnung wird "Kein regelmäßiger Sport" nur als technische Basis
     // erzwungen (siehe anwendenMetUeberschreibung) — kein echter Nutzer-Input,
     // daher hier ausgelassen; die MET-Liste unten ist der eigentliche Eintrag.
@@ -790,6 +808,10 @@
     anwendenMetUeberschreibung(sportModus === "met");
     stelleMetZeilenWieder(gespeichert.metZeilen);
     el("fidgetingAktiv").checked = !!gespeichert.fidgetingAktiv;
+
+    el("laufAktiv").checked = !!gespeichert.laufAktiv;
+    el("feld-lauf-km").hidden = !gespeichert.laufAktiv;
+    el("laufKmWoche").value = gespeichert.laufKmWoche || "";
 
     aktualisiereSchwangerschaftSichtbarkeit();
     if (!el("feld-schwangerschaft").hidden) {

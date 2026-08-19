@@ -59,6 +59,16 @@ window.KBR.i18n = (function () {
       de: "Zähl deine Gesamt-Schrittzahl an einem typischen Tag, so wie sie dein Tracker anzeigt — inklusive Spaziergänge und Laufrunden. Das deckt deine gesamte Alltagsbewegung ab, auch wenn ein Teil davon aus Sport stammt.",
       en: "Count your total steps on a typical day, as shown by your tracker — including walks and jogs. This covers your entire daily movement, even if part of it comes from exercise.",
     },
+    lauf_label: { de: "Davon gelaufen / gejoggt", en: "Of which running / jogging" },
+    lauf_km_label: { de: "Kilometer pro Woche", en: "Kilometers per week" },
+    lauf_km_hint: {
+      de: `Tipp für Läufer: Belasse deine Gesamtschritte oben einfach so, wie deine Smartwatch sie anzeigt. Trage
+        hier deine wöchentlichen Lauf-Kilometer ein — der Rechner addiert automatisch nur den Intensitäts-Aufpreis
+        des Laufens gegenüber dem Gehen. Trage Laufen/Joggen dann nicht zusätzlich unten bei Sport ein.`,
+      en: `Tip for runners: just leave your total steps above as your tracker shows them. Enter your weekly running
+        kilometers here — the calculator automatically adds only the intensity surcharge of running over walking.
+        Don't also enter running/jogging below under exercise in that case.`,
+    },
     feld_sport_haeufigkeit_label: {
       de: "Sport / Training (Häufigkeit pro Woche)",
       en: "Exercise / training (frequency per week)",
@@ -73,8 +83,12 @@ window.KBR.i18n = (function () {
       en: "Frequency of your regular exercise, in addition to the daily activity above.",
     },
     sport_haeufigkeit_doppelzaehlung_warnung: {
-      de: "⚠ Gilt nur für Sport, der nicht wesentlich zu deiner Schrittzahl oben beiträgt (z. B. Radfahren, Schwimmen, Krafttraining, Yoga). Lauf- oder Gehsport ist über deine Schrittzahl bereits abgedeckt — wähle dafür hier nicht zusätzlich eine Häufigkeit, sonst zählt er doppelt.",
-      en: "⚠ Only applies to exercise that doesn't meaningfully add to your step count above (e.g. cycling, swimming, strength training, yoga). Running or walking-based exercise is already covered by your step count — don't also select a frequency here for it, or it will be counted twice.",
+      de: `⚠ Gilt nur für Sport, der nicht wesentlich zu deiner Schrittzahl oben beiträgt (z. B. Radfahren, Schwimmen,
+        Krafttraining, Yoga). Für Lauf- oder Gehsport nutze stattdessen oben bei der Schrittzahl das Feld „Davon
+        gelaufen/gejoggt".`,
+      en: `⚠ Only applies to exercise that doesn't meaningfully add to your step count above (e.g. cycling, swimming,
+        strength training, yoga). For running or walking-based exercise, use the "Of which running/jogging" field
+        above under steps instead.`,
     },
     neat_sport_aequivalenz_text: {
       de: "Der Rechner ermittelt deinen durchschnittlichen Wochen-Tagesbedarf. 10.000 Schritte im Alltag verbrennen oft ähnlich viel Energie wie eine intensive Sporteinheit — solange dein Wochenmittel aus Bewegung und Sport konstant bleibt, passt die Berechnung.",
@@ -130,8 +144,12 @@ window.KBR.i18n = (function () {
         automatically for multiple activities.`,
     },
     met_doppelzaehlung_warnung: {
-      de: "⚠ Trage hier vor allem Sport ein, der nicht wesentlich zu deiner Schrittzahl oben beiträgt (Rad, Schwimmen, Kraft, Ballsport …). Lauf- oder Gehsport ist über deine Schrittzahl bereits erfasst.",
-      en: "⚠ Enter exercise here that doesn't meaningfully add to your step count above (cycling, swimming, strength, ball sports …). Running or walking-based exercise is already captured by your step count.",
+      de: `⚠ Trage hier vor allem Sport ein, der nicht wesentlich zu deiner Schrittzahl oben beiträgt (Rad, Schwimmen,
+        Kraft, Ballsport …). Für Lauf- oder Gehsport nutze stattdessen oben bei der Schrittzahl das Feld „Davon
+        gelaufen/gejoggt".`,
+      en: `⚠ Enter exercise here that doesn't meaningfully add to your step count above (cycling, swimming, strength,
+        ball sports …). For running or walking-based exercise, use the "Of which running/jogging" field above under
+        steps instead.`,
     },
     hinweis_met_override: {
       de: `Bei genauer MET-Berechnung wird oben automatisch „Kein regelmäßiger Sport" als Sport-Häufigkeit angenommen (Feld ist deaktiviert) — dein Training wird hier separat und präziser dazugerechnet. Deine Alltagsaktivität (NEAT) bleibt davon unberührt.`,
@@ -282,6 +300,7 @@ window.KBR.i18n = (function () {
     druck_ffm_direkt_label: { de: "Fettfreie Masse (direkt gemessen)", en: "Fat-free mass (measured directly)" },
     druck_ffm_kfa_label: { de: "Fettfreie Masse (aus Körperfettanteil)", en: "Fat-free mass (from body fat %)" },
     druck_sport_zeile: { de: "{{stunden}} h/Woche, {{met}} MET", en: "{{stunden}} h/week, {{met}} MET" },
+    druck_lauf_km_zeile: { de: "{{km}} km/Woche", en: "{{km}} km/week" },
 
     disclaimer: {
       de: `Diese Berechnung liefert eine grobe Orientierung basierend auf anthropometrischen Schätzformeln (Standardschätzfehler ±10 % / ±200 kcal).
@@ -380,6 +399,10 @@ window.KBR.i18n = (function () {
     mod_fidgeting: {
       de: "Auffällig viel Spontanbewegung: PAL-Äquivalent +{{zuschlagMin}}…+{{zuschlagMax}}",
       en: "Noticeably high spontaneous movement: PAL equivalent +{{zuschlagMin}}…+{{zuschlagMax}}",
+    },
+    mod_lauf_intensitaet: {
+      de: "Lauf-Intensität ({{km}} km/Woche): PAL-Äquivalent +{{zuschlag}}",
+      en: "Running intensity ({{km}} km/week): PAL equivalent +{{zuschlag}}",
     },
     mod_sport_aktivitaet_eintrag: {
       de: "{{label}} ({{stunden}} h/Woche, {{met}} MET)",

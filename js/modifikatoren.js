@@ -117,6 +117,25 @@ window.KBR.modifikatoren = (function () {
     return { min: 0.05, max: 0.1 };
   }
 
+  /**
+   * Intensitäts-Aufpreis von Laufen/Joggen gegenüber Gehen, als PAL-Äquivalent
+   * (analog zu sportMet). Löst die Schritt/Sport-Doppelzählung für Läufer
+   * präziser als ein reiner Hinweistext: die Gesamt-Schrittzahl (NEAT) deckt
+   * die zurückgelegte Distanz bereits mit einer impliziten Geh-Tempo-Annahme
+   * ab — hier wird nur die Differenz zum höheren Lauf-Tempo addiert, nicht die
+   * volle Laufenergie (sonst Doppelzählung der Grunddistanz).
+   * Koeffizient 0,5 kcal/kg/km ist eine gängige Näherung für die Netto-
+   * Mehrkosten von Laufen ggü. zügigem Gehen (Lauf-Bruttokosten ~1,0 kcal/kg/km
+   * minus Geh-Bruttokosten ~0,5 kcal/kg/km), keine Studien-Einzelquelle.
+   * @param {{aktiv:boolean, kmWoche:number, weightKg:number, reeAdj:number}} p
+   */
+  function laufIntensitaetsZuschlag({ aktiv, kmWoche, weightKg, reeAdj }) {
+    if (!aktiv || !kmWoche || kmWoche <= 0 || !weightKg || !reeAdj) return null;
+    const kcalProTag = (kmWoche * weightKg * 0.5) / 7;
+    const zuschlag = kcalProTag / reeAdj;
+    return { min: zuschlag, max: zuschlag };
+  }
+
   // MET-Referenztabelle für die Sport-Auswahl im UI. Werte aus dem Compendium
   // of Physical Activities (Ainsworth et al., 2024 Adult Compendium,
   // pacompendium.com) — die Standardquelle für MET-Werte in der Sportwissenschaft.
@@ -216,6 +235,7 @@ window.KBR.modifikatoren = (function () {
     SPORT_HAEUFIGKEIT_STUFEN,
     sportHaeufigkeitZuschlag,
     fidgetingPalZuschlag,
+    laufIntensitaetsZuschlag,
     sportMet,
     MET_AKTIVITAETEN,
     schwangerschaftStillzeit,

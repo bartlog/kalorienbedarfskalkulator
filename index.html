@@ -67,6 +67,20 @@
         </div>
 
         <div class="field">
+          <label class="checkbox-label"><input type="checkbox" id="laufAktiv"> <span data-i18n="lauf_label">Davon gelaufen / gejoggt</span></label>
+          <div class="field sub-field" id="feld-lauf-km" hidden>
+            <label for="laufKmWoche" data-i18n="lauf_km_label">Kilometer pro Woche</label>
+            <input type="number" id="laufKmWoche" min="0" max="200" step="1" placeholder="0">
+            <p class="field-hint" data-i18n="lauf_km_hint">
+              Tipp für Läufer: Belasse deine Gesamtschritte oben einfach so, wie deine Smartwatch sie anzeigt. Trage
+              hier deine wöchentlichen Lauf-Kilometer ein — der Rechner addiert automatisch nur den
+              Intensitäts-Aufpreis des Laufens gegenüber dem Gehen. Trage Laufen/Joggen dann nicht zusätzlich unten
+              bei Sport ein.
+            </p>
+          </div>
+        </div>
+
+        <div class="field">
           <label for="sportHaeufigkeit" data-i18n="feld_sport_haeufigkeit_label">Sport / Training (Häufigkeit pro Woche)</label>
           <select id="sportHaeufigkeit" name="sportHaeufigkeit" required>
             <option value="keinSport" selected data-i18n="sport_haeufigkeit_opt_keinSport">Kein regelmäßiger Sport</option>
@@ -76,7 +90,7 @@
             <option value="leistungssport" data-i18n="sport_haeufigkeit_opt_leistungssport">Leistungssport / sehr intensiv</option>
           </select>
           <p class="field-hint" data-i18n="feld_sport_haeufigkeit_hint">Häufigkeit deines regelmäßigen Sports, zusätzlich zur Alltagsaktivität oben.</p>
-          <p class="disclaimer-inline" data-i18n="sport_haeufigkeit_doppelzaehlung_warnung">⚠ Gilt nur für Sport, der nicht wesentlich zu deiner Schrittzahl oben beiträgt (z. B. Radfahren, Schwimmen, Krafttraining, Yoga). Lauf- oder Gehsport ist über deine Schrittzahl bereits abgedeckt — wähle dafür hier nicht zusätzlich eine Häufigkeit, sonst zählt er doppelt.</p>
+          <p class="disclaimer-inline" data-i18n="sport_haeufigkeit_doppelzaehlung_warnung">⚠ Gilt nur für Sport, der nicht wesentlich zu deiner Schrittzahl oben beiträgt (z. B. Radfahren, Schwimmen, Krafttraining, Yoga). Für Lauf- oder Gehsport nutze stattdessen oben bei der Schrittzahl das Feld „Davon gelaufen/gejoggt".</p>
         </div>
 
         <div class="hint-box" data-i18n="neat_sport_aequivalenz_text">
@@ -138,7 +152,7 @@
                 „Methodik &amp; Quellen"). Wähle je Aktivität einen Eintrag und die Stunden pro Woche — bei mehreren
                 Sportarten erscheint automatisch eine neue Zeile.
               </p>
-              <p class="disclaimer-inline" data-i18n="met_doppelzaehlung_warnung">⚠ Trage hier vor allem Sport ein, der nicht wesentlich zu deiner Schrittzahl oben beiträgt (Rad, Schwimmen, Kraft, Ballsport …). Lauf- oder Gehsport ist über deine Schrittzahl bereits erfasst.</p>
+              <p class="disclaimer-inline" data-i18n="met_doppelzaehlung_warnung">⚠ Trage hier vor allem Sport ein, der nicht wesentlich zu deiner Schrittzahl oben beiträgt (Rad, Schwimmen, Kraft, Ballsport …). Für Lauf- oder Gehsport nutze stattdessen oben bei der Schrittzahl das Feld „Davon gelaufen/gejoggt".</p>
               <div id="met-liste"></div>
             </div>
             <p class="field-hint sub-field" id="hinweis-met-override" hidden data-i18n="hinweis_met_override">

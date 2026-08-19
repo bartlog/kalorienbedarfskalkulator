@@ -90,15 +90,24 @@ window.KBR.berechnung = (function (auswahl, modifikatoren) {
       });
     }
     const fidgeting = modifikatoren.fidgetingPalZuschlag({ aktiv: !!eingabe.fidgetingAktiv });
+    const lauf = modifikatoren.laufIntensitaetsZuschlag({
+      aktiv: !!eingabe.laufAktiv,
+      kmWoche: eingabe.laufKmWoche,
+      weightKg: eingabe.weightKg,
+      reeAdj: reeAdjHaupt,
+    });
 
     const sportMin = sportZuschlag ? sportZuschlag.min : 0;
     const sportMax = sportZuschlag ? sportZuschlag.max : 0;
     const fidgetMin = fidgeting ? fidgeting.min : 0;
     const fidgetMax = fidgeting ? fidgeting.max : 0;
+    const laufMin = lauf ? lauf.min : 0;
+    const laufMax = lauf ? lauf.max : 0;
 
-    const palMinRoh = neat.palMin + sportMin + fidgetMin;
-    const palMaxRoh = neat.palMax + sportMax + fidgetMax;
-    const palHauptRoh = (neat.palMin + neat.palMax) / 2 + (sportMin + sportMax) / 2 + (fidgetMin + fidgetMax) / 2;
+    const palMinRoh = neat.palMin + sportMin + fidgetMin + laufMin;
+    const palMaxRoh = neat.palMax + sportMax + fidgetMax + laufMax;
+    const palHauptRoh =
+      (neat.palMin + neat.palMax) / 2 + (sportMin + sportMax) / 2 + (fidgetMin + fidgetMax) / 2 + (laufMin + laufMax) / 2;
 
     // Obergrenze 2,6 statt der früheren 2,4: NEAT-Max 2,0 + Sport-Max 0,4 +
     // Fidgeting-Max 0,1 = 2,5 würde sonst abgeschnitten. Die alte Grenze war
@@ -115,6 +124,7 @@ window.KBR.berechnung = (function (auswahl, modifikatoren) {
       sportHaeufigkeitId: sportModus !== "met" && eingabe.sport ? eingabe.sport.haeufigkeitId : null,
       neatSchritteId: eingabe.neatSchritteId,
       fidgetingZuschlag: fidgeting,
+      laufZuschlag: lauf,
     };
   }
 
@@ -171,6 +181,9 @@ window.KBR.berechnung = (function (auswahl, modifikatoren) {
     if (pal.fidgetingZuschlag) {
       liste.push({ id: "fidgeting", zuschlagMin: pal.fidgetingZuschlag.min, zuschlagMax: pal.fidgetingZuschlag.max });
     }
+    if (pal.laufZuschlag) {
+      liste.push({ id: "lauf_intensitaet", kmWoche: eingabe.laufKmWoche, zuschlag: pal.laufZuschlag.min });
+    }
     if (teeAdditiv.schwangerschaft) {
       liste.push({ id: eingabe.schwangerschaftStillzeit === "schwanger" ? "schwangerschaft" : "stillzeit" });
     }
@@ -192,7 +205,7 @@ window.KBR.berechnung = (function (auswahl, modifikatoren) {
    * Führt die komplette Pipeline aus und liefert alle Anzeige-relevanten Werte.
    * @param {object} eingabe - siehe auswahl.js/modifikatoren.js für erwartete Felder,
    *   zusätzlich: neatSchritteId, sport ({modus, haeufigkeitId, aktivitaeten}), fidgetingAktiv,
-   *   ziel ('lose'|'maintain'|'gain'), schilddruese, fieber,
+   *   laufAktiv, laufKmWoche, ziel ('lose'|'maintain'|'gain'), schilddruese, fieber,
    *   adaptiveThermogeneseAktiv, betaBlockerAktiv, schwangerschaftStillzeit
    */
   function berechne(eingabe) {

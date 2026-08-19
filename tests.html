@@ -371,6 +371,28 @@
       assert(!hatSportHaeufigkeitMet, "aktiveModifikatoren enthält 'sport_haeufigkeit' NICHT im MET-Modus (auch bei gesetztem haeufigkeitId)");
     })();
 
+    // ---- Lauf-Intensitätszuschlag ----------------------------------------
+    group("Lauf-Intensitätszuschlag");
+    (function () {
+      const m = window.KBR.modifikatoren;
+      assert(m.laufIntensitaetsZuschlag({ aktiv: false, kmWoche: 30, weightKg: 80, reeAdj: 1800 }) === null, "Lauf inaktiv liefert null");
+      assert(m.laufIntensitaetsZuschlag({ aktiv: true, kmWoche: 0, weightKg: 80, reeAdj: 1800 }) === null, "Lauf aktiv mit 0 km liefert null");
+      const z = m.laufIntensitaetsZuschlag({ aktiv: true, kmWoche: 35, weightKg: 80, reeAdj: 1800 });
+      // (35 * 80 * 0.5 / 7) / 1800 = 200 / 1800
+      assertApprox(z.min, 200 / 1800, 0.0001, "Lauf-Zuschlag: 35km/Woche, 80kg, reeAdj 1800 -> (35*80*0.5/7)/1800");
+      assertApprox(z.max, z.min, 0.0001, "Lauf-Zuschlag ist ein Punktwert (min===max)");
+    })();
+    (function () {
+      const basis = { gender: "male", age: 30, heightCm: 178, weightKg: 75, neatSchritteId: "5000bis10000", ziel: "maintain", sport: { modus: "keine", haeufigkeitId: "keinSport" } };
+      const rOhne = berechne({ ...basis, laufAktiv: false, laufKmWoche: 0 });
+      const rMit = berechne({ ...basis, laufAktiv: true, laufKmWoche: 40 });
+      assert(rMit.tee.haupt > rOhne.tee.haupt, "Aktivierter Lauf-Zuschlag erhöht TEE");
+      const hatLauf = rMit.aktiveModifikatoren.some((mod) => mod.id === "lauf_intensitaet");
+      const hatLaufOhne = rOhne.aktiveModifikatoren.some((mod) => mod.id === "lauf_intensitaet");
+      assert(hatLauf, "aktiveModifikatoren enthält 'lauf_intensitaet' wenn aktiv mit km>0");
+      assert(!hatLaufOhne, "aktiveModifikatoren enthält 'lauf_intensitaet' NICHT wenn inaktiv");
+    })();
+
     // ---- Rendering ----
     const list = document.getElementById("results");
     let passCount = 0;
