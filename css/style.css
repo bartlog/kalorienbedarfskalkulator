@@ -203,6 +203,85 @@ label {
   color: var(--color-signal);
 }
 
+/* Kompaktes Info-Icon (ⓘ) statt Dauertext-Hinweis -- nutzt <details>/<summary>,
+   dasselbe native Auf/Zuklapp-Muster wie "Erweiterte Angaben"/"Details zur
+   Berechnung", nur klein gestylt. Keine eigene JS-Logik nötig. */
+.field-label-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+.info-toggle {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.info-toggle summary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  width: 1.15rem;
+  height: 1.15rem;
+  border-radius: 50%;
+  background: var(--color-highlight-bg);
+  color: var(--color-accent);
+  font-size: 0.75rem;
+  font-weight: 700;
+  font-style: italic;
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+}
+
+.info-toggle summary::-webkit-details-marker,
+.info-toggle summary::marker {
+  display: none;
+  content: "";
+}
+
+.info-toggle summary:hover {
+  background: var(--color-border);
+}
+
+.info-toggle-inhalt {
+  margin-top: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: var(--color-highlight-bg);
+  border-radius: var(--radius-sm);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.info-toggle-inhalt p {
+  margin: 0 0 0.6rem;
+}
+
+.info-toggle-inhalt p:last-child {
+  margin-bottom: 0;
+}
+
+/* Variante für Icons, die nicht neben einem Feld-Label stehen, sondern für
+   sich als eigene Zeile -- Summary ist dann breiter (Icon + Kurztext) statt
+   nur ein rundes Icon. */
+.info-toggle-standalone {
+  display: block;
+  margin: 0.5rem 0;
+}
+
+.info-toggle-standalone summary {
+  width: auto;
+  height: auto;
+  padding: 0.4rem 0.7rem;
+  border-radius: var(--radius-sm);
+  font-style: normal;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--color-accent);
+}
+
 .field-error {
   margin: 0.35rem 0 0;
   font-size: 0.82rem;

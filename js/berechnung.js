@@ -90,29 +90,72 @@ window.KBR.berechnung = (function (auswahl, modifikatoren) {
       });
     }
     const fidgeting = modifikatoren.fidgetingPalZuschlag({ aktiv: !!eingabe.fidgetingAktiv });
-    const lauf = modifikatoren.laufIntensitaetsZuschlag({
+
+    // Default true: wer die Checkbox nie sieht/anfasst (kein MET-Modus aktiv),
+    // bekommt dieselbe Reduktion wie bisher -- der Schalter betrifft nur, OB
+    // reduziert wird, nie die Höhe der Trainings-Zuschläge selbst.
+    const traegtTracker = eingabe.traegtTrackerBeimSport !== false;
+
+    const metHatLaufen =
+      sportModus === "met" &&
+      eingabe.sport.aktivitaeten.some((a) => {
+        const eintrag = modifikatoren.MET_AKTIVITAETEN.find((m) => m.id === a.aktivitaetId);
+        return eintrag && eintrag.kategorieId === "laufen";
+      });
+
+    const lauf = modifikatoren.laufAnpassung({
       aktiv: !!eingabe.laufAktiv,
       kmWoche: eingabe.laufKmWoche,
       weightKg: eingabe.weightKg,
       reeAdj: reeAdjHaupt,
+      vonMetAbgedeckt: metHatLaufen,
+      traegtTracker,
     });
+
+    const metKorrekturRoh =
+      sportModus === "met"
+        ? modifikatoren.schrittIntensiveMetKorrektur({
+            aktivitaeten: eingabe.sport.aktivitaeten,
+            weightKg: eingabe.weightKg,
+            reeAdj: reeAdjHaupt,
+            traegtTracker,
+            laufAusschliessen: !!eingabe.laufAktiv && eingabe.laufKmWoche > 0,
+          })
+        : 0;
 
     const sportMin = sportZuschlag ? sportZuschlag.min : 0;
     const sportMax = sportZuschlag ? sportZuschlag.max : 0;
     const fidgetMin = fidgeting ? fidgeting.min : 0;
     const fidgetMax = fidgeting ? fidgeting.max : 0;
-    const laufMin = lauf ? lauf.min : 0;
-    const laufMax = lauf ? lauf.max : 0;
+    const laufMin = lauf ? lauf.zuschlagMin : 0;
+    const laufMax = lauf ? lauf.zuschlagMax : 0;
 
-    const palMinRoh = neat.palMin + sportMin + fidgetMin + laufMin;
-    const palMaxRoh = neat.palMax + sportMax + fidgetMax + laufMax;
+    // Plausibilitäts-Boden: bei extremen Eingaben (niedrigste NEAT-Stufe +
+    // sehr hohe MET-Stunden für Laufen/Ballsport) könnte die rechnerische
+    // Reduktion größer werden als neat.palMin/palMax selbst. Die globale
+    // clamp(1.2, 2.6) am Ende fängt zwar das Gesamtergebnis ab, aber ein
+    // negativer Zwischenwert würde unclampt in die Modifikator-Anzeige
+    // durchgereicht (z. B. "NEAT-PAL um 3,5 reduziert" -- physikalisch
+    // unmöglich, eine Stufe hat nie mehr als palMin Ausgangswert). Daher wird
+    // die Reduktion hier auf Komponenten-Ebene bei neat.palMin gedeckelt, mit
+    // Priorität für die präzisere Lauf-km-Reduktion -- die generische
+    // MET-Korrektur nutzt nur das danach verbleibende "Budget".
+    const neatReduktionLauf = clamp(lauf ? lauf.neatReduktion : 0, 0, neat.palMin);
+    const metKorrekturVerfuegbar = Math.max(0, neat.palMin - neatReduktionLauf);
+    const metKorrektur = Math.min(metKorrekturRoh, metKorrekturVerfuegbar);
+
+    const neatPalMin = neat.palMin - neatReduktionLauf - metKorrektur;
+    const neatPalMax = neat.palMax - neatReduktionLauf - metKorrektur;
+
+    const palMinRoh = neatPalMin + sportMin + fidgetMin + laufMin;
+    const palMaxRoh = neatPalMax + sportMax + fidgetMax + laufMax;
     const palHauptRoh =
-      (neat.palMin + neat.palMax) / 2 + (sportMin + sportMax) / 2 + (fidgetMin + fidgetMax) / 2 + (laufMin + laufMax) / 2;
+      (neatPalMin + neatPalMax) / 2 + (sportMin + sportMax) / 2 + (fidgetMin + fidgetMax) / 2 + (laufMin + laufMax) / 2;
 
     // Obergrenze 2,6 statt der früheren 2,4: NEAT-Max 2,0 + Sport-Max 0,4 +
     // Fidgeting-Max 0,1 = 2,5 würde sonst abgeschnitten. Die alte Grenze war
     // auf das frühere Einzel-Dropdown-Maximum (1,9) plus kleinem MET-Zuschlag
-    // kalibriert, jetzt strukturell höher durch drei addierte Quellen.
+    // kalibriert, jetzt strukturell höher durch mehrere addierte Quellen.
     return {
       palAdjHaupt: clamp(palHauptRoh, 1.2, 2.6),
       palAdjMin: clamp(palMinRoh, 1.2, 2.6),
@@ -125,6 +168,9 @@ window.KBR.berechnung = (function (auswahl, modifikatoren) {
       neatSchritteId: eingabe.neatSchritteId,
       fidgetingZuschlag: fidgeting,
       laufZuschlag: lauf,
+      laufVonMetAbgedeckt: metHatLaufen,
+      metNeatKorrektur: metKorrektur,
+      traegtTracker,
     };
   }
 
@@ -182,7 +228,14 @@ window.KBR.berechnung = (function (auswahl, modifikatoren) {
       liste.push({ id: "fidgeting", zuschlagMin: pal.fidgetingZuschlag.min, zuschlagMax: pal.fidgetingZuschlag.max });
     }
     if (pal.laufZuschlag) {
-      liste.push({ id: "lauf_intensitaet", kmWoche: eingabe.laufKmWoche, zuschlag: pal.laufZuschlag.min });
+      liste.push({
+        id: pal.laufVonMetAbgedeckt ? "lauf_via_met" : "lauf_intensitaet",
+        kmWoche: eingabe.laufKmWoche,
+        zuschlag: pal.laufZuschlag.zuschlagMin,
+      });
+    }
+    if (pal.metNeatKorrektur > 0) {
+      liste.push({ id: "met_neat_korrektur", zuschlag: pal.metNeatKorrektur });
     }
     if (teeAdditiv.schwangerschaft) {
       liste.push({ id: eingabe.schwangerschaftStillzeit === "schwanger" ? "schwangerschaft" : "stillzeit" });
@@ -205,7 +258,7 @@ window.KBR.berechnung = (function (auswahl, modifikatoren) {
    * Führt die komplette Pipeline aus und liefert alle Anzeige-relevanten Werte.
    * @param {object} eingabe - siehe auswahl.js/modifikatoren.js für erwartete Felder,
    *   zusätzlich: neatSchritteId, sport ({modus, haeufigkeitId, aktivitaeten}), fidgetingAktiv,
-   *   laufAktiv, laufKmWoche, ziel ('lose'|'maintain'|'gain'), schilddruese, fieber,
+   *   laufAktiv, laufKmWoche, traegtTrackerBeimSport, ziel ('lose'|'maintain'|'gain'), schilddruese, fieber,
    *   adaptiveThermogeneseAktiv, betaBlockerAktiv, schwangerschaftStillzeit
    */
   function berechne(eingabe) {

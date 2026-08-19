@@ -56,32 +56,51 @@
         </div>
 
         <div class="field">
-          <label for="neatSchritte" data-i18n="feld_neat_label">Alltagsaktivität (NEAT) — durchschnittliche Schrittzahl/Tag</label>
+          <div class="field-label-row">
+            <label for="neatSchritte" data-i18n="feld_neat_label">Alltagsaktivität (NEAT) — durchschnittliche Schrittzahl/Tag</label>
+            <details class="info-toggle">
+              <summary aria-label="Mehr Informationen">ⓘ</summary>
+              <div class="info-toggle-inhalt" data-i18n="feld_neat_hint">Zähl deine Gesamt-Schrittzahl an einem typischen Tag, so wie sie dein Tracker anzeigt — inklusive Spaziergänge und Laufrunden. Das deckt deine gesamte Alltagsbewegung ab, auch wenn ein Teil davon aus Sport stammt.</div>
+            </details>
+          </div>
           <select id="neatSchritte" name="neatSchritte" required>
             <option value="unter5000" selected data-i18n="neat_opt_unter5000">Unter 5.000 Schritte/Tag (Sitzender Alltag, z. B. Bürojob/Homeoffice)</option>
             <option value="5000bis10000" data-i18n="neat_opt_5000bis10000">5.000–10.000 Schritte/Tag (Moderat aktiv, z. B. Verkäufer, viele Alltagswege)</option>
             <option value="10000bis15000" data-i18n="neat_opt_10000bis15000">10.000–15.000 Schritte/Tag (Sehr aktiv, z. B. Kellner, Pflegekraft)</option>
             <option value="ab15000" data-i18n="neat_opt_ab15000">Über 15.000 Schritte/Tag (Extrem aktiv, z. B. Handwerker, Bauarbeiter)</option>
           </select>
-          <p class="field-hint" data-i18n="feld_neat_hint">Zähl deine Gesamt-Schrittzahl an einem typischen Tag, so wie sie dein Tracker anzeigt — inklusive Spaziergänge und Laufrunden. Das deckt deine gesamte Alltagsbewegung ab, auch wenn ein Teil davon aus Sport stammt.</p>
         </div>
 
         <div class="field">
-          <label class="checkbox-label"><input type="checkbox" id="laufAktiv"> <span data-i18n="lauf_label">Davon gelaufen / gejoggt</span></label>
+          <div class="field-label-row">
+            <label class="checkbox-label"><input type="checkbox" id="laufAktiv"> <span data-i18n="lauf_label">Davon gelaufen / gejoggt</span></label>
+            <details class="info-toggle">
+              <summary aria-label="Mehr Informationen">ⓘ</summary>
+              <div class="info-toggle-inhalt" data-i18n="lauf_km_hint">
+                Zähl deine Gesamtschritte oben weiterhin genau so, wie dein Tracker sie anzeigt. Trage hier deine
+                wöchentlichen Lauf-Kilometer ein. Falls du denselben Lauf unten bei der genauen MET-Berechnung
+                einträgst, erkennt der Rechner das automatisch und übernimmt dafür die MET-Angabe — ohne
+                MET-Eintrag rechnet er stattdessen mit einer einfachen Faustregel.
+              </div>
+            </details>
+          </div>
           <div class="field sub-field" id="feld-lauf-km" hidden>
             <label for="laufKmWoche" data-i18n="lauf_km_label">Kilometer pro Woche</label>
             <input type="number" id="laufKmWoche" min="0" max="200" step="1" placeholder="0">
-            <p class="field-hint" data-i18n="lauf_km_hint">
-              Tipp für Läufer: Belasse deine Gesamtschritte oben einfach so, wie deine Smartwatch sie anzeigt. Trage
-              hier deine wöchentlichen Lauf-Kilometer ein — der Rechner addiert automatisch nur den
-              Intensitäts-Aufpreis des Laufens gegenüber dem Gehen. Trage Laufen/Joggen dann nicht zusätzlich unten
-              bei Sport ein.
-            </p>
           </div>
         </div>
 
         <div class="field">
-          <label for="sportHaeufigkeit" data-i18n="feld_sport_haeufigkeit_label">Sport / Training (Häufigkeit pro Woche)</label>
+          <div class="field-label-row">
+            <label for="sportHaeufigkeit" data-i18n="feld_sport_haeufigkeit_label">Sport / Training (Häufigkeit pro Woche)</label>
+            <details class="info-toggle">
+              <summary aria-label="Mehr Informationen">ⓘ</summary>
+              <div class="info-toggle-inhalt">
+                <p data-i18n="feld_sport_haeufigkeit_hint">Häufigkeit deines regelmäßigen Sports, zusätzlich zur Alltagsaktivität oben.</p>
+                <p data-i18n="sport_haeufigkeit_doppelzaehlung_warnung">Gilt nur für Sport, der nicht wesentlich zu deiner Schrittzahl oben beiträgt (z. B. Radfahren, Schwimmen, Krafttraining, Yoga). Für Lauf- oder Gehsport nutze stattdessen oben bei der Schrittzahl das Feld „Davon gelaufen/gejoggt".</p>
+              </div>
+            </details>
+          </div>
           <select id="sportHaeufigkeit" name="sportHaeufigkeit" required>
             <option value="keinSport" selected data-i18n="sport_haeufigkeit_opt_keinSport">Kein regelmäßiger Sport</option>
             <option value="1bis3" data-i18n="sport_haeufigkeit_opt_1bis3">1–3× pro Woche</option>
@@ -89,8 +108,6 @@
             <option value="6bis7" data-i18n="sport_haeufigkeit_opt_6bis7">6–7× pro Woche</option>
             <option value="leistungssport" data-i18n="sport_haeufigkeit_opt_leistungssport">Leistungssport / sehr intensiv</option>
           </select>
-          <p class="field-hint" data-i18n="feld_sport_haeufigkeit_hint">Häufigkeit deines regelmäßigen Sports, zusätzlich zur Alltagsaktivität oben.</p>
-          <p class="disclaimer-inline" data-i18n="sport_haeufigkeit_doppelzaehlung_warnung">⚠ Gilt nur für Sport, der nicht wesentlich zu deiner Schrittzahl oben beiträgt (z. B. Radfahren, Schwimmen, Krafttraining, Yoga). Für Lauf- oder Gehsport nutze stattdessen oben bei der Schrittzahl das Feld „Davon gelaufen/gejoggt".</p>
         </div>
 
         <div class="hint-box" data-i18n="neat_sport_aequivalenz_text">
@@ -136,23 +153,55 @@
 
           <fieldset class="field-group">
             <legend data-i18n="sport_legend">Sport / Training</legend>
-            <p class="field-hint" data-i18n="sport_hint">
-              Die Sport-Häufigkeit oben ist eine grobe Schätzung. Falls du deine Trainingsdaten genau kennst, kannst du
-              sie stattdessen hier präzise angeben — das <strong>ersetzt</strong> die Häufigkeits-Schätzung oben (kein
-              zusätzlicher Aufschlag, sonst Doppelzählung). Deine Alltagsaktivität (NEAT) bleibt davon unberührt.
-            </p>
+            <details class="info-toggle">
+              <summary aria-label="Mehr Informationen">ⓘ</summary>
+              <div class="info-toggle-inhalt" data-i18n="sport_hint">
+                Die Sport-Häufigkeit oben ist eine grobe Schätzung. Falls du deine Trainingsdaten genau kennst,
+                kannst du sie stattdessen hier präzise angeben — das <strong>ersetzt</strong> die
+                Häufigkeits-Schätzung oben (kein zusätzlicher Aufschlag, sonst Doppelzählung). Deine
+                Alltagsaktivität (NEAT) bleibt davon unberührt.
+              </div>
+            </details>
             <div class="radio-group vertical">
               <label><input type="radio" name="sportModus" value="keine" checked> <span data-i18n="sport_opt_keine">Schätzung oben verwenden</span></label>
               <label><input type="radio" name="sportModus" value="met"> <span data-i18n="sport_opt_met">Genaue MET-Berechnung</span></label>
             </div>
             <div class="sub-field" id="feld-met" hidden>
-              <p class="field-hint" data-i18n="met_hint">
-                <abbr title="Metabolic Equivalent of Task">MET</abbr>: Vielfaches des Grundumsatzes während einer Aktivität. Werte
-                aus dem <em>Compendium of Physical Activities</em> (Standardreferenz der Sportwissenschaft, Details im Tab
-                „Methodik &amp; Quellen"). Wähle je Aktivität einen Eintrag und die Stunden pro Woche — bei mehreren
-                Sportarten erscheint automatisch eine neue Zeile.
-              </p>
-              <p class="disclaimer-inline" data-i18n="met_doppelzaehlung_warnung">⚠ Trage hier vor allem Sport ein, der nicht wesentlich zu deiner Schrittzahl oben beiträgt (Rad, Schwimmen, Kraft, Ballsport …). Für Lauf- oder Gehsport nutze stattdessen oben bei der Schrittzahl das Feld „Davon gelaufen/gejoggt".</p>
+              <div class="field">
+                <div class="field-label-row">
+                  <label class="checkbox-label"><input type="checkbox" id="traegtTrackerBeimSport" checked> <span data-i18n="traegt_tracker_label">Ich trage meinen Schrittzähler auch beim hier eingetragenen Sport</span></label>
+                  <details class="info-toggle">
+                    <summary aria-label="Mehr Informationen">ⓘ</summary>
+                    <div class="info-toggle-inhalt" data-i18n="traegt_tracker_hint">
+                      Aktiv: Laufen, Gehen/Wandern und Ballsportarten unten werden anteilig von deiner Schrittzahl
+                      oben abgezogen, um Doppelzählung zu vermeiden (Krafttraining, Rad, Schwimmen, Yoga bleiben
+                      unberührt). Inaktiv: deine Schrittzahl oben gilt als reine Alltagsbewegung, dein Training
+                      unten wird voll obendrauf gerechnet.
+                    </div>
+                  </details>
+                </div>
+              </div>
+              <details class="info-toggle info-toggle-standalone" id="hinweis-lauf-met" hidden>
+                <summary aria-label="Mehr Informationen">ⓘ<span data-i18n="hinweis_lauf_met_kurz"> Lauf-km oben werden berücksichtigt</span></summary>
+                <div class="info-toggle-inhalt" data-i18n="hinweis_lauf_met">
+                  Wenn du kein Laufen in die MET-Tabelle einträgst, werden deine oben angegebenen Lauf-Kilometer
+                  berücksichtigt. Wenn du auch hier dein Lauftraining einträgst, berechnet der Rechner dein Training
+                  exakt über MET. Deine gelaufenen Schritte werden im Hintergrund von deinen Alltagsschritten
+                  abgezogen, um eine Doppelzählung zu vermeiden. Du musst oben nichts ändern.
+                </div>
+              </details>
+              <div class="field-label-row">
+                <span class="field-label" data-i18n="met_legend">MET-Aktivitäten</span>
+                <details class="info-toggle">
+                  <summary aria-label="Mehr Informationen">ⓘ</summary>
+                  <div class="info-toggle-inhalt" data-i18n="met_hint">
+                    <abbr title="Metabolic Equivalent of Task">MET</abbr>: Vielfaches des Grundumsatzes während einer Aktivität. Werte
+                    aus dem <em>Compendium of Physical Activities</em> (Standardreferenz der Sportwissenschaft, Details im Tab
+                    „Methodik &amp; Quellen"). Wähle je Aktivität einen Eintrag und die Stunden pro Woche — bei mehreren
+                    Sportarten erscheint automatisch eine neue Zeile.
+                  </div>
+                </details>
+              </div>
               <div id="met-liste"></div>
             </div>
             <p class="field-hint sub-field" id="hinweis-met-override" hidden data-i18n="hinweis_met_override">
@@ -191,8 +240,13 @@
             </div>
 
             <div class="field">
-              <label class="checkbox-label"><input type="checkbox" id="fidgetingAktiv"> <span data-i18n="fidgeting_label">Auffällig viel unbewusste Bewegung / Zappeln</span></label>
-              <p class="field-hint" data-i18n="fidgeting_hint">Erhöht den Energieverbrauch leicht (PAL +0,05 bis +0,10) — unabhängig von Sport oder Alltagsaktivität.</p>
+              <div class="field-label-row">
+                <label class="checkbox-label"><input type="checkbox" id="fidgetingAktiv"> <span data-i18n="fidgeting_label">Auffällig viel unbewusste Bewegung / Zappeln</span></label>
+                <details class="info-toggle">
+                  <summary aria-label="Mehr Informationen">ⓘ</summary>
+                  <div class="info-toggle-inhalt" data-i18n="fidgeting_hint">Erhöht den Energieverbrauch leicht (PAL +0,05 bis +0,10) — unabhängig von Sport oder Alltagsaktivität.</div>
+                </details>
+              </div>
             </div>
 
             <div class="field">

@@ -371,16 +371,112 @@
       assert(!hatSportHaeufigkeitMet, "aktiveModifikatoren enthält 'sport_haeufigkeit' NICHT im MET-Modus (auch bei gesetztem haeufigkeitId)");
     })();
 
-    // ---- Lauf-Intensitätszuschlag ----------------------------------------
+    // ---- Lauf-Intensitätszuschlag + generische MET-Kategorie-Korrektur ----
     group("Lauf-Intensitätszuschlag");
     (function () {
       const m = window.KBR.modifikatoren;
-      assert(m.laufIntensitaetsZuschlag({ aktiv: false, kmWoche: 30, weightKg: 80, reeAdj: 1800 }) === null, "Lauf inaktiv liefert null");
-      assert(m.laufIntensitaetsZuschlag({ aktiv: true, kmWoche: 0, weightKg: 80, reeAdj: 1800 }) === null, "Lauf aktiv mit 0 km liefert null");
-      const z = m.laufIntensitaetsZuschlag({ aktiv: true, kmWoche: 35, weightKg: 80, reeAdj: 1800 });
-      // (35 * 80 * 0.5 / 7) / 1800 = 200 / 1800
-      assertApprox(z.min, 200 / 1800, 0.0001, "Lauf-Zuschlag: 35km/Woche, 80kg, reeAdj 1800 -> (35*80*0.5/7)/1800");
-      assertApprox(z.max, z.min, 0.0001, "Lauf-Zuschlag ist ein Punktwert (min===max)");
+      assertApprox(m.gehbasisPalAequivalent({ kmWoche: 14, weightKg: 70, reeAdj: 1750 }), 0.04, 0.0001, "Gehbasis: 14km/Woche, 70kg, reeAdj 1750 -> (14*70*0.5/7)/1750");
+      assert(m.gehbasisPalAequivalent({ kmWoche: 0, weightKg: 70, reeAdj: 1750 }) === 0, "Gehbasis bei 0 km liefert 0");
+      assertApprox(m.schritteZuKmWoche(10000), 7.5, 0.0001, "10.000 Schritte/Woche bei 0,75m Schrittlänge -> 7,5 km/Woche");
+    })();
+    (function () {
+      const m = window.KBR.modifikatoren;
+      assert(m.laufAnpassung({ aktiv: false, kmWoche: 30, weightKg: 80, reeAdj: 1800, vonMetAbgedeckt: false, traegtTracker: true }) === null, "Lauf inaktiv liefert null");
+      assert(m.laufAnpassung({ aktiv: true, kmWoche: 0, weightKg: 80, reeAdj: 1800, vonMetAbgedeckt: false, traegtTracker: true }) === null, "Lauf aktiv mit 0 km liefert null");
+      const z = m.laufAnpassung({ aktiv: true, kmWoche: 35, weightKg: 80, reeAdj: 1800, vonMetAbgedeckt: false, traegtTracker: true });
+      // (35 * 80 * 1.0 / 7) / 1800 = 400 / 1800
+      assertApprox(z.zuschlagMin, 400 / 1800, 0.0001, "Lauf-Zuschlag (volle Laufkosten): 35km/Woche, 80kg, reeAdj 1800 -> (35*80*1.0/7)/1800");
+      assertApprox(z.zuschlagMax, z.zuschlagMin, 0.0001, "Lauf-Zuschlag ist ein Punktwert (min===max)");
+      assertApprox(z.neatReduktion, 200 / 1800, 0.0001, "Gehbasis-Reduktion (0,5 kcal/kg/km) bei aktivem Tracker");
+
+      const ohneTracker = m.laufAnpassung({ aktiv: true, kmWoche: 35, weightKg: 80, reeAdj: 1800, vonMetAbgedeckt: false, traegtTracker: false });
+      assert(ohneTracker.neatReduktion === 0, "Ohne Tracker keine NEAT-Reduktion");
+      assertApprox(ohneTracker.zuschlagMin, z.zuschlagMin, 0.0001, "Zuschlag bleibt trotzdem voll wirksam (Tracker-Schalter betrifft nur die Reduktion)");
+
+      const vonMet = m.laufAnpassung({ aktiv: true, kmWoche: 35, weightKg: 80, reeAdj: 1800, vonMetAbgedeckt: true, traegtTracker: true });
+      assertApprox(vonMet.zuschlagMin, 0, 0.0001, "MET-Abdeckung: kein zusätzlicher Zuschlag");
+      assertApprox(vonMet.neatReduktion, z.neatReduktion, 0.0001, "MET-Abdeckung: NEAT-Reduktion bleibt trotzdem bestehen");
+    })();
+    (function () {
+      const m = window.KBR.modifikatoren;
+      const aktivitaeten = [
+        { aktivitaetId: "joggen_locker", stundenProWoche: 3 },
+        { aktivitaetId: "rad_moderat", stundenProWoche: 2 },
+      ];
+      const erwartetKm = (3 * 60 * 150 * m.SCHRITTLAENGE_M) / 1000; // nur joggen_locker (laufen), rad_moderat ist schrittneutral
+      const erwartet = m.gehbasisPalAequivalent({ kmWoche: erwartetKm, weightKg: 75, reeAdj: 1800 });
+      const ergebnis = m.schrittIntensiveMetKorrektur({ aktivitaeten, weightKg: 75, reeAdj: 1800, traegtTracker: true, laufAusschliessen: false });
+      assertApprox(ergebnis, erwartet, 0.0001, "Laufen+Radfahren: nur Laufen (schritt-intensiv) trägt zur Korrektur bei");
+
+      const nurSchrittneutral = m.schrittIntensiveMetKorrektur({
+        aktivitaeten: [{ aktivitaetId: "kraft_intensiv", stundenProWoche: 4 }, { aktivitaetId: "schwimmen_locker", stundenProWoche: 2 }],
+        weightKg: 75, reeAdj: 1800, traegtTracker: true, laufAusschliessen: false,
+      });
+      assert(nurSchrittneutral === 0, "Nur schrittneutrale Aktivitäten (Kraft, Schwimmen) -> keine Korrektur");
+
+      const ohneTracker = m.schrittIntensiveMetKorrektur({ aktivitaeten, weightKg: 75, reeAdj: 1800, traegtTracker: false, laufAusschliessen: false });
+      assert(ohneTracker === 0, "traegtTracker:false -> immer 0, unabhängig von den Aktivitäten");
+
+      const mitAusschluss = m.schrittIntensiveMetKorrektur({
+        aktivitaeten: [{ aktivitaetId: "joggen_locker", stundenProWoche: 3 }, { aktivitaetId: "fussball_locker", stundenProWoche: 2 }],
+        weightKg: 75, reeAdj: 1800, traegtTracker: true, laufAusschliessen: true,
+      });
+      const nurFussball = m.schrittIntensiveMetKorrektur({
+        aktivitaeten: [{ aktivitaetId: "fussball_locker", stundenProWoche: 2 }],
+        weightKg: 75, reeAdj: 1800, traegtTracker: true, laufAusschliessen: false,
+      });
+      assertApprox(mitAusschluss, nurFussball, 0.0001, "laufAusschliessen:true blendet Laufen aus, Ballsport (Fußball) bleibt aber wirksam");
+    })();
+    (function () {
+      // Plausibilitäts-Boden: NEAT-Mindeststufe + extrem hohe MET-Stunden für
+      // eine Laufen-Aktivität darf keinen negativen/unplausiblen Zwischenwert
+      // erzeugen -- weder im Endergebnis (globale Klammer) noch in der
+      // Modifikator-Anzeige (Komponenten-Deckelung).
+      const r = berechne({
+        gender: "male", age: 30, heightCm: 180, weightKg: 70, neatSchritteId: "unter5000", ziel: "maintain",
+        sport: { modus: "met", aktivitaeten: [{ aktivitaetId: "joggen_locker", metWert: 7.5, stundenProWoche: 40 }] },
+        traegtTrackerBeimSport: true,
+      });
+      // Der Gesamt-TEE steigt bei 40h/Woche Joggen berechtigterweise stark an (der
+      // reguläre MET-Zuschlag ist real und unabhängig vom NEAT-Reduktions-Boden) --
+      // die globale Untergrenze 1,2 muss hier nicht erreicht werden, nur nie
+      // unterschritten. Entscheidend ist, dass die NEAT-Reduktion selbst (nicht
+      // der volle TEE) physikalisch plausibel begrenzt bleibt.
+      assert(r.pal.min >= 1.2 - 0.001, "PAL-Untergrenze wird nie unterschritten");
+      const korrektur = r.aktiveModifikatoren.find((mod) => mod.id === "met_neat_korrektur");
+      assert(!korrektur || korrektur.zuschlag <= 1.2 + 0.001, "met_neat_korrektur bleibt physikalisch plausibel (nie größer als die NEAT-Stufen-Untergrenze)");
+    })();
+    (function () {
+      // Fall A: Lauf-km oben + MET-Laufen unten -> MET übernimmt, kein
+      // zusätzlicher lauf_intensitaet-Zuschlag.
+      const basis = { gender: "male", age: 30, heightCm: 178, weightKg: 75, neatSchritteId: "5000bis10000", ziel: "maintain" };
+      const aktivitaeten = [{ aktivitaetId: "joggen_locker", metWert: 7.5, stundenProWoche: 3 }];
+      const rTracker = berechne({ ...basis, laufAktiv: true, laufKmWoche: 40, sport: { modus: "met", aktivitaeten }, traegtTrackerBeimSport: true });
+      assert(rTracker.aktiveModifikatoren.some((m) => m.id === "lauf_via_met"), "Fall A: MET-Laufen vorhanden -> lauf_via_met statt lauf_intensitaet");
+      assert(!rTracker.aktiveModifikatoren.some((m) => m.id === "lauf_intensitaet"), "Fall A: kein zusätzlicher lauf_intensitaet-Zuschlag wenn MET abdeckt");
+
+      const rOhneTracker = berechne({ ...basis, laufAktiv: true, laufKmWoche: 40, sport: { modus: "met", aktivitaeten }, traegtTrackerBeimSport: false });
+      assert(rOhneTracker.tee.haupt > rTracker.tee.haupt, "Fall A ohne Tracker: keine NEAT-Reduktion -> höherer TEE als mit Tracker");
+    })();
+    (function () {
+      // Fall B: Lauf-km oben + andere (schrittneutrale) MET-Sportart unten ->
+      // voller Lauf-Zuschlag bleibt, keine generische MET-Korrektur nötig.
+      const basis = { gender: "male", age: 30, heightCm: 178, weightKg: 75, neatSchritteId: "5000bis10000", ziel: "maintain" };
+      const aktivitaeten = [{ aktivitaetId: "kraft_intensiv", metWert: 5.0, stundenProWoche: 3 }];
+      const r = berechne({ ...basis, laufAktiv: true, laufKmWoche: 40, sport: { modus: "met", aktivitaeten }, traegtTrackerBeimSport: true });
+      assert(r.aktiveModifikatoren.some((m) => m.id === "lauf_intensitaet"), "Fall B: Lauf-km-Zuschlag bleibt voll bestehen, MET-Krafttraining deckt das Laufen nicht ab");
+      assert(!r.aktiveModifikatoren.some((m) => m.id === "met_neat_korrektur"), "Fall B: Krafttraining ist schrittneutral, keine generische MET-Korrektur");
+    })();
+    (function () {
+      // Fall C (Sonderfall): kein Lauf-km oben, aber MET-Laufen unten ->
+      // generische Korrektur greift für die Laufen-Zeile.
+      const basis = { gender: "male", age: 30, heightCm: 178, weightKg: 75, neatSchritteId: "5000bis10000", ziel: "maintain" };
+      const aktivitaeten = [{ aktivitaetId: "joggen_locker", metWert: 7.5, stundenProWoche: 3 }];
+      const rTracker = berechne({ ...basis, laufAktiv: false, laufKmWoche: 0, sport: { modus: "met", aktivitaeten }, traegtTrackerBeimSport: true });
+      const rOhneTracker = berechne({ ...basis, laufAktiv: false, laufKmWoche: 0, sport: { modus: "met", aktivitaeten }, traegtTrackerBeimSport: false });
+      assert(rTracker.aktiveModifikatoren.some((m) => m.id === "met_neat_korrektur"), "Fall C: MET-Laufen ohne Lauf-km löst generische NEAT-Korrektur aus");
+      assert(!rOhneTracker.aktiveModifikatoren.some((m) => m.id === "met_neat_korrektur"), "Fall C ohne Tracker: keine Korrektur");
+      assert(rOhneTracker.tee.haupt > rTracker.tee.haupt, "Fall C ohne Tracker: keine Reduktion -> höherer TEE als mit Tracker");
     })();
     (function () {
       const basis = { gender: "male", age: 30, heightCm: 178, weightKg: 75, neatSchritteId: "5000bis10000", ziel: "maintain", sport: { modus: "keine", haeufigkeitId: "keinSport" } };

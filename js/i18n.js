@@ -62,12 +62,14 @@ window.KBR.i18n = (function () {
     lauf_label: { de: "Davon gelaufen / gejoggt", en: "Of which running / jogging" },
     lauf_km_label: { de: "Kilometer pro Woche", en: "Kilometers per week" },
     lauf_km_hint: {
-      de: `Tipp für Läufer: Belasse deine Gesamtschritte oben einfach so, wie deine Smartwatch sie anzeigt. Trage
-        hier deine wöchentlichen Lauf-Kilometer ein — der Rechner addiert automatisch nur den Intensitäts-Aufpreis
-        des Laufens gegenüber dem Gehen. Trage Laufen/Joggen dann nicht zusätzlich unten bei Sport ein.`,
-      en: `Tip for runners: just leave your total steps above as your tracker shows them. Enter your weekly running
-        kilometers here — the calculator automatically adds only the intensity surcharge of running over walking.
-        Don't also enter running/jogging below under exercise in that case.`,
+      de: `Zähl deine Gesamtschritte oben weiterhin genau so, wie dein Tracker sie anzeigt. Trage hier deine
+        wöchentlichen Lauf-Kilometer ein. Falls du denselben Lauf unten bei der genauen MET-Berechnung einträgst,
+        erkennt der Rechner das automatisch und übernimmt dafür die MET-Angabe — ohne MET-Eintrag rechnet er
+        stattdessen mit einer einfachen Faustregel.`,
+      en: `Keep counting your total steps above exactly as your tracker shows them. Enter your weekly running
+        kilometers here. If you also log the same run below under the precise MET calculation, the calculator
+        detects this automatically and uses your MET entry instead — without a MET entry it uses a simple rule of
+        thumb instead.`,
     },
     feld_sport_haeufigkeit_label: {
       de: "Sport / Training (Häufigkeit pro Woche)",
@@ -143,13 +145,32 @@ window.KBR.i18n = (function () {
         "Methodology &amp; Sources" tab). Choose an entry per activity and the hours per week — a new row appears
         automatically for multiple activities.`,
     },
-    met_doppelzaehlung_warnung: {
-      de: `⚠ Trage hier vor allem Sport ein, der nicht wesentlich zu deiner Schrittzahl oben beiträgt (Rad, Schwimmen,
-        Kraft, Ballsport …). Für Lauf- oder Gehsport nutze stattdessen oben bei der Schrittzahl das Feld „Davon
-        gelaufen/gejoggt".`,
-      en: `⚠ Enter exercise here that doesn't meaningfully add to your step count above (cycling, swimming, strength,
-        ball sports …). For running or walking-based exercise, use the "Of which running/jogging" field above under
-        steps instead.`,
+    met_legend: { de: "MET-Aktivitäten", en: "MET activities" },
+    traegt_tracker_label: {
+      de: "Ich trage meinen Schrittzähler auch beim hier eingetragenen Sport",
+      en: "I also wear my step tracker during the exercise entered here",
+    },
+    traegt_tracker_hint: {
+      de: `Aktiv: Laufen, Gehen/Wandern und Ballsportarten unten werden anteilig von deiner Schrittzahl oben
+        abgezogen, um Doppelzählung zu vermeiden (Krafttraining, Rad, Schwimmen, Yoga bleiben unberührt). Inaktiv:
+        deine Schrittzahl oben gilt als reine Alltagsbewegung, dein Training unten wird voll obendrauf gerechnet.`,
+      en: `On: running, walking/hiking, and ball sports below are proportionally deducted from your step count above
+        to avoid double-counting (strength training, cycling, swimming, yoga are unaffected). Off: your step count
+        above is treated as pure daily activity, your training below is added fully on top.`,
+    },
+    hinweis_lauf_met_kurz: {
+      de: "Lauf-km oben werden berücksichtigt",
+      en: "Running km above are taken into account",
+    },
+    hinweis_lauf_met: {
+      de: `Wenn du kein Laufen in die MET-Tabelle einträgst, werden deine oben angegebenen Lauf-Kilometer
+        berücksichtigt. Wenn du auch hier dein Lauftraining einträgst, berechnet der Rechner dein Training exakt
+        über MET. Deine gelaufenen Schritte werden im Hintergrund von deinen Alltagsschritten abgezogen, um eine
+        Doppelzählung zu vermeiden. Du musst oben nichts ändern.`,
+      en: `If you don't enter running in the MET table, your running kilometers entered above are taken into
+        account. If you also log the same running below, the calculator uses your MET entry for the precise
+        calculation instead. Your running steps are deducted from your daily steps in the background to avoid
+        double-counting. You don't need to change anything above.`,
     },
     hinweis_met_override: {
       de: `Bei genauer MET-Berechnung wird oben automatisch „Kein regelmäßiger Sport" als Sport-Häufigkeit angenommen (Feld ist deaktiviert) — dein Training wird hier separat und präziser dazugerechnet. Deine Alltagsaktivität (NEAT) bleibt davon unberührt.`,
@@ -297,6 +318,7 @@ window.KBR.i18n = (function () {
     // ---- Druckseite "Eingegebene Werte" (nur PDF-Export, siehe ui.js) --------
     druck_eingaben_heading: { de: "Eingegebene Werte", en: "Values Entered" },
     druck_ja: { de: "Ja", en: "Yes" },
+    druck_nein: { de: "Nein", en: "No" },
     druck_ffm_direkt_label: { de: "Fettfreie Masse (direkt gemessen)", en: "Fat-free mass (measured directly)" },
     druck_ffm_kfa_label: { de: "Fettfreie Masse (aus Körperfettanteil)", en: "Fat-free mass (from body fat %)" },
     druck_sport_zeile: { de: "{{stunden}} h/Woche, {{met}} MET", en: "{{stunden}} h/week, {{met}} MET" },
@@ -403,6 +425,14 @@ window.KBR.i18n = (function () {
     mod_lauf_intensitaet: {
       de: "Lauf-Intensität ({{km}} km/Woche): PAL-Äquivalent +{{zuschlag}}",
       en: "Running intensity ({{km}} km/week): PAL equivalent +{{zuschlag}}",
+    },
+    mod_lauf_via_met: {
+      de: "Lauf-Basis aus Alltagsaktivität herausgerechnet ({{km}} km/Woche) — Energieverbrauch wird über deine MET-Angabe berücksichtigt.",
+      en: "Running baseline removed from daily activity ({{km}} km/week) — energy expenditure is accounted for via your MET entry instead.",
+    },
+    mod_met_neat_korrektur: {
+      de: "Schrittintensiver Sport (Laufen/Gehen/Ballsport): NEAT-PAL um {{zuschlag}} reduziert",
+      en: "Step-intensive exercise (running/walking/ball sports): NEAT-PAL reduced by {{zuschlag}}",
     },
     mod_sport_aktivitaet_eintrag: {
       de: "{{label}} ({{stunden}} h/Woche, {{met}} MET)",

@@ -117,23 +117,46 @@ window.KBR.modifikatoren = (function () {
     return { min: 0.05, max: 0.1 };
   }
 
+  // Gehbasis-Modell für "wie viel des Trainings war eigentlich schon in der
+  // Schrittzahl (NEAT) enthalten": 0,5 kcal/kg/km ist eine gängige Näherung
+  // für Geh-Bruttokosten (Lauf-Bruttokosten ~1,0 kcal/kg/km zum Vergleich).
+  // Zentrale, einzige Gehbasis-Formel im Code -- sowohl vom expliziten
+  // Lauf-km-Feld als auch von der generischen MET-Kategorie-Korrektur
+  // genutzt (siehe schrittIntensiveMetKorrektur), damit dieselbe Aktivität
+  // nie unterschiedlich stark reduziert wird je nachdem, über welchen Weg
+  // (km-Eingabe vs. MET-Trainingsstunden) sie erfasst wurde.
+  function gehbasisPalAequivalent({ kmWoche, weightKg, reeAdj }) {
+    if (!kmWoche || kmWoche <= 0 || !weightKg || !reeAdj) return 0;
+    return (kmWoche * weightKg * 0.5) / 7 / reeAdj;
+  }
+
+  // Schrittlänge als Näherung, um eine über Kadenz (Schritte/Minute, siehe
+  // SCHRITTE_PRO_MINUTE) geschätzte Schrittzahl in eine Äquivalent-Distanz
+  // umzurechnen, die dann durch dieselbe Gehbasis-Formel läuft.
+  const SCHRITTLAENGE_M = 0.75;
+
+  function schritteZuKmWoche(schritteProWoche) {
+    return (schritteProWoche * SCHRITTLAENGE_M) / 1000;
+  }
+
   /**
-   * Intensitäts-Aufpreis von Laufen/Joggen gegenüber Gehen, als PAL-Äquivalent
-   * (analog zu sportMet). Löst die Schritt/Sport-Doppelzählung für Läufer
-   * präziser als ein reiner Hinweistext: die Gesamt-Schrittzahl (NEAT) deckt
-   * die zurückgelegte Distanz bereits mit einer impliziten Geh-Tempo-Annahme
-   * ab — hier wird nur die Differenz zum höheren Lauf-Tempo addiert, nicht die
-   * volle Laufenergie (sonst Doppelzählung der Grunddistanz).
-   * Koeffizient 0,5 kcal/kg/km ist eine gängige Näherung für die Netto-
-   * Mehrkosten von Laufen ggü. zügigem Gehen (Lauf-Bruttokosten ~1,0 kcal/kg/km
-   * minus Geh-Bruttokosten ~0,5 kcal/kg/km), keine Studien-Einzelquelle.
-   * @param {{aktiv:boolean, kmWoche:number, weightKg:number, reeAdj:number}} p
+   * Lauf/Jogging-Anpassung: trennt "wie viel der Schrittzahl war eigentlich
+   * ein Lauf" (neatReduktion, nur falls traegtTracker) von "wie wird der
+   * Lauf selbst bewertet" (zuschlag: volle Laufkosten 1,0 kcal/kg/km, ODER 0
+   * falls eine MET-„Laufen"-Aktivität denselben Lauf bereits präziser erfasst
+   * -- dann übernimmt sportMet die Berechnung). Löst die Schritt/Sport-
+   * Doppelzählung für Läufer präziser als ein reiner Hinweistext.
+   * @param {{aktiv:boolean, kmWoche:number, weightKg:number, reeAdj:number, vonMetAbgedeckt:boolean, traegtTracker:boolean}} p
    */
-  function laufIntensitaetsZuschlag({ aktiv, kmWoche, weightKg, reeAdj }) {
+  function laufAnpassung({ aktiv, kmWoche, weightKg, reeAdj, vonMetAbgedeckt, traegtTracker }) {
     if (!aktiv || !kmWoche || kmWoche <= 0 || !weightKg || !reeAdj) return null;
-    const kcalProTag = (kmWoche * weightKg * 0.5) / 7;
-    const zuschlag = kcalProTag / reeAdj;
-    return { min: zuschlag, max: zuschlag };
+    const neatReduktion = traegtTracker ? gehbasisPalAequivalent({ kmWoche, weightKg, reeAdj }) : 0;
+    if (vonMetAbgedeckt) {
+      return { neatReduktion, zuschlagMin: 0, zuschlagMax: 0, vonMetAbgedeckt: true };
+    }
+    const laufKcalProTag = (kmWoche * weightKg * 1.0) / 7;
+    const zuschlag = laufKcalProTag / reeAdj;
+    return { neatReduktion, zuschlagMin: zuschlag, zuschlagMax: zuschlag, vonMetAbgedeckt: false };
   }
 
   // MET-Referenztabelle für die Sport-Auswahl im UI. Werte aus dem Compendium
@@ -180,6 +203,36 @@ window.KBR.modifikatoren = (function () {
     { id: "badminton_locker", kategorieId: "ballsport", met: 5.5 },
     { id: "badminton_wettkampf", kategorieId: "ballsport", met: 9.0 },
   ];
+
+  // Grobe Kadenz-Schätzung (Schritte/Minute) je schritt-intensiver MET-
+  // Kategorie, genutzt von schrittIntensiveMetKorrektur. Kategorien ohne
+  // Eintrag hier (kraft, radfahren, schwimmen, yoga) erzeugen keine
+  // nennenswerten Schritte und lösen daher nie eine Reduktion aus.
+  const SCHRITTE_PRO_MINUTE = { laufen: 150, gehen_wandern: 110, ballsport: 100 };
+
+  /**
+   * NEAT-Reduktion für schritt-intensive MET-Aktivitäten (Laufen ohne
+   * eigene Lauf-km-Angabe, Gehen/Wandern, Ballsport), sofern der Tracker
+   * auch beim Sport getragen wird. Rechnet Trainingsstunden über die
+   * Kadenz-Schätzung in eine Äquivalent-Distanz um und nutzt danach dieselbe
+   * Gehbasis-Formel wie laufAnpassung -- keine zweite, abweichende
+   * Kostenlogik für dieselbe physikalische Größe.
+   * @param {{aktivitaeten: {aktivitaetId:string, stundenProWoche:number}[], weightKg:number, reeAdj:number, traegtTracker:boolean, laufAusschliessen:boolean}} p
+   */
+  function schrittIntensiveMetKorrektur({ aktivitaeten, weightKg, reeAdj, traegtTracker, laufAusschliessen }) {
+    if (!traegtTracker || !aktivitaeten || !aktivitaeten.length || !weightKg || !reeAdj) return 0;
+    let kmWocheSumme = 0;
+    for (const a of aktivitaeten) {
+      const eintrag = MET_AKTIVITAETEN.find((m) => m.id === a.aktivitaetId);
+      if (!eintrag) continue;
+      const schritteProMin = SCHRITTE_PRO_MINUTE[eintrag.kategorieId];
+      if (!schritteProMin) continue; // schrittneutrale Kategorie (kraft, radfahren, schwimmen, yoga)
+      if (eintrag.kategorieId === "laufen" && laufAusschliessen) continue; // bereits über Lauf-km abgedeckt
+      const schritteProWoche = a.stundenProWoche * 60 * schritteProMin;
+      kmWocheSumme += schritteZuKmWoche(schritteProWoche);
+    }
+    return gehbasisPalAequivalent({ kmWoche: kmWocheSumme, weightKg, reeAdj });
+  }
 
   /**
    * MET-basierte Sportberechnung als PAL-Äquivalent. Ersetzt den Sport-
@@ -235,7 +288,12 @@ window.KBR.modifikatoren = (function () {
     SPORT_HAEUFIGKEIT_STUFEN,
     sportHaeufigkeitZuschlag,
     fidgetingPalZuschlag,
-    laufIntensitaetsZuschlag,
+    gehbasisPalAequivalent,
+    schritteZuKmWoche,
+    laufAnpassung,
+    SCHRITTE_PRO_MINUTE,
+    SCHRITTLAENGE_M,
+    schrittIntensiveMetKorrektur,
     sportMet,
     MET_AKTIVITAETEN,
     schwangerschaftStillzeit,

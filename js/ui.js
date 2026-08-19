@@ -170,9 +170,15 @@
       el("feld-fieber").hidden = !e.target.checked;
     });
 
+    function aktualisiereHinweisLaufMet() {
+      const aktiv = el("laufAktiv").checked && Number(el("laufKmWoche").value) > 0;
+      el("hinweis-lauf-met").hidden = !aktiv;
+    }
     el("laufAktiv").addEventListener("change", (e) => {
       el("feld-lauf-km").hidden = !e.target.checked;
+      aktualisiereHinweisLaufMet();
     });
+    el("laufKmWoche").addEventListener("input", aktualisiereHinweisLaufMet);
   }
 
   // ---- MET-Aktivitätsliste (dynamisch, Kategorie B) ------------------------
@@ -378,6 +384,7 @@
     const fidgetingAktiv = el("fidgetingAktiv").checked;
     const laufAktiv = el("laufAktiv").checked;
     const laufKmWoche = Number(el("laufKmWoche").value) || 0;
+    const traegtTrackerBeimSport = el("traegtTrackerBeimSport").checked;
 
     const schwangerschaftStillzeit = el("schwangerschaftStillzeit").value || null;
     const adaptiveThermogeneseAktiv = el("adaptiveThermogenese").checked;
@@ -405,6 +412,7 @@
       fidgetingAktiv,
       laufAktiv,
       laufKmWoche,
+      traegtTrackerBeimSport,
       schwangerschaftStillzeit,
       adaptiveThermogeneseAktiv,
       schilddruese,
@@ -428,6 +436,7 @@
         fidgetingAktiv,
         laufAktiv,
         laufKmWoche: el("laufKmWoche").value,
+        traegtTrackerBeimSport,
         schwangerschaftStillzeit,
         adaptiveThermogeneseAktiv,
         schilddruseAktiv: el("schilddruseAktiv").checked,
@@ -592,6 +601,10 @@
           km: i18n.zahlNatuerlich(eintrag.kmWoche),
           zuschlag: i18n.zahl(eintrag.zuschlag, 2),
         });
+      case "lauf_via_met":
+        return i18n.t("mod_lauf_via_met", { km: i18n.zahlNatuerlich(eintrag.kmWoche) });
+      case "met_neat_korrektur":
+        return i18n.t("mod_met_neat_korrektur", { zuschlag: i18n.zahl(eintrag.zuschlag, 2) });
       case "schwangerschaft":
         return i18n.t("mod_schwangerschaft");
       case "stillzeit":
@@ -734,6 +747,11 @@
       zeilen.push(druckZeile(i18n.t("ffm_sportler_label"), i18n.t("druck_ja")));
     }
 
+    const laufOderMetAktiv = (eingabe.sport && eingabe.sport.modus === "met") || (eingabe.laufAktiv && eingabe.laufKmWoche > 0);
+    if (laufOderMetAktiv && !eingabe.traegtTrackerBeimSport) {
+      zeilen.push(druckZeile(i18n.t("traegt_tracker_label"), i18n.t("druck_nein")));
+    }
+
     if (eingabe.sport && eingabe.sport.modus === "met" && eingabe.sport.aktivitaeten.length) {
       zeilen.push(`<div class="druck-untergruppe">${escapeHtml(i18n.t("sport_legend"))}</div>`);
       eingabe.sport.aktivitaeten.forEach((a) => {
@@ -812,6 +830,8 @@
     el("laufAktiv").checked = !!gespeichert.laufAktiv;
     el("feld-lauf-km").hidden = !gespeichert.laufAktiv;
     el("laufKmWoche").value = gespeichert.laufKmWoche || "";
+    el("hinweis-lauf-met").hidden = !(gespeichert.laufAktiv && Number(gespeichert.laufKmWoche) > 0);
+    el("traegtTrackerBeimSport").checked = gespeichert.traegtTrackerBeimSport !== false;
 
     aktualisiereSchwangerschaftSichtbarkeit();
     if (!el("feld-schwangerschaft").hidden) {
