@@ -30,6 +30,10 @@ window.KBR.i18n = (function () {
     info_aria_lauf_met: { de: "Mehr Informationen zur Lauf-km/MET-Erkennung", en: "More information about running km/MET detection" },
     info_aria_met: { de: "Mehr Informationen zu MET-Aktivitäten", en: "More information about MET activities" },
     info_aria_fidgeting: { de: "Mehr Informationen zu Spontanbewegung", en: "More information about spontaneous movement" },
+    info_aria_wochenmittel: { de: "Mehr Informationen zum Wochendurchschnitt", en: "More information about the weekly average" },
+    info_aria_ffm: { de: "Mehr Informationen zur fettfreien Masse", en: "More information about fat-free mass" },
+    info_aria_speichern: { de: "Mehr Informationen zum Speichern", en: "More information about saving" },
+    info_aria_druck_footer: { de: "Mehr Informationen zur PDF-Fußzeile", en: "More information about the PDF footer" },
     info_aria_diaet: { de: "Mehr Informationen zu Diät / Kalorienrestriktion", en: "More information about diet / calorie restriction" },
     info_aria_betablocker: { de: "Mehr Informationen zu Beta-Blockern", en: "More information about beta blockers" },
     info_aria_fieber: { de: "Mehr Informationen zu Fieber", en: "More information about fever" },
@@ -114,10 +118,14 @@ window.KBR.i18n = (function () {
     // einzelnen Tooltips darunter nicht mehr jeweils das Gesamtbild wiederholen
     // müssen, sondern nur noch ihre eigene, feldspezifische Mechanik erklären.
     bewegung_kurzuebersicht: {
-      de: `Schrittzahl, Lauf-km, Sport-Häufigkeit und die MET-Tabelle bilden zusammen deine Bewegung ab — dieselbe
-        Aktivität nicht doppelt eintragen. Details an den Info-Symbolen.`,
-      en: `Step count, running km, exercise frequency, and the MET table together cover your movement — don't enter
-        the same activity twice. Details via the info icons.`,
+      de: `Schrittzahl, Lauf-km, Sport-Häufigkeit und MET-Tabelle ergänzen sich automatisch — der Rechner erkennt
+        Überschneidungen selbst und rechnet sie heraus. Details dazu an den jeweiligen Info-Symbolen.`,
+      en: `Step count, running km, exercise frequency, and the MET table complement each other automatically — the
+        calculator detects overlaps itself and adjusts for them. Details via the respective info icons.`,
+    },
+    wochenmittel_teaser: {
+      de: "Wie der Rechner mit deinem Wochendurchschnitt umgeht",
+      en: "How the calculator handles your weekly average",
     },
     neat_sport_aequivalenz_text: {
       de: "Der Rechner ermittelt deinen durchschnittlichen Wochen-Tagesbedarf. 10.000 Schritte im Alltag verbrennen oft ähnlich viel Energie wie eine intensive Sporteinheit — solange dein Wochenmittel aus Bewegung und Sport konstant bleibt, passt die Berechnung.",
@@ -278,13 +286,17 @@ window.KBR.i18n = (function () {
     fieber_temp_label: { de: "Körpertemperatur (°C)", en: "Body temperature (°C)" },
 
     speichern_label: { de: "Eingaben auf diesem Gerät speichern", en: "Save inputs on this device" },
-    speichern_hint: {
-      de: `Speichert deine Eingaben (nicht das Ergebnis) über <code>localStorage</code> direkt in diesem Browser auf diesem
-        Gerät — kein Cache, keine automatische Löschung durch den Browser. Die Daten bleiben, bis du „Daten löschen"
-        klickst oder die Website-Daten manuell in den Browser-Einstellungen leerst. Es wird nichts an einen Server übertragen.`,
-      en: `Saves your inputs (not the result) via <code>localStorage</code> directly in this browser on this device —
-        no cache, no automatic deletion by the browser. The data stays until you click "Delete data" or manually
-        clear the site data in your browser settings. Nothing is transmitted to a server.`,
+    speichern_hint_kurz: {
+      de: "Speichert deine Eingaben nur lokal in diesem Browser — nichts wird übertragen.",
+      en: "Saves your inputs only locally in this browser — nothing is transmitted.",
+    },
+    speichern_hint_technisch: {
+      de: `Über <code>localStorage</code> direkt in diesem Browser auf diesem Gerät — kein Cache, keine automatische
+        Löschung durch den Browser. Die Daten bleiben, bis du „Daten löschen" klickst oder die Website-Daten manuell
+        in den Browser-Einstellungen leerst.`,
+      en: `Via <code>localStorage</code> directly in this browser on this device — no cache, no automatic deletion by
+        the browser. The data stays until you click "Delete data" or manually clear the site data in your browser
+        settings.`,
     },
     speichern_loeschen_btn: { de: "Gespeicherte Daten löschen", en: "Delete saved data" },
     submit_btn: { de: "Berechnen", en: "Calculate" },
