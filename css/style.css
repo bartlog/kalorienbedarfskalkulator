@@ -253,6 +253,28 @@ label {
   vertical-align: middle;
 }
 
+/* Icon + aufgeklappte Box nebeneinander statt untereinander -- die eigentliche
+   Wirkung entsteht im Zusammenspiel mit .field-label-row (flex-wrap:wrap):
+   ein geöffnetes .info-toggle wird durch die Box breiter und passt dann nicht
+   mehr neben Label/andere Icons auf dieselbe Zeile -- es rutscht als Ganzes
+   (Icon + Box zusammen, da beide jetzt ein Flex-Paar sind) in eine eigene
+   Zeile. Geschlossene Icons (nur das kompakte Icon sichtbar) bleiben oben
+   neben dem Label stehen. Bei mehreren geöffneten Icons in derselben Zeile
+   landet jedes -- in Dokumentreihenfolge -- auf seiner eigenen neuen Zeile.
+   Gilt nicht für .info-toggle-standalone (Sport-Training-Pille, Lauf-km-MET-
+   Status): deren Box ist bewusst volle Breite unter dem längeren Teaser-Text,
+   nicht neben einem einzelnen Icon. */
+.info-toggle:not(.info-toggle-standalone) {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+}
+
+.info-toggle:not(.info-toggle-standalone) .info-toggle-inhalt {
+  margin-top: 0;
+  max-width: 320px;
+}
+
 .info-toggle summary {
   display: inline-flex;
   align-items: center;
