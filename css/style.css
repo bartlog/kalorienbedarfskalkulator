@@ -797,10 +797,13 @@ button[type="submit"]:hover {
 /* ---- Druck / PDF-Export (DIN A4) ------------------------------------------ */
 
 @media print {
-  /* margin:0 auf @page + Rand als Padding auf .card statt @page margin:
-     @page margin wird je nach Browser/Druckdialog-Einstellung ("Standard"
-     vs. "Keine" vs. "Minimal") unzuverlässig übernommen — Padding im
-     Box-Modell greift dagegen immer, unabhängig vom Druckdialog. */
+  /* margin:0 auf @page, Ränder kommen stattdessen aus Padding + box-decoration-
+     break -- @page margin wurde probiert (2026-08-20), verschiebt aber
+     nachweislich die Containing Box von .druck-footer (position:fixed): der
+     Footer landete konsequent zu weit oben statt unten am Seitenrand, egal
+     welcher @page-margin-Wert (getestet: einseitig, symmetrisch, mit/ohne
+     Playwright-preferCSSPageSize). @page margin:0 ist der einzige Wert, bei
+     dem die Fußzeile zuverlässig unten auf jeder Seite bleibt. */
   @page {
     size: A4;
     margin: 0;
@@ -811,11 +814,46 @@ button[type="submit"]:hover {
     background: #fff;
   }
 
+  /* Eigener, kleiner Seitenrand nur für den Header (erscheint nur einmal, auf
+     Seite 1) -- normales margin auf einem einzelnen, nicht fragmentierenden
+     Element, unabhängig von der Seiten-Umbruch-Logik unten. */
+  .header-row {
+    margin-top: 1cm;
+  }
+
   .card {
     max-width: none;
     box-shadow: none;
     border-radius: 0;
-    padding: 2cm;
+    /* Nur noch links/rechts -- oben/unten übernimmt #druck-inhalt (siehe
+       dort). Würde .card hier zusätzlich oben/unten padden, käme das auf
+       Seite 1 zum eigenen Seite-1-Anteil von #druck-inhalts Padding hinzu
+       und würde dort unnötig Platz verschwenden (führte in einem Test zu
+       einer zusätzlichen, fast leeren Seite). */
+    padding: 0 2cm;
+  }
+
+  /* Eigener Wrapper um den gedruckten Inhalt (Ergebnis, Disclaimer,
+     "Eingegebene Werte") -- absichtlich getrennt von .card und ohne
+     .druck-footer als Nachfahre (der bleibt außerhalb, direktes Kind von
+     .card). box-decoration-break:clone auf .druck-footers eigenem Vorfahren
+     bringt dessen Containing-Block-Auflösung durcheinander (per PDF-Text-
+     Positions-Messung bestätigt: die Fußzeile verschwand auf allen Seiten
+     außer der letzten, sobald ein Vorfahre "clone" war -- unabhängig davon,
+     ob .druck-footer selbst Nachfahre dieses Vorfahren war oder nur Sibling).
+     Ohne "clone" greift Block-Achsen-Padding (oben/unten) laut Fragmentierungs-
+     Spec (box-decoration-break: slice, der Default) nur am allerersten
+     Seitenanfang bzw. allerletzten Seitenende einer über mehrere Seiten
+     laufenden Box, nicht an jedem inneren Seitenumbruch -- das war der
+     ursprünglich gemeldete Bug (Seite 1 hatte ~2,5cm oberen Rand, Folgeseiten
+     nur ~0,3-0,6cm, Inhalt lief praktisch bis an die Fußzeile heran). "clone"
+     wiederholt Padding an jedem Fragment, exakt der Use-Case, für den die
+     Eigenschaft eingeführt wurde -- hier isoliert auf diesen Wrapper
+     angewendet, damit .druck-footer unangetastet bleibt. */
+  #druck-inhalt {
+    padding: 2cm 0;
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
   }
 
   .tabs,
@@ -862,6 +900,18 @@ button[type="submit"]:hover {
 
   .disclaimer {
     margin-top: 0.75rem;
+  }
+
+  /* Verhindert, dass ein Absatz/Block mitten im Satz auf die nächste Seite
+     umbricht -- seit #druck-inhalt echte Seitenränder reserviert (siehe oben),
+     ist dafür pro Seite weniger Platz übrig als vorher, wodurch harte Umbrüche
+     mitten in Fließtext-Blöcken erstmals sichtbar wurden. */
+  .disclaimer,
+  .result-item,
+  .hint-box,
+  .formel-eintrag,
+  .soft-boundary-hinweis {
+    break-inside: avoid;
   }
 
   .soft-boundary-hinweis {
