@@ -934,6 +934,7 @@
         "afterprint",
         () => {
           document.title = titelOriginal;
+          el("druck-footer").hidden = true;
         },
         { once: true }
       );

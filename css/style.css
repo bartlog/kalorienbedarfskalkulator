@@ -808,6 +808,15 @@ button[type="submit"]:hover {
   display: none;
 }
 
+/* Dasselbe gilt für die Fußzeile: ihr hidden-Attribut wird kurz vor dem Druck
+   per JS entfernt (siehe ui.js printBtn-Handler) und danach nicht wieder
+   gesetzt -- ohne diese unbedingte Regel bliebe sie ab dem ersten PDF-Export
+   dauerhaft auch auf der normalen Seite sichtbar, da [hidden]{display:none}
+   dann nicht mehr greift. */
+.druck-footer {
+  display: none;
+}
+
 /* ---- Druck / PDF-Export (DIN A4) ------------------------------------------ */
 
 @media print {
