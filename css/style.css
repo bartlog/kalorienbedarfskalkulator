@@ -234,8 +234,14 @@ label {
 }
 
 .disclaimer-inline {
-  margin-top: 0.75rem;
   color: var(--color-signal);
+}
+
+/* Höhere Spezifität als .hint-box p (margin: 0 0 0.6rem), das den
+   margin-top sonst zuverlässig auf 0 zurücksetzt -- ein einfaches
+   margin-top auf .disclaimer-inline allein griff deshalb nie. */
+.hint-box .disclaimer-inline {
+  margin-top: 1.25rem;
 }
 
 /* Kompaktes Info-Icon (ⓘ) statt Dauertext-Hinweis -- nutzt <details>/<summary>,
@@ -248,16 +254,12 @@ label {
   gap: 0.5rem;
 }
 
-.info-toggle {
-  display: inline-block;
-  vertical-align: middle;
-}
-
 /* Icon + aufgeklappte Box nebeneinander statt untereinander. */
-.info-toggle:not(.info-toggle-standalone) {
+.info-toggle {
   display: inline-flex;
   align-items: flex-start;
   gap: 0.6rem;
+  vertical-align: middle;
 }
 
 /* Erzwingt den Zeilenumbruch: ein geöffnetes Icon beansprucht laut flex-basis
@@ -273,14 +275,14 @@ label {
    oben neben dem Label stehen bleiben sollen. Öffnet man ein zweites Icon,
    wechselt auch das zu order:1 und rutscht -- da beide order:1 sind, in
    Dokumentreihenfolge sortiert -- unter die Box des zuerst geöffneten. */
-.info-toggle:not(.info-toggle-standalone)[open] {
+.info-toggle[open] {
   order: 1;
   flex: 1 1 100%;
 }
 
 /* Box füllt die gesamte verbleibende Breite neben dem Icon (nicht nur eine
    feste, schmale Spalte). */
-.info-toggle:not(.info-toggle-standalone) .info-toggle-inhalt {
+.info-toggle .info-toggle-inhalt {
   margin-top: 0;
   flex: 1 1 auto;
 }
@@ -365,25 +367,6 @@ label {
 
 .info-toggle-inhalt p:last-child {
   margin-bottom: 0;
-}
-
-/* Variante für Icons, die nicht neben einem Feld-Label stehen, sondern für
-   sich als eigene Zeile -- Summary ist dann breiter (Icon + Kurztext) statt
-   nur ein rundes Icon. */
-.info-toggle-standalone {
-  display: block;
-  margin: 0.5rem 0;
-}
-
-/* Bewusst kein Linkstil (Akzentfarbe + Hover-Unterstreichung, wie z. B.
-   .link-btn) -- das Icon allein soll als Klick-Hinweis reichen, der Teaser-
-   Text ist normaler Text, kein zweiter, optisch widersprüchlicher
-   "Klick-mich"-Hinweis daneben. */
-.info-toggle-standalone summary {
-  padding: 0.4rem 0.2rem;
-  font-size: 0.85rem;
-  font-weight: 500;
-  color: var(--color-text);
 }
 
 .field-error {
