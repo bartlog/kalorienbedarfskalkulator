@@ -79,7 +79,7 @@
         <div class="field">
           <div class="field-label-row">
             <label class="checkbox-label"><input type="checkbox" id="laufAktiv"> <span data-i18n="lauf_label">Davon gelaufen / gejoggt</span></label>
-            <details class="info-toggle info-toggle-wichtig">
+            <details class="info-toggle">
               <summary data-i18n-attr-aria-label="info_aria_lauf"><span class="info-icon" aria-hidden="true">i</span></summary>
               <div class="info-toggle-inhalt" data-i18n="lauf_km_hint">
                 Zähl deine Gesamtschritte oben weiterhin genau so, wie dein Tracker sie anzeigt. Trage hier deine
@@ -98,7 +98,7 @@
         <div class="field">
           <div class="field-label-row">
             <label for="sportHaeufigkeit" data-i18n="feld_sport_haeufigkeit_label">Sport / Training (Häufigkeit pro Woche)</label>
-            <details class="info-toggle info-toggle-wichtig">
+            <details class="info-toggle">
               <summary data-i18n-attr-aria-label="info_aria_sport_haeufigkeit"><span class="info-icon" aria-hidden="true">i</span></summary>
               <div class="info-toggle-inhalt">
                 <p data-i18n="feld_sport_haeufigkeit_hint">Häufigkeit deines regelmäßigen Sports, zusätzlich zur Alltagsaktivität oben.</p>
@@ -159,7 +159,7 @@
 
           <fieldset class="field-group">
             <legend data-i18n="sport_legend">Sport / Training</legend>
-            <details class="info-toggle info-toggle-standalone info-toggle-wichtig">
+            <details class="info-toggle info-toggle-standalone">
               <summary data-i18n-attr-aria-label="info_aria_sport_training"><span class="info-icon" aria-hidden="true">i</span><span data-i18n="sport_hint_kurz"> Genauere Eingabe statt Häufigkeits-Schätzung</span></summary>
               <div class="info-toggle-inhalt" data-i18n="sport_hint">
                 Falls du deine Trainingsdaten genau kennst, kannst du sie hier präzise angeben — das
@@ -175,7 +175,7 @@
               <div class="field">
                 <div class="field-label-row">
                   <label class="checkbox-label"><input type="checkbox" id="traegtTrackerBeimSport" checked> <span data-i18n="traegt_tracker_label">Ich trage meinen Schrittzähler auch beim hier eingetragenen Sport</span></label>
-                  <details class="info-toggle info-toggle-wichtig">
+                  <details class="info-toggle">
                     <summary data-i18n-attr-aria-label="info_aria_tracker"><span class="info-icon" aria-hidden="true">i</span></summary>
                     <div class="info-toggle-inhalt" data-i18n="traegt_tracker_hint">
                       Aktiv: Laufen, Gehen/Wandern und Ballsportarten unten werden anteilig von deiner Schrittzahl
@@ -185,7 +185,7 @@
                   </details>
                 </div>
               </div>
-              <details class="info-toggle info-toggle-standalone info-toggle-wichtig" id="hinweis-lauf-met" hidden>
+              <details class="info-toggle info-toggle-standalone" id="hinweis-lauf-met" hidden>
                 <summary data-i18n-attr-aria-label="info_aria_lauf_met"><span class="info-icon" aria-hidden="true">i</span><span data-i18n="hinweis_lauf_met_kurz"> Lauf-km oben werden berücksichtigt</span></summary>
                 <div class="info-toggle-inhalt" data-i18n="hinweis_lauf_met">
                   Wenn du hier kein Laufen einträgst, werden deine oben angegebenen Lauf-Kilometer berücksichtigt.
@@ -217,33 +217,60 @@
             <legend data-i18n="weitere_legend">Weitere Faktoren</legend>
 
             <div class="field" id="feld-schwangerschaft">
-              <label for="schwangerschaftStillzeit" data-i18n="schwangerschaft_label">Schwangerschaft / Stillzeit</label>
+              <div class="field-label-row">
+                <label for="schwangerschaftStillzeit" data-i18n="schwangerschaft_label">Schwangerschaft / Stillzeit</label>
+                <details class="info-toggle">
+                  <summary data-i18n-attr-aria-label="info_aria_schwangerschaft"><span class="info-icon" aria-hidden="true">i</span></summary>
+                  <div class="info-toggle-inhalt" data-i18n="schwangerschaft_hint">Erhöht deinen täglichen Gesamtenergieverbrauch spürbar (Schwangerschaft ca. +250 kcal/Tag, Stillzeit ca. +500 kcal/Tag).</div>
+                </details>
+                <details class="info-toggle info-toggle-wichtig">
+                  <summary data-i18n-attr-aria-label="info_aria_schwangerschaft_warnung"><span class="info-icon" aria-hidden="true">!</span></summary>
+                  <div class="info-toggle-inhalt"><strong data-i18n="hinweis_fachpersonal_kurz">Ersetzt keine individuelle Beratung durch qualifiziertes Fachpersonal.</strong></div>
+                </details>
+              </div>
               <select id="schwangerschaftStillzeit">
                 <option value="" data-i18n="schwangerschaft_opt_keine">Keine Angabe</option>
                 <option value="schwanger" data-i18n="schwangerschaft_opt_schwanger">Schwangerschaft</option>
                 <option value="stillzeit" data-i18n="schwangerschaft_opt_stillzeit">Stillzeit</option>
               </select>
-              <p class="field-hint" data-i18n="schwangerschaft_hint">Erhöht deinen täglichen Gesamtenergieverbrauch spürbar (Schwangerschaft ca. +250 kcal/Tag, Stillzeit ca. +500 kcal/Tag).</p>
-              <p class="field-hint disclaimer-inline" data-i18n="hinweis_fachpersonal_kurz">Ersetzt keine individuelle Beratung durch qualifiziertes Fachpersonal.</p>
             </div>
 
             <div class="field">
-              <label class="checkbox-label"><input type="checkbox" id="adaptiveThermogenese"> <span data-i18n="diaet_label">Seit längerem in Diät / Kalorienrestriktion</span></label>
-              <p class="field-hint" data-i18n="diaet_hint">Senkt den Grundumsatz um ca. 5–10 % (adaptive Thermogenese).</p>
-            </div>
-
-            <div class="field">
-              <label class="checkbox-label"><input type="checkbox" id="schilddruseAktiv"> <span data-i18n="schilddruese_label">Ärztlich diagnostizierte Schilddrüsen-Erkrankung</span></label>
-              <div class="field sub-field" id="feld-schilddruse" hidden>
-                <label for="schilddruseProzent" data-i18n="schilddruese_prozent_label">Abweichung vom Grundumsatz laut Diagnose (%)</label>
-                <input type="number" id="schilddruseProzent" min="-10" max="30" step="1">
-                <p class="field-hint disclaimer-inline" data-i18n="hinweis_fachpersonal_kurz">Ersetzt keine individuelle Beratung durch qualifiziertes Fachpersonal.</p>
+              <div class="field-label-row">
+                <label class="checkbox-label"><input type="checkbox" id="adaptiveThermogenese"> <span data-i18n="diaet_label">Seit längerem in Diät / Kalorienrestriktion</span></label>
+                <details class="info-toggle">
+                  <summary data-i18n-attr-aria-label="info_aria_diaet"><span class="info-icon" aria-hidden="true">i</span></summary>
+                  <div class="info-toggle-inhalt" data-i18n="diaet_hint">Senkt den Grundumsatz um ca. 5–10 % (adaptive Thermogenese).</div>
+                </details>
               </div>
             </div>
 
             <div class="field">
-              <label class="checkbox-label"><input type="checkbox" id="betaBlockerAktiv"> <span data-i18n="betablocker_label">Einnahme von Beta-Blockern</span></label>
-              <p class="field-hint" data-i18n="betablocker_hint">Kann den täglichen Gesamtenergieverbrauch leicht senken (ca. 50–100 kcal/Tag) — dauerhaft wirksam, daher trotz der kleinen Größenordnung eingerechnet.</p>
+              <div class="field-label-row">
+                <label class="checkbox-label"><input type="checkbox" id="schilddruseAktiv"> <span data-i18n="schilddruese_label">Ärztlich diagnostizierte Schilddrüsen-Erkrankung</span></label>
+                <details class="info-toggle">
+                  <summary data-i18n-attr-aria-label="info_aria_schilddruese"><span class="info-icon" aria-hidden="true">i</span></summary>
+                  <div class="info-toggle-inhalt" data-i18n="schilddruese_hint">Schilddrüsenerkrankungen (Über- oder Unterfunktion) können den Grundumsatz messbar verändern. Da die Abweichung individuell sehr unterschiedlich ausfällt, trägst du hier den Prozentwert aus deiner ärztlichen Diagnose direkt ein, statt dass er pauschal geschätzt wird.</div>
+                </details>
+                <details class="info-toggle info-toggle-wichtig">
+                  <summary data-i18n-attr-aria-label="info_aria_schilddruese_warnung"><span class="info-icon" aria-hidden="true">!</span></summary>
+                  <div class="info-toggle-inhalt"><strong data-i18n="hinweis_fachpersonal_kurz">Ersetzt keine individuelle Beratung durch qualifiziertes Fachpersonal.</strong></div>
+                </details>
+              </div>
+              <div class="field sub-field" id="feld-schilddruse" hidden>
+                <label for="schilddruseProzent" data-i18n="schilddruese_prozent_label">Abweichung vom Grundumsatz laut Diagnose (%)</label>
+                <input type="number" id="schilddruseProzent" min="-10" max="30" step="1">
+              </div>
+            </div>
+
+            <div class="field">
+              <div class="field-label-row">
+                <label class="checkbox-label"><input type="checkbox" id="betaBlockerAktiv"> <span data-i18n="betablocker_label">Einnahme von Beta-Blockern</span></label>
+                <details class="info-toggle">
+                  <summary data-i18n-attr-aria-label="info_aria_betablocker"><span class="info-icon" aria-hidden="true">i</span></summary>
+                  <div class="info-toggle-inhalt" data-i18n="betablocker_hint">Kann den täglichen Gesamtenergieverbrauch leicht senken (ca. 50–100 kcal/Tag) — dauerhaft wirksam, daher trotz der kleinen Größenordnung eingerechnet.</div>
+                </details>
+              </div>
             </div>
 
             <div class="field">
@@ -257,9 +284,17 @@
             </div>
 
             <div class="field">
-              <label class="checkbox-label"><input type="checkbox" id="fieberAktiv"> <span data-i18n="fieber_label">Aktuell Fieber</span></label>
-              <p class="field-hint" data-i18n="fieber_hint">Erhöht den Grundumsatz spürbar (ca. +10–13 % pro °C Körperkerntemperatur über 37 °C).</p>
-              <p class="field-hint disclaimer-inline" data-i18n="hinweis_fachpersonal_kurz">Ersetzt keine individuelle Beratung durch qualifiziertes Fachpersonal.</p>
+              <div class="field-label-row">
+                <label class="checkbox-label"><input type="checkbox" id="fieberAktiv"> <span data-i18n="fieber_label">Aktuell Fieber</span></label>
+                <details class="info-toggle">
+                  <summary data-i18n-attr-aria-label="info_aria_fieber"><span class="info-icon" aria-hidden="true">i</span></summary>
+                  <div class="info-toggle-inhalt" data-i18n="fieber_hint">Erhöht den Grundumsatz spürbar (ca. +10–13 % pro °C Körperkerntemperatur über 37 °C).</div>
+                </details>
+                <details class="info-toggle info-toggle-wichtig">
+                  <summary data-i18n-attr-aria-label="info_aria_fieber_warnung"><span class="info-icon" aria-hidden="true">!</span></summary>
+                  <div class="info-toggle-inhalt"><strong data-i18n="hinweis_fachpersonal_kurz">Ersetzt keine individuelle Beratung durch qualifiziertes Fachpersonal.</strong></div>
+                </details>
+              </div>
               <div class="field sub-field" id="feld-fieber" hidden>
                 <label for="fieberTemperatur" data-i18n="fieber_temp_label">Körpertemperatur (°C)</label>
                 <input type="number" id="fieberTemperatur" min="35" max="45" step="0.1" aria-describedby="error-fieber">

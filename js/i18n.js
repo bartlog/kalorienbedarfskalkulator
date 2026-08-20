@@ -30,6 +30,17 @@ window.KBR.i18n = (function () {
     info_aria_lauf_met: { de: "Mehr Informationen zur Lauf-km/MET-Erkennung", en: "More information about running km/MET detection" },
     info_aria_met: { de: "Mehr Informationen zu MET-Aktivitäten", en: "More information about MET activities" },
     info_aria_fidgeting: { de: "Mehr Informationen zu Spontanbewegung", en: "More information about spontaneous movement" },
+    info_aria_diaet: { de: "Mehr Informationen zu Diät / Kalorienrestriktion", en: "More information about diet / calorie restriction" },
+    info_aria_betablocker: { de: "Mehr Informationen zu Beta-Blockern", en: "More information about beta blockers" },
+    info_aria_fieber: { de: "Mehr Informationen zu Fieber", en: "More information about fever" },
+    info_aria_schwangerschaft: { de: "Mehr Informationen zu Schwangerschaft/Stillzeit", en: "More information about pregnancy/breastfeeding" },
+    info_aria_schilddruese: { de: "Mehr Informationen zu Schilddrüsen-Erkrankung", en: "More information about thyroid conditions" },
+    // Warnhinweis-Icons (rot) bekommen ein eigenes aria-label-Muster statt
+    // "Mehr Informationen zu..." -- macht die Kategorie (Warnung statt
+    // Zusatzinfo) auch für Screenreader-Nutzer eindeutig, nicht nur über Farbe.
+    info_aria_schilddruese_warnung: { de: "Warnhinweis zu Schilddrüse", en: "Warning: thyroid" },
+    info_aria_fieber_warnung: { de: "Warnhinweis zu Fieber", en: "Warning: fever" },
+    info_aria_schwangerschaft_warnung: { de: "Warnhinweis zu Schwangerschaft/Stillzeit", en: "Warning: pregnancy/breastfeeding" },
 
     // ---- Tabs ---------------------------------------------------------------
     tab_rechner: { de: "Rechner", en: "Calculator" },
@@ -73,11 +84,11 @@ window.KBR.i18n = (function () {
     lauf_km_label: { de: "Kilometer pro Woche", en: "Kilometers per week" },
     lauf_km_hint: {
       de: `Trage hier deine wöchentlichen Lauf-Kilometer ein. Trägst du denselben Lauf unten bei der genauen
-        MET-Berechnung ein, erkennt der Rechner das automatisch und rechnet darüber statt mit der einfachen
-        Kilometer-Faustregel.`,
+        MET-Berechnung ein, <strong>erkennt der Rechner das automatisch und rechnet darüber statt mit der einfachen
+        Kilometer-Faustregel</strong>.`,
       en: `Enter your weekly running kilometers here. If you also log the same run below under the precise MET
-        calculation, the calculator detects this automatically and uses that instead of the simple kilometer rule
-        of thumb.`,
+        calculation, <strong>the calculator detects this automatically and uses that instead of the simple
+        kilometer rule of thumb</strong>.`,
     },
     feld_sport_haeufigkeit_label: {
       de: "Sport / Training (Häufigkeit pro Woche)",
@@ -93,10 +104,10 @@ window.KBR.i18n = (function () {
       en: "Frequency of your regular exercise, in addition to the daily activity above.",
     },
     sport_haeufigkeit_doppelzaehlung_warnung: {
-      de: `Gilt nur für Sport, der nicht wesentlich zu deiner Schrittzahl oben beiträgt (z. B. Radfahren, Schwimmen,
-        Krafttraining, Yoga).`,
-      en: `Only applies to exercise that doesn't meaningfully add to your step count above (e.g. cycling, swimming,
-        strength training, yoga).`,
+      de: `<strong>Gilt nur für Sport, der nicht wesentlich zu deiner Schrittzahl oben beiträgt (z. B. Radfahren,
+        Schwimmen, Krafttraining, Yoga).</strong>`,
+      en: `<strong>Only applies to exercise that doesn't meaningfully add to your step count above (e.g. cycling,
+        swimming, strength training, yoga).</strong>`,
     },
     // Kompakte, immer sichtbare Kurzübersicht direkt vor dem NEAT-Feld (Beginn des
     // Aktivitäts-Blocks) — nennt die Doppelzählungs-Regel einmal, damit die
@@ -228,6 +239,14 @@ window.KBR.i18n = (function () {
     schilddruese_prozent_label: {
       de: "Abweichung vom Grundumsatz laut Diagnose (%)",
       en: "Deviation from resting energy expenditure per diagnosis (%)",
+    },
+    schilddruese_hint: {
+      de: `Schilddrüsenerkrankungen (Über- oder Unterfunktion) können den Grundumsatz messbar verändern. Da die
+        Abweichung individuell sehr unterschiedlich ausfällt, trägst du hier den Prozentwert aus deiner ärztlichen
+        Diagnose direkt ein, statt dass er pauschal geschätzt wird.`,
+      en: `Thyroid conditions (hyper- or hypothyroidism) can measurably change resting energy expenditure. Because
+        the deviation varies a lot from person to person, you enter the percentage from your medical diagnosis
+        directly here instead of it being estimated generically.`,
     },
     // Kurzmarkierung für Risikostellen (Schilddrüse, Schwangerschaft/Stillzeit,
     // Fieber) — kurze Variante des disclaimer-Kernsatzes oben, überall identisch
