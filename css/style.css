@@ -253,26 +253,36 @@ label {
   vertical-align: middle;
 }
 
-/* Icon + aufgeklappte Box nebeneinander statt untereinander -- die eigentliche
-   Wirkung entsteht im Zusammenspiel mit .field-label-row (flex-wrap:wrap):
-   ein geöffnetes .info-toggle wird durch die Box breiter und passt dann nicht
-   mehr neben Label/andere Icons auf dieselbe Zeile -- es rutscht als Ganzes
-   (Icon + Box zusammen, da beide jetzt ein Flex-Paar sind) in eine eigene
-   Zeile. Geschlossene Icons (nur das kompakte Icon sichtbar) bleiben oben
-   neben dem Label stehen. Bei mehreren geöffneten Icons in derselben Zeile
-   landet jedes -- in Dokumentreihenfolge -- auf seiner eigenen neuen Zeile.
-   Gilt nicht für .info-toggle-standalone (Sport-Training-Pille, Lauf-km-MET-
-   Status): deren Box ist bewusst volle Breite unter dem längeren Teaser-Text,
-   nicht neben einem einzelnen Icon. */
+/* Icon + aufgeklappte Box nebeneinander statt untereinander. */
 .info-toggle:not(.info-toggle-standalone) {
   display: inline-flex;
   align-items: flex-start;
   gap: 0.6rem;
 }
 
+/* Erzwingt den Zeilenumbruch: ein geöffnetes Icon beansprucht laut flex-basis
+   die gesamte Breite von .field-label-row, statt nur so viel Platz wie
+   Icon+Box tatsächlich brauchen -- dadurch passt garantiert nichts anderes
+   mehr auf dieselbe Zeile, unabhängig von der verfügbaren Breite (reines
+   "es ist zu breit"-Wrapping hätte bei schmalem Label + kurzer Box sonst
+   manchmal noch Platz auf der Label-Zeile gefunden). order:1 schiebt es
+   zusätzlich hinter ALLE noch geschlossenen Icons in der visuellen
+   Reihenfolge (die bleiben bei ihrem Default order:0) -- ohne das würde ein
+   100%-breites Element automatisch auch alles nach ihm im DOM auf eine neue
+   Zeile verdrängen, selbst noch geschlossene, kompakte Icons, die eigentlich
+   oben neben dem Label stehen bleiben sollen. Öffnet man ein zweites Icon,
+   wechselt auch das zu order:1 und rutscht -- da beide order:1 sind, in
+   Dokumentreihenfolge sortiert -- unter die Box des zuerst geöffneten. */
+.info-toggle:not(.info-toggle-standalone)[open] {
+  order: 1;
+  flex: 1 1 100%;
+}
+
+/* Box füllt die gesamte verbleibende Breite neben dem Icon (nicht nur eine
+   feste, schmale Spalte). */
 .info-toggle:not(.info-toggle-standalone) .info-toggle-inhalt {
   margin-top: 0;
-  max-width: 320px;
+  flex: 1 1 auto;
 }
 
 .info-toggle summary {
@@ -365,15 +375,15 @@ label {
   margin: 0.5rem 0;
 }
 
+/* Bewusst kein Linkstil (Akzentfarbe + Hover-Unterstreichung, wie z. B.
+   .link-btn) -- das Icon allein soll als Klick-Hinweis reichen, der Teaser-
+   Text ist normaler Text, kein zweiter, optisch widersprüchlicher
+   "Klick-mich"-Hinweis daneben. */
 .info-toggle-standalone summary {
   padding: 0.4rem 0.2rem;
   font-size: 0.85rem;
   font-weight: 500;
-  color: var(--color-accent);
-}
-
-.info-toggle-standalone summary:hover {
-  text-decoration: underline;
+  color: var(--color-text);
 }
 
 .field-error {
