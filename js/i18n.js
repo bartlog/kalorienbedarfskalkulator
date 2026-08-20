@@ -128,8 +128,8 @@ window.KBR.i18n = (function () {
       en: "How the calculator handles your weekly average",
     },
     neat_sport_aequivalenz_text: {
-      de: "Der Rechner ermittelt deinen durchschnittlichen Wochen-Tagesbedarf. 10.000 Schritte im Alltag verbrennen oft ähnlich viel Energie wie eine intensive Sporteinheit — solange dein Wochenmittel aus Bewegung und Sport konstant bleibt, passt die Berechnung.",
-      en: "This calculator determines your average daily needs over the week. 10,000 daily steps often burn a similar amount of energy to an intense workout — as long as your weekly average of movement and exercise stays consistent, the calculation holds.",
+      de: "Der Rechner ermittelt deinen durchschnittlichen Tagesbedarf. 10.000 Schritte im Alltag verbrennen oft ähnlich viel Energie wie eine intensive Sporteinheit — solange dein Wochenmittel aus Bewegung und Sport konstant bleibt, passt die Berechnung.",
+      en: "This calculator determines your average daily needs. 10,000 daily steps often burn a similar amount of energy to an intense workout — as long as your weekly average of movement and exercise stays consistent, the calculation holds.",
     },
     feld_ziel_label: { de: "Ziel", en: "Goal" },
     ziel_opt_lose: { de: "Gewicht verlieren", en: "Lose weight" },
@@ -142,6 +142,10 @@ window.KBR.i18n = (function () {
       en: "Advanced details — fill in only if known",
     },
     ffm_legend: { de: "Fettfreie Masse (FFM)", en: "Fat-free mass (FFM)" },
+    ffm_teaser: {
+      de: "Genauere Eingabe statt Körperkompositions-Schätzung",
+      en: "More precise entry instead of a body-composition estimate",
+    },
     ffm_hint: {
       de: "Falls bekannt, ermöglicht das eine präzisere Formel (Cunningham 1991 / Katch-McArdle).",
       en: "If known, this enables a more precise formula (Cunningham 1991 / Katch-McArdle).",
@@ -229,8 +233,8 @@ window.KBR.i18n = (function () {
     schwangerschaft_opt_schwanger: { de: "Schwangerschaft", en: "Pregnancy" },
     schwangerschaft_opt_stillzeit: { de: "Stillzeit", en: "Breastfeeding" },
     schwangerschaft_hint: {
-      de: "Erhöht deinen täglichen Gesamtenergieverbrauch spürbar (Schwangerschaft ca. +250 kcal/Tag, Stillzeit ca. +500 kcal/Tag).",
-      en: "Noticeably increases your total daily energy expenditure (pregnancy approx. +250 kcal/day, breastfeeding approx. +500 kcal/day).",
+      de: "Erhöht deinen täglichen Gesamtumsatz spürbar (Schwangerschaft ca. +250 kcal/Tag, Stillzeit ca. +500 kcal/Tag).",
+      en: "Noticeably increases your total energy expenditure (pregnancy approx. +250 kcal/day, breastfeeding approx. +500 kcal/day).",
     },
     diaet_label: {
       de: "Seit längerem in Diät / Kalorienrestriktion",
@@ -267,16 +271,16 @@ window.KBR.i18n = (function () {
     },
     betablocker_label: { de: "Einnahme von Beta-Blockern", en: "Taking beta blockers" },
     betablocker_hint: {
-      de: "Kann den täglichen Gesamtenergieverbrauch leicht senken (ca. 50–100 kcal/Tag) — dauerhaft wirksam, daher trotz der kleinen Größenordnung eingerechnet.",
-      en: "May slightly lower your total daily energy expenditure (approx. 50–100 kcal/day) — has a chronic effect, so it's factored in despite the small magnitude.",
+      de: "Kann den täglichen Gesamtumsatz leicht senken (ca. 50–100 kcal/Tag) — dauerhaft wirksam, daher trotz der kleinen Größenordnung eingerechnet.",
+      en: "May slightly lower your total energy expenditure (approx. 50–100 kcal/day) — has a chronic effect, so it's factored in despite the small magnitude.",
     },
     fidgeting_label: {
       de: "Auffällig viel unbewusste Bewegung / Zappeln",
       en: "Noticeably high unconscious movement / fidgeting",
     },
     fidgeting_hint: {
-      de: "Erhöht deinen täglichen Gesamtenergieverbrauch leicht.",
-      en: "Slightly increases your total daily energy expenditure.",
+      de: "Erhöht deinen täglichen Gesamtumsatz leicht.",
+      en: "Slightly increases your total energy expenditure.",
     },
     fieber_label: { de: "Aktuell Fieber", en: "Currently have a fever" },
     fieber_hint: {

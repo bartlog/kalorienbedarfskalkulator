@@ -121,7 +121,7 @@
           <details class="info-toggle">
             <summary data-i18n-attr-aria-label="info_aria_wochenmittel"><span class="info-icon" aria-hidden="true">i</span></summary>
             <div class="info-toggle-inhalt" data-i18n="neat_sport_aequivalenz_text">
-              Der Rechner ermittelt deinen durchschnittlichen Wochen-Tagesbedarf. 10.000 Schritte im Alltag verbrennen oft
+              Der Rechner ermittelt deinen durchschnittlichen Tagesbedarf. 10.000 Schritte im Alltag verbrennen oft
               ähnlich viel Energie wie eine intensive Sporteinheit — solange dein Wochenmittel aus Bewegung und Sport
               konstant bleibt, passt die Berechnung.
             </div>
@@ -142,10 +142,13 @@
 
           <fieldset class="field-group">
             <legend data-i18n="ffm_legend">Fettfreie Masse (FFM)</legend>
-            <details class="info-toggle">
-              <summary data-i18n-attr-aria-label="info_aria_ffm"><span class="info-icon" aria-hidden="true">i</span></summary>
-              <div class="info-toggle-inhalt" data-i18n="ffm_hint">Falls bekannt, ermöglicht das eine präzisere Formel (Cunningham 1991 / Katch-McArdle).</div>
-            </details>
+            <div class="field-label-row">
+              <span data-i18n="ffm_teaser">Genauere Eingabe statt Körperkompositions-Schätzung</span>
+              <details class="info-toggle">
+                <summary data-i18n-attr-aria-label="info_aria_ffm"><span class="info-icon" aria-hidden="true">i</span></summary>
+                <div class="info-toggle-inhalt" data-i18n="ffm_hint">Falls bekannt, ermöglicht das eine präzisere Formel (Cunningham 1991 / Katch-McArdle).</div>
+              </details>
+            </div>
             <div class="radio-group vertical">
               <label><input type="radio" name="ffmModus" value="keine" checked> <span data-i18n="ffm_opt_keine">Keine Angabe</span></label>
               <label><input type="radio" name="ffmModus" value="direkt"> <span data-i18n="ffm_opt_direkt">FFM direkt bekannt (z. B. DXA/BIA/ADP)</span></label>
@@ -236,7 +239,7 @@
                 <label for="schwangerschaftStillzeit" data-i18n="schwangerschaft_label">Schwangerschaft / Stillzeit</label>
                 <details class="info-toggle">
                   <summary data-i18n-attr-aria-label="info_aria_schwangerschaft"><span class="info-icon" aria-hidden="true">i</span></summary>
-                  <div class="info-toggle-inhalt" data-i18n="schwangerschaft_hint">Erhöht deinen täglichen Gesamtenergieverbrauch spürbar (Schwangerschaft ca. +250 kcal/Tag, Stillzeit ca. +500 kcal/Tag).</div>
+                  <div class="info-toggle-inhalt" data-i18n="schwangerschaft_hint">Erhöht deinen täglichen Gesamtumsatz spürbar (Schwangerschaft ca. +250 kcal/Tag, Stillzeit ca. +500 kcal/Tag).</div>
                 </details>
                 <details class="info-toggle info-toggle-wichtig">
                   <summary data-i18n-attr-aria-label="info_aria_schwangerschaft_warnung"><span class="info-icon" aria-hidden="true">!</span></summary>
@@ -283,7 +286,7 @@
                 <label class="checkbox-label"><input type="checkbox" id="betaBlockerAktiv"> <span data-i18n="betablocker_label">Einnahme von Beta-Blockern</span></label>
                 <details class="info-toggle">
                   <summary data-i18n-attr-aria-label="info_aria_betablocker"><span class="info-icon" aria-hidden="true">i</span></summary>
-                  <div class="info-toggle-inhalt" data-i18n="betablocker_hint">Kann den täglichen Gesamtenergieverbrauch leicht senken (ca. 50–100 kcal/Tag) — dauerhaft wirksam, daher trotz der kleinen Größenordnung eingerechnet.</div>
+                  <div class="info-toggle-inhalt" data-i18n="betablocker_hint">Kann den täglichen Gesamtumsatz leicht senken (ca. 50–100 kcal/Tag) — dauerhaft wirksam, daher trotz der kleinen Größenordnung eingerechnet.</div>
                 </details>
               </div>
             </div>
@@ -293,7 +296,7 @@
                 <label class="checkbox-label"><input type="checkbox" id="fidgetingAktiv"> <span data-i18n="fidgeting_label">Auffällig viel unbewusste Bewegung / Zappeln</span></label>
                 <details class="info-toggle">
                   <summary data-i18n-attr-aria-label="info_aria_fidgeting"><span class="info-icon" aria-hidden="true">i</span></summary>
-                  <div class="info-toggle-inhalt" data-i18n="fidgeting_hint">Erhöht deinen täglichen Gesamtenergieverbrauch leicht.</div>
+                  <div class="info-toggle-inhalt" data-i18n="fidgeting_hint">Erhöht deinen täglichen Gesamtumsatz leicht.</div>
                 </details>
               </div>
             </div>
