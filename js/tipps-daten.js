@@ -598,6 +598,11 @@ window.KBR.tipps = (function () {
         },
         {
           stufe: "gut",
+          de: ["TMG Betain (2,5 g/Tag)", "Dient als Osmolyt zur Muskelzellhydratation und Methyl-Donator; steigert die Kraftausdauer und das Trainingsvolumen bei Verbundübungen."],
+          en: ["TMG betaine (2.5 g/day)", "Acts as an osmolyte for muscle cell hydration and a methyl donor; increases strength endurance and training volume on compound lifts."],
+        },
+        {
+          stufe: "gut",
           de: ["Kälteexposition morgens (z. B. 1-3 Minuten kalt duschen) oder vor dem Training (statt danach)", "Aktiviert das braune Fettgewebe zur Erhöhung der Thermogenese, löst eine lang anhaltende Erhöhung von Dopamin und Noradrenalin (+250 %) aus, steigert die mentale Belastbarkeit und erhöht die Alertness, ohne anabole Signale des Krafttrainings zu beeinträchtigen."],
           en: ["Morning cold exposure (e.g. a 1–3 minute cold shower) or before training (rather than after)", "Activates brown adipose tissue to increase thermogenesis, triggers a long-lasting rise in dopamine and norepinephrine (+250%), boosts mental resilience and alertness, without interfering with the anabolic signaling of strength training."],
         },
@@ -610,6 +615,11 @@ window.KBR.tipps = (function () {
           stufe: "ok",
           de: ["L-Citrullin / Citrullin-Malat (6–8 g)", "Erhöht als L-Arginin-Vorläufer die Stickstoffmonoxid-Synthese für bessere Muskeldurchblutung und puffert saure Stoffwechselnebenprodukte bei hoher Trainingsintensität."],
           en: ["L-citrulline / citrulline malate (6–8 g)", "As a precursor to L-arginine, increases nitric oxide synthesis for better muscle blood flow and buffers acidic metabolic byproducts during high-intensity training."],
+        },
+        {
+          stufe: "ok",
+          de: ["HMB (β-Hydroxy-β-Methylbutyrat; 3 g/Tag)", "Schützt die Muskelmasse vor allem bei Trainingsanfängern, Senioren oder in sehr aggressiven Diätphasen vor Abbau."],
+          en: ["HMB (β-hydroxy-β-methylbutyrate; 3 g/day)", "Protects muscle mass from breakdown, especially for training beginners, older adults, or during very aggressive diet phases."],
         },
         {
           stufe: "ok",
