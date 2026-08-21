@@ -177,6 +177,11 @@ window.KBR.tipps = (function () {
         },
         {
           stufe: "top",
+          de: ["Hefeflocken / Edelhefe (\"Nutritional Yeast\")", "Extrem hohe Proteindichte (~50 % Protein mit allen EAAs); reich an Beta-Glucanen zur Entzündungshemmung und Darmstärkung; liefert B-Vitamine für den Energiestoffwechsel; perfekter fett- und kaloriensparender Käse-/Umami-Ersatz."],
+          en: ["Nutritional yeast (\"Hefeflocken\")", "Extremely high protein density (~50% protein with all EAAs); rich in beta-glucans for anti-inflammatory and gut-supporting effects; supplies B vitamins for energy metabolism; a perfect low-fat, low-calorie cheese/umami substitute."],
+        },
+        {
+          stufe: "top",
           de: ["Speisepilze (z. B. Kräuterseitlinge, Pfifferlinge, Shiitake, Champignons)", "Bieten extrem hohes Magenvolumen und Sättigung bei minimaler Kaloriendichte (ideal im Defizit). Reich an Beta-Glucanen und Ergothionein – einem mächtigen zellulären Antioxidans zur Reduktion von oxidativem Stress."],
           en: ["Edible mushrooms (e.g. king oyster, chanterelle, shiitake, button mushrooms)", "Offer extremely high stomach volume and satiety at minimal calorie density (ideal in a deficit). Rich in beta-glucans and ergothioneine — a powerful cellular antioxidant that reduces oxidative stress."],
         },
@@ -247,8 +252,33 @@ window.KBR.tipps = (function () {
         },
         {
           stufe: "gut",
-          de: ["Walnüsse, Mandeln", "Nährstoffdichte Quellen für pflanzliche Omega-3-Fettsäuren, Magnesium und Polyphenole; wirken entzündungshemmend bei hoher Energiedichte."],
-          en: ["Walnuts, almonds", "Nutrient-dense sources of plant-based omega-3 fatty acids, magnesium, and polyphenols; anti-inflammatory but energy-dense."],
+          de: ["Macadamia-Nüsse (idealerweise roh/ungesalzen)", "Höchster Anteil an einfach ungesättigten Fettsäuren (MUFA & Omega-7) bei minimalem Omega-6-Gehalt; wirkt stark entzündungshemmend und insulinsensitivierend (sehr hohe Kaloriendichte beachten)."],
+          en: ["Macadamia nuts (ideally raw/unsalted)", "Highest proportion of monounsaturated fatty acids (MUFA & omega-7) at minimal omega-6 content; strongly anti-inflammatory and insulin-sensitizing (note the very high calorie density)."],
+        },
+        {
+          stufe: "gut",
+          de: ["Pistazien (idealerweise roh/ungesalzen)", "Vollständiges pflanzliches Protein (hoher EAA/BCAA-Gehalt); geringere Kaloriendichte als andere Nüsse; senkt Entzündungsmarker (IL-6, CRP); das manuelle Entfernen aus der Schale entschleunigt die Nahrungsaufnahme."],
+          en: ["Pistachios (ideally raw/unsalted)", "Complete plant protein (high EAA/BCAA content); lower calorie density than other nuts; lowers inflammation markers (IL-6, CRP); manually shelling them slows down eating."],
+        },
+        {
+          stufe: "gut",
+          de: ["Mandeln (idealerweise roh/ungesalzen, mit Haut)", "Hervorragende Quelle für Vitamin E (Alpha-Tocopherol), Magnesium und Ballaststoffe; glättet postprandiale Blutzuckerkurven, verbessert das LDL-Profil und bietet eine sehr hohe Sättigungswirkung pro Kalorie."],
+          en: ["Almonds (ideally raw/unsalted, with skin)", "Excellent source of vitamin E (alpha-tocopherol), magnesium, and fiber; flattens post-meal blood sugar curves, improves LDL profile, and offers very high satiety per calorie."],
+        },
+        {
+          stufe: "gut",
+          de: ["Walnüsse (idealerweise roh/ungesalzen)", "Höchster Gehalt an pflanzlicher Omega-3-Fettsäure (ALA) aller Nüsse; reich an Polyphenolen (Ellagitanninen); senkt Entzündungsmarker (CRP, IL-6), fördert die Mikrobiom-Diversität und schützt die Endothelfunktion."],
+          en: ["Walnuts (ideally raw/unsalted)", "Highest content of plant-based omega-3 fatty acid (ALA) of all nuts; rich in polyphenols (ellagitannins); lowers inflammation markers (CRP, IL-6), promotes microbiome diversity, and protects endothelial function."],
+        },
+        {
+          stufe: "gut",
+          de: ["Mandelmus oder Macadamiamus (100% – ohne Zucker & ungesalzen)", "Liefert hochreine MUFA-Fettsäuren und Vitamin E; durch zerstörte Zellwände jedoch 100 % Kalorienabsorption und geringerer Kauseffekt (strikte Portionskontrolle nötig)."],
+          en: ["Almond butter or macadamia butter (100% – no added sugar & unsalted)", "Supplies highly pure MUFA fatty acids and vitamin E; but due to broken-down cell walls, 100% calorie absorption and less chewing effect (strict portion control needed)."],
+        },
+        {
+          stufe: "gut",
+          de: ["Biltong & Jerky (Beef/Chicken – ohne Zuckerzusatz)", "Höchste Proteindichte (~50g/100g), gut für unterwegs; löst ohne Zucker keine Insulinspitzen aus; hoher Natriumgehalt erfordert jedoch Maß beim täglichen Konsum."],
+          en: ["Biltong & jerky (beef/chicken – no added sugar)", "Highest protein density (~50g/100g), good for on the go; without sugar it doesn't trigger insulin spikes; high sodium content requires moderation in daily consumption."],
         },
         {
           stufe: "gut",
@@ -281,6 +311,21 @@ window.KBR.tipps = (function () {
           en: ["Diet soft drinks", "Calorie-free fluid intake that makes sticking to a calorie deficit easier; provide no nutritional value but don't hinder fat loss either."],
         },
         {
+          stufe: "ok",
+          de: ["Cashews (idealerweise roh/ungesalzen)", "Gute Mineralstoffquelle (Magnesium, Zink), aber hoher Kohlenhydratgehalt (~30g/100g) bei geringerem Ballaststoffanteil; erzeugt höheren Blutzuckerreiz und birgt Überess-Gefahr im Defizit."],
+          en: ["Cashews (ideally raw/unsalted)", "Good source of minerals (magnesium, zinc), but higher carbohydrate content (~30g/100g) with lower fiber; produces a bigger blood sugar response and carries overeating risk in a deficit."],
+        },
+        {
+          stufe: "ok",
+          de: ["Erdnüsse (idealerweise roh/ungesalzen)", "Hoher Eiweißgehalt (~26g/100g) zur einfachen Proteinabdeckung, jedoch ungünstiges Omega-6:Omega-3-Verhältnis (potenziell proinflammatorisch) und hohe Hyperpalatabilität."],
+          en: ["Peanuts (ideally raw/unsalted)", "High protein content (~26g/100g) for easy protein coverage, but an unfavorable omega-6:omega-3 ratio (potentially pro-inflammatory) and high hyperpalatability."],
+        },
+        {
+          stufe: "ok",
+          de: ["Erdnussmus oder Cashewmus (100% – ohne Zucker & ungesalzen)", "Gute pflanzliche Proteinquelle, jedoch durch cremige Textur sehr hohe Gefahr des unbewussten Überessens (\"Spoon-Trap\") und ungünstigeres Fettsäureprofil als Mandelmus."],
+          en: ["Peanut butter or cashew butter (100% – no added sugar & unsalted)", "A good plant protein source, but the creamy texture carries a very high risk of unconscious overeating (the \"spoon trap\") and a less favorable fatty acid profile than almond butter."],
+        },
+        {
           stufe: "selten",
           de: ["Butter und große Mengen gesättigter tierischer Fette (fettes Fleisch, Milchprodukte mit hohem Fettanteil)", "Hohe Energiedichte bei ungünstigem Fettsäureprofil; erhöht die Anzahl entzündungsfördernder LDL-Partikel im Vergleich zu pflanzlichen Ölen wie EVOO."],
           en: ["Butter and large amounts of saturated animal fats (fatty meat, high-fat dairy)", "High energy density with an unfavorable fatty acid profile; increases the number of pro-inflammatory LDL particles compared to plant oils like EVOO."],
@@ -309,6 +354,11 @@ window.KBR.tipps = (function () {
           stufe: "selten",
           de: ["Fruktose-Sirup-Produkte", "Begünstigen De-novo-Lipogenese in der Leber, verschlechtern die Insulinsensitivität und unterdrücken Sättigungssignale wie Leptin."],
           en: ["High-fructose syrup products", "Promote de novo lipogenesis in the liver, worsen insulin sensitivity, and suppress satiety signals like leptin."],
+        },
+        {
+          stufe: "selten",
+          de: ["Gesalzene/in Pflanzenöl geröstete Erdnüsse etc.", "Kombination aus oxidierten Frittierölen, Natriumüberschuss und zugesetztem Zucker/Transfetten steigert Entzündungsmarker und untergräbt die Kalorienkontrolle."],
+          en: ["Salted peanuts roasted in vegetable oil, etc.", "The combination of oxidized frying oils, excess sodium, and added sugar/trans fats raises inflammation markers and undermines calorie control."],
         },
         {
           stufe: "vermeiden",
